@@ -11,7 +11,7 @@ export function Hero() {
     <section className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[rgb(11,59,106)] via-[#165490] to-[#0B3B6A] flex flex-col justify-center">
       <div className="absolute inset-0 bg-grid-white/5" />
       <div className="container mx-auto px-4 relative">
-        <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl text-center -mt-28">
           <div className="overflow-hidden">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl pb-2">
               <span className="block animate-rising break-words ">
