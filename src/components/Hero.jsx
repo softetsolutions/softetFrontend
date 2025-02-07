@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
 
-export function Hero() {
+export function Hero({ scrollToSection, targetRef }) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -42,7 +43,9 @@ export function Hero() {
                 : "opacity-0 translate-y-4"
             }`}
           >
-            <button className="px-8 py-4 text-[#0B3B6A] border-2 border-[#0B3B6A] bg-white rounded-xl hover:bg-blue-50 hover:border-blue-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-75 active:scale-95 transition-all duration-200 font-semibold shadow-sm animate-rising cursor-pointer">
+            <button
+            onClick={() => scrollToSection(targetRef)}
+             className="px-8 py-4 text-[#0B3B6A] border-2 border-[#0B3B6A] bg-white rounded-xl hover:bg-blue-50 hover:border-blue-800 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-75 active:scale-95 transition-all duration-200 font-semibold shadow-md animate-rising cursor-pointer">
               Discover Our Services
             </button>
           </div>
@@ -51,3 +54,8 @@ export function Hero() {
     </section>
   );
 }
+
+Hero.propTypes = {
+  scrollToSection: PropTypes.func.isRequired,
+  targetRef: PropTypes.object.isRequired,
+};
