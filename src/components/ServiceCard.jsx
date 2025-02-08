@@ -38,7 +38,7 @@ export const ServiceCard = ({ service, index }) => {
           {service.icon}
         </motion.div>
 
-        <h3 className="text-xl font-bold text-[#0B3B6A] mb-4">
+        <h3 className="text-xl font-bold text-black mb-4">
           <motion.span
             initial={{ backgroundSize: "0% 2px" }}
             animate={isInView ? { backgroundSize: "100% 2px" } : {}}

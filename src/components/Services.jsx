@@ -28,21 +28,32 @@ export function Services() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-sky-900 mb-4">
-            <motion.span
-              initial={{ backgroundPositionX: "100%" }}
-              animate={isInView ? { backgroundPositionX: "0%" } : {}}
-              transition={{ duration: 1.5, ease: "circOut" }}
-              className="bg-gradient-to-r from-sky-500 to-indigo-600 bg-no-repeat bg-[length:200%_2px] bg-bottom"
-            >
-              Our Services
-            </motion.span>
-          </h2>
+       <h2 className="text-3xl md:text-4xl font-bold text-sky-900 mb-4">
+  <motion.span
+    initial={{ opacity: 0, y: 10 }}
+    animate={isInView ? { opacity: 1, y: 0 } : {}}
+    transition={{ duration: 0.6 }}
+    className="relative inline-block"
+  >
+    Our Services
+    {/* underline animation */}
+    <motion.div
+      initial={{ scaleX: 0 }}
+      animate={isInView ? { scaleX: 1 } : {}}
+      transition={{ 
+        duration: 1.2, 
+        ease: [0.22, 1, 0.36, 1],
+        delay: 0.3
+      }}
+      className="absolute bottom-0 left-0 w-full h-[2px] md:h-[3px] bg-gradient-to-r from-sky-500 to-indigo-600 origin-left rounded-full"
+    />
+  </motion.span>
+</h2>
           <motion.p
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ delay: 0.3 }}
-            className="text-sky-700/90 max-w-2xl mx-auto text-lg"
+            className="text-black max-w-2xl mx-auto text-lg"
           >
             We provide comprehensive software solutions tailored to your business needs
           </motion.p>
