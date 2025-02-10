@@ -9,59 +9,55 @@ export function Services() {
   return (
     <section 
       ref={ref}
-      className="py-24 relative overflow-hidden bg-gradient-to-br from-sky-50 to-indigo-50"
+      className="py-16 md:py-32 relative overflow-hidden bg-gradient-to-br from-sky-50 to-indigo-50"
     >
-      {/* Animated background elements */}
       <div className="absolute inset-0 opacity-20 [background:radial-gradient(theme(colors.indigo.200),transparent_1px)] [background-size:16px_16px]" />
-      
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={isInView ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute top-1/4 left-1/4 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-sky-200 to-indigo-200 rounded-full mix-blend-multiply opacity-10 blur-3xl"
-      />
       
       <div className="container mx-auto px-4 relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
-       <h2 className="text-3xl md:text-4xl font-bold text-sky-900 mb-4">
-  <motion.span
-    initial={{ opacity: 0, y: 10 }}
-    animate={isInView ? { opacity: 1, y: 0 } : {}}
-    transition={{ duration: 0.6 }}
-    className="relative inline-block"
-  >
-    Our Services
-    {/* underline animation */}
-    <motion.div
-      initial={{ scaleX: 0 }}
-      animate={isInView ? { scaleX: 1 } : {}}
-      transition={{ 
-        duration: 1.2, 
-        ease: [0.22, 1, 0.36, 1],
-        delay: 0.3
-      }}
-      className="absolute bottom-0 left-0 w-full h-[2px] md:h-[3px] bg-gradient-to-r from-sky-500 to-indigo-600 origin-left rounded-full"
-    />
-  </motion.span>
-</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-sky-900 mb-6">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6 }}
+              className="relative inline-block"
+            >
+              Our Services
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={isInView ? { scaleX: 1 } : {}}
+                transition={{ 
+                  duration: 1.2, 
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.3
+                }}
+                className="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600 origin-left rounded-full"
+              />
+            </motion.span>
+          </h2>
           <motion.p
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
             transition={{ delay: 0.3 }}
-            className="text-black max-w-2xl mx-auto text-lg"
+            className="text-black max-w-3xl mx-auto text-xl"
           >
-            We provide comprehensive software solutions tailored to your business needs
+             We provide comprehensive software solutions tailored to your business needs
           </motion.p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12">
           {services.map((service, index) => (
-            <ServiceCard key={index} service={service} index={index} />
+            <ServiceCard 
+              key={index} 
+              service={service} 
+              index={index} 
+              className="h-60 md:h-80" 
+            />
           ))}
         </div>
       </div>
