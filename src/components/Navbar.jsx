@@ -84,7 +84,7 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
             mobileMenuOpen ? "max-h-96" : "max-h-0"
           }`}
         >
-          <nav className="flex flex-col gap-4 py-4">
+        {mobileMenuOpen && (<nav className="flex flex-col gap-4 py-4">
             {navItems.map((item, i) => (
               <button
                 key={item.label}
@@ -105,6 +105,7 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
               Login
             </button>
           </nav>
+        )}
         </div>
       </div>
     </header>
