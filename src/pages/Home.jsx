@@ -2,11 +2,16 @@ import { useRef } from "react";
 import { Navbar } from "../components/Navbar";
 import { Hero } from "../components/Hero";
 import { Services } from "../components/Services";
+import { Testimonial } from "../components/Testimonial";
+import { AboutUs } from "../components/AboutUs";
 
 function Home() {
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
-
+  const testimonialsRef = useRef(null);
+  const contactRef = useRef(null);
+  const coursesRef = useRef(null);
+  const aboutUsRef = useRef(null);
   // smooth scrolling
   const scrollToSection = (ref) => {
     if (ref?.current) {
@@ -24,6 +29,10 @@ function Home() {
         scrollToSection={scrollToSection}
         heroRef={heroRef}
         servicesRef={servicesRef}
+        testimonialsRef={testimonialsRef}
+        contactRef={contactRef}
+        coursesRef={coursesRef}
+        aboutUsRef={aboutUsRef}
       />
       <div 
       ref={heroRef}>
@@ -32,6 +41,12 @@ function Home() {
 
       <div ref={servicesRef}>
         <Services />
+      </div>
+      <div ref={testimonialsRef}>
+        <Testimonial />
+      </div>
+      <div ref={aboutUsRef}>
+        <AboutUs />
       </div>
     </div>
   );
