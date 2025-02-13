@@ -27,7 +27,7 @@ export function AboutUs() {
 
   return (
     <section
-      className="min-h-screen relative bg-[#F5F9FF] py-20 flex items-center"
+      className="relative bg-[#F5F9FF] py-20 flex items-center overflow-hidden"
       ref={sectionRef}
     >
       {/* Background*/}

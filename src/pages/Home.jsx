@@ -4,6 +4,9 @@ import { Hero } from "../components/Hero";
 import { Services } from "../components/Services";
 import { Testimonial } from "../components/Testimonial";
 import { AboutUs } from "../components/AboutUs";
+import { ContactUs } from "../components/ContactUs";
+import { Footer } from "../components/Footer";
+
 
 function Home() {
   const heroRef = useRef(null);
@@ -47,6 +50,19 @@ function Home() {
       </div>
       <div ref={aboutUsRef}>
         <AboutUs />
+      </div>
+      <div ref={contactRef}>
+        <ContactUs/>
+      </div>
+      <div>
+        <Footer
+        scrollToSection={scrollToSection}
+        heroRef={heroRef}
+        servicesRef={servicesRef}
+        testimonialsRef={testimonialsRef}
+        contactRef={contactRef}
+        coursesRef={coursesRef}
+        aboutUsRef={aboutUsRef}/>
       </div>
     </div>
   );
