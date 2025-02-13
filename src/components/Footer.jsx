@@ -1,4 +1,4 @@
-import { Linkedin, Mail, Phone, Slack } from "lucide-react";
+import { Linkedin, Mail, Phone} from "lucide-react";
 import logo from "../assets/logo.jpeg";
 import React from "react";
 import PropTypes from "prop-types";
@@ -12,11 +12,7 @@ const quickLinks = [
 ];
 
 const socialLinks = [
-  {
-    name: "Slack",
-    href: "#",
-    icon: Slack,
-  },
+
   {
     name: "LinkedIn",
     href: "https://www.linkedin.com/company/softet-solutions/",
@@ -107,7 +103,7 @@ export function Footer({
                   className="inline-flex items-center text-sm text-white/90 hover:text-white"
                 >
                   <Phone className="mr-2 h-4 w-4" />
-                  +91 XXXXXXX
+                  +91 6387651169
                 </a>
               </li>
             </ul>
