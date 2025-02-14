@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-
+import  about from "../assets/about.avif";
 export function AboutUs() {
   const sectionRef = useRef(null);
 
@@ -42,7 +42,7 @@ export function AboutUs() {
           <div className="relative animate-on-scroll opacity-0 translate-y-10 transition-all duration-700 ease-out order-2 lg:order-1">
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border-2 border-[#E3F2FF] group transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl h-full">
               <img
-                src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                src={about}
                 alt="Softet Solutions"
                 className="object-cover w-full h-full absolute inset-0 transition-transform duration-700 group-hover:scale-110 load-on-scroll"
               />
