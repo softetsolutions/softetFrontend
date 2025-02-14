@@ -87,9 +87,9 @@ export function Testimonial() {
                         </svg>
                       </div>
                       <div>
-                        <h4 className="text-xl font-bold text-white group-hover:text-[#E8F0FF] transition-colors">
+                        <h1 className="text-xl font-bold text-white group-hover:text-[#E8F0FF] transition-colors">
                           {testimonial.name}
-                        </h4>
+                        </h1> 
                         {testimonial.role && (
                           <p className="text-[#D6E4FF] text-sm font-medium mt-1">
                             {testimonial.role}
