@@ -6,6 +6,7 @@ import { Testimonial } from "../components/Testimonial";
 import { AboutUs } from "../components/AboutUs";
 import { ContactUs } from "../components/ContactUs";
 import { Footer } from "../components/Footer";
+import { Tools } from "../components/Tools";
 
 
 function Home() {
@@ -15,6 +16,7 @@ function Home() {
   const contactRef = useRef(null);
   const coursesRef = useRef(null);
   const aboutUsRef = useRef(null);
+  const toolsRef = useRef(null);
   // smooth scrolling
   const scrollToSection = (ref) => {
     if (ref?.current) {
@@ -44,6 +46,9 @@ function Home() {
 
       <div ref={servicesRef}>
         <Services />
+      </div>
+      <div ref={toolsRef}>
+        <Tools />
       </div>
       <div ref={testimonialsRef}>
         <Testimonial />
