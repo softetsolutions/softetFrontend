@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
-import { Menu } from "lucide-react";
+import { motion } from "framer-motion";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -10,6 +10,54 @@ const navItems = [
   { label: "Courses", refKey: "coursesRef" },
   { label: "Contact", refKey: "contactRef" },
 ];
+
+//  hamburger button component
+const MenuButton = ({ isOpen, toggle }) => {
+  return (
+    <button
+      onClick={toggle}
+       className="text-gray-700 p-2 rounded-md hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-[#0B3B6A] focus-visible:outline-none transition-colors relative"
+      aria-expanded={isOpen}
+      aria-label="Toggle menu"
+    >
+      <div className="relative w-6 h-6">
+        <motion.span
+          className="absolute top-2 left-0 w-6 h-0.5 bg-gray-600 rounded-full"
+          animate={{
+            rotate: isOpen ? 45 : 0,
+            y: isOpen ? 4 : 0,
+          }}
+          transition={{
+            duration: 0.4,
+            ease: [0.6, 0.05, 0.01, 0.9],
+          }}
+        />
+        <motion.span
+          className="absolute top-4 left-0 w-6 h-0.5 bg-gray-600 rounded-full"
+          animate={{
+            opacity: isOpen ? 0 : 1,
+            x: isOpen ? 8 : 0,
+          }}
+          transition={{
+            duration: 0.4,
+            ease: [0.6, 0.05, 0.01, 0.9],
+          }}
+        />
+        <motion.span
+          className="absolute top-6 left-0 w-6 h-0.5 bg-gray-600 rounded-full"
+          animate={{
+            rotate: isOpen ? -45 : 0,
+            y: isOpen ? -4 : 0,
+          }}
+          transition={{
+            duration: 0.4,
+            ease: [0.6, 0.05, 0.01, 0.9],
+          }}
+        />
+      </div>
+    </button>
+  )
+}
 
 export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef, aboutUsRef, coursesRef, contactRef }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -67,22 +115,20 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
 
           {/* Mobile Menu Button */}
           <div className="lg:hidden flex items-center">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-700 p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#0B3B6A] transition-colors"
-              aria-expanded={mobileMenuOpen}
-              aria-label="Toggle menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
+            <MenuButton isOpen={mobileMenuOpen} toggle={() => setMobileMenuOpen(!mobileMenuOpen)} />
           </div>
         </div>
 
         {/* Mobile Navigation Menu */}
-        <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            mobileMenuOpen ? "max-h-96" : "max-h-0"
-          }`}
+        <motion.div
+          initial="closed"
+          animate={mobileMenuOpen ? "open" : "closed"}
+          variants={{
+            open: { height: "auto", opacity: 1 },
+            closed: { height: 0, opacity: 0 },
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="lg:hidden overflow-hidden"
         >
         {mobileMenuOpen && (<nav className="flex flex-col gap-4 py-4">
             {navItems.map((item, i) => (
@@ -106,7 +152,7 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
             </button>
           </nav>
         )}
-        </div>
+        </motion.div>
       </div>
     </header>
   );
@@ -123,5 +169,9 @@ Navbar.propTypes = {
   contactRef: PropTypes.object.isRequired,
 };
 
-export default Navbar;
+MenuButton.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired,
+};
 
+export default Navbar;
