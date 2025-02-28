@@ -31,7 +31,7 @@ export function ContactUs() {
     try {
       emailjs.init(publicKey);
       await emailjs.send(serviceId, templateId, {
-        to_name: 'Softnet Solutions',
+        to_name: 'Softet Solutions',
         from_name: formData.name.trim(),
         message: `Subject: ${formData.subject.trim()}\nMessage: ${formData.message.trim()}\nPhone: ${formData.contact.trim()}\nEmail: ${formData.email.trim()}`,
       });
