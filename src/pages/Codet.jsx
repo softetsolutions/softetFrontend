@@ -212,6 +212,7 @@ export default function Codet() {
       clearTimeout(timeout);
       window.removeEventListener("resize", handleResize);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRun = () => {
