@@ -165,7 +165,9 @@ Navbar.propTypes = {
   servicesRef: PropTypes.object.isRequired,
   testimonialsRef: PropTypes.object.isRequired,
   aboutUsRef: PropTypes.object.isRequired,
+  toolsRef: PropTypes.object.isRequired,
   coursesRef: PropTypes.object.isRequired,
+  isLoginRequired: PropTypes.bool.isRequired,
   contactRef: PropTypes.object.isRequired,
 };
 

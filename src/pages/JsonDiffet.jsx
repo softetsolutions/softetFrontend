@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { diff } from "deep-diff";
+import PropTypes from 'prop-types';
 
 function Card({ children }) {
   return <div className="border rounded-lg shadow-sm p-4 bg-white">{children}</div>;
@@ -39,7 +40,7 @@ export default function JsonDiffTool() {
       const obj2 = JSON.parse(json2);
       const differences = diff(obj1, obj2);
       setDiffResult(differences ? JSON.stringify(differences, null, 2) : "No differences found");
-    } catch (error) {
+    } catch {
       setDiffResult("Invalid JSON format");
     }
   };
@@ -71,3 +72,22 @@ export default function JsonDiffTool() {
     </div>
   );
 }
+
+Card.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+CardContent.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+Textarea.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  rows: PropTypes.number.isRequired,
+};
+
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
