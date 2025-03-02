@@ -37,7 +37,9 @@ function Home() {
         testimonialsRef={testimonialsRef}
         contactRef={contactRef}
         coursesRef={coursesRef}
+        toolsRef={toolsRef}
         aboutUsRef={aboutUsRef}
+        isLoginRequired={false}
       />
       <div 
       ref={heroRef}>

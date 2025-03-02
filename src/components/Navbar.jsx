@@ -7,7 +7,7 @@ const navItems = [
   { label: "Services", refKey: "servicesRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About Us", refKey: "aboutUsRef" },
-  { label: "Courses", refKey: "coursesRef" },
+  { label: "Our Tools", refKey: "toolsRef" },
   { label: "Contact", refKey: "contactRef" },
 ];
 
@@ -59,7 +59,7 @@ const MenuButton = ({ isOpen, toggle }) => {
   )
 }
 
-export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef, aboutUsRef, coursesRef, contactRef }) {
+export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef, aboutUsRef, toolsRef, contactRef, isLoginRequired }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Mapping refKey to actual useRef
@@ -68,7 +68,7 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
     servicesRef,
     testimonialsRef,
     aboutUsRef,
-    coursesRef,
+    toolsRef,
     contactRef,
   };
 
@@ -105,12 +105,12 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
                 {item.label}
               </button>
             ))}
-            <button
+            {isLoginRequired && <button
               className="nav-item ml-2 px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white text-sm xl:text-base rounded-lg hover:bg-[#165490] active:bg-[#0A2E4D] focus:outline-none focus:ring-2 focus:ring-[#165490] focus:ring-opacity-75 hover:shadow-md active:scale-95 transition-all font-medium whitespace-nowrap"
               style={{ animationDelay: `${navItems.length * 0.1}s` }}
             >
               Login
-            </button>
+            </button>}
           </nav>
 
           {/* Mobile Menu Button */}
