@@ -321,6 +321,7 @@ export default function Codet() {
                 <div className="flex-1 overflow-hidden">
                   <div className={`h-full ${activeTab !== "html" && "hidden"}`}>
                     <AceEditor
+                      key={html}
                       mode="html"
                       theme="chrome"
                       value={html}
@@ -335,6 +336,7 @@ export default function Codet() {
 
                   <div className={`h-full ${activeTab !== "css" && "hidden"}`}>
                     <AceEditor
+                      key={css}
                       mode="css"
                       theme="chrome"
                       value={css}
@@ -349,6 +351,7 @@ export default function Codet() {
 
                   <div className={`h-full ${activeTab !== "js" && "hidden"}`}>
                     <AceEditor
+                      key={js}
                       mode="javascript"
                       theme="chrome"
                       value={js}
