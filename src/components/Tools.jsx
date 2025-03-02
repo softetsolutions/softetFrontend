@@ -84,7 +84,7 @@ export function Tools() {
               ),
             }}
             index={0}
-            redirectUrl="/compiler"  /* Replace with the actual URL for the compiler when it's created */
+            redirectUrl="/tools/codet"  /* Replace with the actual URL for the compiler when it's created */
           />
         </div>
       </div>

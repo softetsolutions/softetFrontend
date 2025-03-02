@@ -212,7 +212,7 @@ export default function Codet() {
       clearTimeout(timeout);
       window.removeEventListener("resize", handleResize);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRun = () => {
@@ -229,7 +229,11 @@ export default function Codet() {
 
   const handleClearAll = () => {
     if (confirm("Are you sure you want to clear all code?")) {
-      setHtml("");
+      setHtml(`<html>
+<body>  
+</body>
+</html>
+        `);
       setCss("");
       setJs("");
     }
@@ -242,23 +246,23 @@ export default function Codet() {
     showLineNumbers: true,
     tabSize: 2,
     fontSize: 16,
-    useWorker: false,
+    useWorker: true,
     bracketMatching: true,
     showPrintMargin: false,
     wrap: true,
-    
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-white border-b shadow-sm sticky top-0 z-50">
+      <header className="bg-white border-b shadow-sm sticky top-0 z-50 flex justify-between">
         <div className="flex h-14 items-center justify-between px-3">
           <div className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer select-none -ml-1">
             <Code2 className="ml-2 h-8 w-8 text-blue-600 shrink-0" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight">
               Codet
-            </span>
+            </span>{" "}
+            <span className="text-slate-500 text-lg">by softet</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -270,9 +274,25 @@ export default function Codet() {
             </button>
           </div>
         </div>
+        <div className="flex gap-1.5 items-center mr-3">
+          <button
+            onClick={handleRun}
+            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
+          >
+            <Play size={16} />
+            Run
+          </button>
+          <button
+            onClick={handleClearAll}
+            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
+          >
+            <Trash2 size={16} />
+            Clear All
+          </button>
+        </div>
       </header>
 
-      <div className="p-3 sm:p-4">
+      <div className="pl-3 pr-3 sm:pr-4 sm:pl-4">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-4.5rem)]">
           <PanelGroup direction={isVerticalLayout ? "vertical" : "horizontal"}>
             {/* Editor Panel */}
@@ -294,22 +314,6 @@ export default function Codet() {
                         {tab.toUpperCase()}
                       </button>
                     ))}
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={handleRun}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
-                    >
-                      <Play size={16} />
-                      Run
-                    </button>
-                    <button
-                      onClick={handleClearAll}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
-                    >
-                      <Trash2 size={16} />
-                      Clear All
-                    </button>
                   </div>
                 </div>
 
@@ -380,7 +384,7 @@ export default function Codet() {
             {/* Preview */}
             <Panel defaultSize={50} minSize={30}>
               <div className="h-full flex flex-col">
-                <div className="p-3 border-b bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10">
+                <div className="p-3 pt-5 border-b bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10">
                   <h3 className="text-sm font-medium text-gray-600">Preview</h3>
                 </div>
                 <iframe
