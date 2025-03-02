@@ -1,4 +1,5 @@
 import { motion, useInView } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useRef } from 'react';
 
@@ -88,8 +89,9 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
           </motion.div>
 
           {/* Redirect Button */}
+          <Link to={redirectUrl}>
           <motion.a
-            href={redirectUrl}
+            // href={redirectUrl}
             className="inline-block mt-6 bg-gradient-to-r from-sky-500 to-indigo-600 text-white py-3 px-6 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-gradient-to-l"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
@@ -97,6 +99,7 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
           >
             Go to Compiler
           </motion.a>
+          </Link>
         </div>
       </div>
     </motion.div>

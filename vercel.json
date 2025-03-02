@@ -1,9 +1,0 @@
-{
-    "rewrites": [
-      {
-        "source": "/tools/:path*",
-        "destination": "/index.html"
-      }
-    ]
-  }
-  
