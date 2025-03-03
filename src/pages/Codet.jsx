@@ -277,14 +277,14 @@ export default function Codet() {
         <div className="flex gap-1.5 items-center mr-3">
           <button
             onClick={handleRun}
-            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
+            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer active:scale-110"
           >
             <Play size={16} />
             Run
           </button>
           <button
             onClick={handleClearAll}
-            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer"
+            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer active:scale-110"
           >
             <Trash2 size={16} />
             Clear All
@@ -319,50 +319,56 @@ export default function Codet() {
 
                 {/* Editors */}
                 <div className="flex-1 overflow-hidden">
-                  <div className={`h-full ${activeTab !== "html" && "hidden"}`}>
-                    <AceEditor
-                      key={html}
-                      mode="html"
-                      theme="chrome"
-                      value={html}
-                      onChange={setHtml}
-                      name="html-editor"
-                      width="100%"
-                      height="100%"
-                      setOptions={editorOptions}
-                      editorProps={{ $blockScrolling: true }}
-                    />
-                  </div>
+                  {activeTab === "html" && (
+                    <div className="h-full">
+                      <AceEditor
+                        key="#softetHtml"
+                        mode="html"
+                        theme="chrome"
+                        value={html}
+                        onChange={setHtml}
+                        name="html-editor"
+                        width="100%"
+                        height="100%"
+                        setOptions={editorOptions}
+                        editorProps={{ $blockScrolling: true }}
+                      />
+                    </div>
+                  )}
 
-                  <div className={`h-full ${activeTab !== "css" && "hidden"}`}>
-                    <AceEditor
-                      key={css}
-                      mode="css"
-                      theme="chrome"
-                      value={css}
-                      onChange={setCss}
-                      name="css-editor"
-                      width="100%"
-                      height="100%"
-                      setOptions={editorOptions}
-                      editorProps={{ $blockScrolling: true }}
-                    />
-                  </div>
+                  {activeTab === "css" && (
+                    <div className="h-full">
+                      <AceEditor
+                        key="#softetCss"
+                        mode="css"
+                        theme="chrome"
+                        value={css}
+                        onChange={setCss}
+                        name="css-editor"
+                        width="100%"
+                        height="100%"
+                        setOptions={editorOptions}
+                        editorProps={{ $blockScrolling: true }}
+                      />
+                    </div>
+                  )}
 
-                  <div className={`h-full ${activeTab !== "js" && "hidden"}`}>
-                    <AceEditor
-                      key={js}
-                      mode="javascript"
-                      theme="chrome"
-                      value={js}
-                      onChange={setJs}
-                      name="js-editor"
-                      width="100%"
-                      height="100%"
-                      setOptions={editorOptions}
-                      editorProps={{ $blockScrolling: true }}
-                    />
-                  </div>
+                  {activeTab === "js" && (
+                    <div className="h-full">
+                      <AceEditor
+                        key="softetJs"
+                        mode="javascript"
+                        theme="chrome"
+                        value={js}
+                        onChange={setJs}
+                        name="js-editor"
+                        width="100%"
+                        height="100%"
+                        setOptions={editorOptions}
+                        editorProps={{ $blockScrolling: true }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </Panel>
