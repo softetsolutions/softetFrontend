@@ -5,9 +5,9 @@ import PropTypes from "prop-types";
 
 const quickLinks = [
   { label: "Services", refKey: "servicesRef" },
+  { label: "Our Tools", refKey: "toolsRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About Us", refKey: "aboutUsRef" },
-  { label: "Courses", refKey: "coursesRef" },
   { label: "Contact", refKey: "contactRef" },
 ];
 

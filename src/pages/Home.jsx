@@ -14,7 +14,6 @@ function Home() {
   const servicesRef = useRef(null);
   const testimonialsRef = useRef(null);
   const contactRef = useRef(null);
-  const coursesRef = useRef(null);
   const aboutUsRef = useRef(null);
   const toolsRef = useRef(null);
   // smooth scrolling
@@ -36,7 +35,6 @@ function Home() {
         servicesRef={servicesRef}
         testimonialsRef={testimonialsRef}
         contactRef={contactRef}
-        coursesRef={coursesRef}
         toolsRef={toolsRef}
         aboutUsRef={aboutUsRef}
         isLoginRequired={false}
@@ -68,7 +66,7 @@ function Home() {
         servicesRef={servicesRef}
         testimonialsRef={testimonialsRef}
         contactRef={contactRef}
-        coursesRef={coursesRef}
+        toolsRef={toolsRef}
         aboutUsRef={aboutUsRef}/>
       </div>
     </div>
