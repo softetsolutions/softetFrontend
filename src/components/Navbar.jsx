@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
+  { label: "Our Tools", refKey: "toolsRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About Us", refKey: "aboutUsRef" },
-  { label: "Our Tools", refKey: "toolsRef" },
   { label: "Contact", refKey: "contactRef" },
 ];
 
@@ -135,8 +135,10 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
               <button
                 key={item.label}
                 onClick={() => {
-                  scrollToSection(refMap[item.refKey])
-                  setMobileMenuOpen(false)
+                  setMobileMenuOpen(false);
+                  setTimeout(() => {
+                    scrollToSection(refMap[item.refKey]);
+                  }, 100);
                 }}
                 className="nav-item text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A] hover:underline py-2"
                 style={{ animationDelay: `${i * 0.1}s` }}
