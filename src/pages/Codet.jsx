@@ -229,11 +229,7 @@ export default function Codet() {
 
   const handleClearAll = () => {
     if (confirm("Are you sure you want to clear all code?")) {
-      setHtml(`<html>
-<body>  
-</body>
-</html>
-        `);
+      setHtml("");
       setCss("");
       setJs("");
     }
