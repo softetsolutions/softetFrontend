@@ -1,6 +1,6 @@
 import { useState, useEffect} from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { Play, Trash2, Code2, Layout } from "lucide-react";
+import { Trash2, Code2, Layout } from "lucide-react";
 import { initialHtml, initialCss, initialJs } from "../constant";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-html";
@@ -18,17 +18,17 @@ export default function Codet() {
   const [activeTab, setActiveTab] = useState("html");
   const [isVerticalLayout, setIsVerticalLayout] = useState(false);
 
-  function handleRun() {
-    setOutput(`
-      <html>
-        <head><style>${css}</style></head>
-        <body>
-          ${html}
-          <script>${js.replace(/<\/script>/gi, "<\\/script>")}</script>
-        </body>
-      </html>
-    `);
-  }
+  // function handleRun() {
+  //   setOutput(`
+  //     <html>
+  //       <head><style>${css}</style></head>
+  //       <body>
+  //         ${html}
+  //         <script>${js.replace(/<\/script>/gi, "<\\/script>")}</script>
+  //       </body>
+  //     </html>
+  //   `);
+  // }
 
   useEffect(() => {
     const timeout = setTimeout(()=>{
@@ -60,7 +60,6 @@ export default function Codet() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   console.log("Codet is rendering");
