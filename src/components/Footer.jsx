@@ -35,7 +35,7 @@ export function Footer({
   servicesRef,
   testimonialsRef,
   aboutUsRef,
-  coursesRef,
+  toolsRef,
   contactRef,
 }) {
   // Mapping refKey to actual useRef
@@ -44,7 +44,7 @@ export function Footer({
     servicesRef,
     testimonialsRef,
     aboutUsRef,
-    coursesRef,
+    toolsRef,
     contactRef,
   };
 
@@ -176,7 +176,7 @@ Footer.propTypes = {
   servicesRef: PropTypes.object.isRequired,
   testimonialsRef: PropTypes.object.isRequired,
   aboutUsRef: PropTypes.object.isRequired,
-  coursesRef: PropTypes.object.isRequired,
+  toolsRef: PropTypes.object.isRequired,
   contactRef: PropTypes.object.isRequired,
 };
 export default Footer;
