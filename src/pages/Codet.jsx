@@ -1,7 +1,11 @@
 import { useState, useEffect} from "react";
+import { Link } from "react-router-dom";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Play, Trash2, Code2, Layout } from "lucide-react";
 import { initialHtml, initialCss, initialJs } from "../constant";
+import IFramePreview from "../components/IFramePreview";
+import AceEditorComponent from "../components/AceEditorComponent";
+
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-html";
 import "ace-builds/src-noconflict/snippets/html";
@@ -100,7 +104,7 @@ export default function Codet() {
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight">
               Codet
             </span>{" "}
-            <span className="text-slate-500 text-lg">by softet</span>
+            <Link to="/" ><span className="text-slate-500 text-lg">by softet</span></Link>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -230,17 +234,10 @@ export default function Codet() {
 
             {/* Preview */}
             <Panel defaultSize={50} minSize={30}>
-              <div className="h-full flex flex-col">
-                <div className="p-3 pt-5 border-b bg-gray-50/80 backdrop-blur-sm sticky top-0 z-10">
-                  <h3 className="text-sm font-medium text-gray-600">Preview</h3>
-                </div>
-                <iframe
-                  srcDoc={output}
-                  className="flex-1 w-full bg-white"
-                  sandbox="allow-scripts allow-modals"
-                  title="preview"
-                />
-              </div>
+              <IFramePreview 
+                    src={output}
+                    title="Preview"
+                  />
             </Panel>
           </PanelGroup>
         </div>
