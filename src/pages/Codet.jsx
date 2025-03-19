@@ -117,13 +117,7 @@ export default function Codet() {
           </div>
         </div>
         <div className="flex gap-1.5 items-center mr-3">
-          {/* <button
-            onClick={handleRun}
-            className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer active:scale-110"
-          >
-            <Play size={16} />
-            Run
-          </button> */}
+          
           <button
             onClick={handleClearAll}
             className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer active:scale-110"
