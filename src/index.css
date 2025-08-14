@@ -65,3 +65,8 @@
 .group:hover {
   animation: cardFloat 3s ease-in-out infinite;
 }
+
+option {
+  background-color: white; /* dark gray */
+  color: black;
+}
