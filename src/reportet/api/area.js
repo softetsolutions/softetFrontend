@@ -1,8 +1,5 @@
 import { API_BASE_URL } from "./config";
-/**
- * Add multiple areas
- * @param {string[]} names - Array of area names
- */
+
 export const createArea = async (data) => {
   const res = await fetch(`${API_BASE_URL}/area/add`, {
     method: "POST",
@@ -14,11 +11,6 @@ export const createArea = async (data) => {
   return res.json();
 };
 
-/**
- * Assign an area to an MR
- * @param {string} mrId - MR's ID
- * @param {string} areaId - Area's ID
- */
 export const assignAreaToMR = async (mrId, areaId) => {
   try {
     const res = await fetch(`${API_BASE_URL}/area/assign`, {
@@ -38,9 +30,6 @@ export const assignAreaToMR = async (mrId, areaId) => {
   }
 };
 
-/**
- * Get all areas
- */
 export const getAreas = async () => {
   try {
     const res = await fetch(`${API_BASE_URL}/area`, {
@@ -58,10 +47,6 @@ export const getAreas = async () => {
   }
 };
 
-/**
- * Get area by ID
- * @param {string} id - Area's ID
- */
 export const getAreaById = async (id) => {
   try {
     const res = await fetch(`${API_BASE_URL}/area/${id}`, {
@@ -79,10 +64,6 @@ export const getAreaById = async (id) => {
   }
 };
 
-/**
- * Import areas from Excel
- * @param {File} file - Excel file
- */
 export const importAreasFromExcel = async (file) => {
   try {
     const formData = new FormData();
@@ -103,7 +84,6 @@ export const importAreasFromExcel = async (file) => {
     throw err;
   }
 };
-
 
 export const getAreaByMrId = async (mrId) => {
   try {

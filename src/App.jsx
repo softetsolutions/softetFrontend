@@ -4,6 +4,7 @@ import Codet from './pages/Codet'
 import Frontet from './pages/Frontet';
 import JsonDiffet from './pages/JsonDiffet';
 import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from './reportet/admin/ProtectedRoute';
 
 {/* ReportEt path */ }
 import HomePage from './reportet/HomePage';
@@ -19,13 +20,23 @@ function App() {
         {/* Temprory frontent route */}
         <Route path="/tools/Frontet" element={<Frontet />} />
         <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
-        
+
         {/* -------------------ReportEt Routes-------------------------*/}
 
         <Route path="/reportet" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<UserSignupPage />} />
-        <Route path="/admin" element={<Sidebar />}/>
+        {/* <Route path="/admin" element={<Sidebar />} /> */}
+
+        {/* Protected admin route */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute routeName="admin" requireRole="admin">
+              <Sidebar />
+            </ProtectedRoute>
+          }
+        />
 
         {/*------------------------------------------------------------------- */}
       </Routes>
