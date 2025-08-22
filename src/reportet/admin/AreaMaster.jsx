@@ -171,7 +171,7 @@ const AreaMaster = () => {
         </div>
 
         {/* Area List */}
-        <h3 className="font-semibold mb-2">All Areas:</h3>
+
         {filteredAreas.length > 0 ? (
           <table className="w-full border border-gray-300 rounded-md">
             <thead>

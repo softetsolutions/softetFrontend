@@ -1,33 +1,58 @@
 import { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { getAllDoctors } from '../api/doctor';
+import { FaFileImport } from 'react-icons/fa';
+import { getAllDoctors, importDoctorsFromExcel } from '../api/doctor';
+import toast from 'react-hot-toast';
 
 const DoctorsList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
 
   // Fetch doctors from API
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllDoctors();
-        setDoctors(Array.isArray(data) ? data : data.doctors || []);
-      } catch (error) {
-        console.error("Error fetching doctors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDoctors = async () => {
+    try {
+      setLoading(true);
+      const data = await getAllDoctors();
+      setDoctors(Array.isArray(data) ? data : data.doctors || []);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDoctors();
   }, []);
 
+  // Handle file import
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const newDoctors = await importDoctorsFromExcel(file);
+      toast.success(newDoctors.message);
+
+      // refresh doctor list
+      await fetchDoctors();
+    } catch (err) {
+      toast.error("Failed to import doctors");
+      console.error(err);
+    } finally {
+      setImporting(false);
+      e.target.value = ""; // reset file input
+    }
+  };
+
   // Filter doctors based on search term
-  const filteredDoctors = doctors.filter((doctor) =>
-    doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDoctors = doctors.filter(
+    (doctor) =>
+      doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -36,12 +61,27 @@ const DoctorsList = () => {
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">Doctors</h1>
-          <p className="text-gray-500 mt-1 italic">Manage your medical staff and their information.</p>
+          <p className="text-gray-500 mt-1 italic">
+            Manage your medical staff and their information.
+          </p>
         </div>
+
+
       </header>
 
       {/* Doctor List Section */}
       <div className="bg-white p-6 rounded-lg shadow-md">
+        {/* Import Button */}
+        <label className="bg-green-600 w-fit text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700 flex items-center gap-2">
+          <FaFileImport />
+          {importing ? "Importing..." : "Import Excel"}
+          <input
+            type="file"
+            accept=".xlsx, .xls"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </label>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-medium text-gray-800">Doctors List</h2>
           <div className="flex items-center space-x-4">
@@ -63,33 +103,44 @@ const DoctorsList = () => {
         {/* Doctor Table */}
         <div className="overflow-x-auto">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">Loading doctors...</div>
+            <div className="text-center py-6 text-gray-500 text-sm">
+              Loading doctors...
+            </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialty</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Specialty
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredDoctors.length > 0 ? (
                   filteredDoctors.map((doctor) => (
-                    <tr key={doctor._id}>
+                    <tr
+                      key={doctor._id}
+                      className={`hover:bg-gray-50 transition-colors}`}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{doctor.name}</div>
-                          </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {doctor.name}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{doctor.specialty}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {doctor.specialty}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td
+                      colSpan="7"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
                       No doctors found.
                     </td>
                   </tr>

@@ -6,6 +6,7 @@ import VisitReport from "./admin/VisitReport";
 import AreaMaster from "./admin/AreaMaster";
 import AssignArea from "./admin/AssignArea";
 import CreateStockist from "./admin/CreateStockist";
+import AssignDoctor from "./admin/AssignDoctor";
 import {
   ClipboardList,
   Package,
@@ -41,6 +42,7 @@ export const sidebarTabs = [
     dropdown: [
       { id: "doctors-list", label: "Doctors List",icon: <List size={18} />, component: <DoctorsList /> },
       { id: "add-doctor", label: "Add Doctor",icon: <UserPlus size={18} />, component: <AddDoctor/> },
+      { id: "assign-doctor", label: "Assign Doctor",icon: <UserCheck size={18} />, component: <AssignDoctor/> },
     ]
   },
   {

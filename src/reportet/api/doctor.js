@@ -41,7 +41,7 @@ export const getDoctorsByAreaId = async (areaId) => {
 
 // 4. Assign doctor to MR
 export const assignDoctorToMR = async (mrId, doctorId) => {
-  const res = await fetch(`${API_BASE_URL}/doctors/assign`, {
+  const res = await fetch(`${API_BASE_URL}/doctor/assigntoMR`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -57,7 +57,7 @@ export const importDoctorsFromExcel = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await fetch(`${API_BASE_URL}/doctors/import`, {
+  const res = await fetch(`${API_BASE_URL}/doctor/import`, {
     method: "POST",
     credentials: "include",
     body: formData,

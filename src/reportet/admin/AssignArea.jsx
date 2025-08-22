@@ -16,9 +16,13 @@ const AssignArea = () => {
             try {
                 const mrData = await getAllMrs();
                 setMrs(mrData);
+                console.log(mrData);
+                
 
                 const areaData = await getAreas();
                 setAreas(areaData);
+                console.log(areaData);
+                
             } catch (err) {
                 toast.error("Failed to load MRs or Areas");
             }
@@ -32,6 +36,7 @@ const AssignArea = () => {
         }
         setLoading(true);
         try {
+            
             await assignAreaToMR(selectedMr, selectedArea);
             toast.success("Area assigned successfully!");
             setSelectedMr("");
@@ -55,7 +60,7 @@ const AssignArea = () => {
                     <label className="block mb-1">Select MR:</label>
                     <select
                         value={selectedMr}
-                        onChange={(e) => setSelectedMr({mr:e.target.value})}
+                        onChange={(e) => setSelectedMr(e.target.value)}
                         className="w-full border p-2 rounded text-black"
                     >
                         <option value="" className="bg-white text-black">-- Select MR --</option>
