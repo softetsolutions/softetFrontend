@@ -2,6 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
+import {Link} from "react-router-dom"
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -95,6 +96,7 @@ export function Navbar({ scrollToSection, heroRef, servicesRef, testimonialsRef,
 
           {/* Desktop Navigation Items */}
           <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
+            <Link className="bg-blue-400 px-4 py-2 text-white font-semibold rounded-lg" to="/reportet">ReportEt</Link>
             {navItems.map((item, i) => (
               <button
                 key={item.label}
