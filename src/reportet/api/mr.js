@@ -17,7 +17,7 @@ export const getAllMrs = async () => {
       throw new Error(data.message || "Failed to fetch MRs");
     }
 
-    return data; // returns array of MR objects
+    return data.data; // returns array of MR objects
   } catch (error) {
     console.error("Error fetching MRs:", error);
     throw error; // let caller handle UI error

@@ -1,16 +1,24 @@
-import './App.css'
-import Home from './pages/Home'
-import Codet from './pages/Codet'
-import Frontet from './pages/Frontet';
-import JsonDiffet from './pages/JsonDiffet';
+import { lazy } from "react";
+import "./App.css";
+import Home from "./pages/Home";
+// import Codet from './pages/Codet'
+// import Frontet from './pages/Frontet';
+// import JsonDiffet from './pages/JsonDiffet';
 import { Routes, Route } from "react-router-dom";
-import ProtectedRoute from './reportet/admin/ProtectedRoute';
+import ProtectedRoute from "./reportet/admin/ProtectedRoute";
 
-{/* ReportEt path */ }
-import HomePage from './reportet/HomePage';
-import Login from "./reportet/Login"
-import UserSignupPage from './reportet/UserSignup';
-import Sidebar from './reportet/Sidebar';
+{
+  /* ReportEt path */
+}
+import HomePage from "./reportet/HomePage";
+import Login from "./reportet/Login";
+import UserSignupPage from "./reportet/UserSignup";
+import Sidebar from "./reportet/Sidebar";
+
+const Codet = lazy(() => import("./pages/Codet"));
+const Frontet = lazy(() => import("./pages/Frontet"));
+const JsonDiffet = lazy(() => import("./pages/JsonDiffet"));
+
 function App() {
   return (
     <>
@@ -40,9 +48,8 @@ function App() {
 
         {/*------------------------------------------------------------------- */}
       </Routes>
-
     </>
-  )
+  );
 }
 
-export default App
+export default App;

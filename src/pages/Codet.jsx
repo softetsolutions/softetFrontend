@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Trash2, Code2, Layout } from "lucide-react";
@@ -14,28 +14,20 @@ import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-chrome";
 import "ace-builds/src-noconflict/ext-language_tools";
 
-export default function Codet() {
+export default function Codet({ title = "Sample Project" }) {
   const [js, setJs] = useState(initialJs);
   const [output, setOutput] = useState("");
   const [css, setCss] = useState(initialCss);
   const [html, setHtml] = useState(initialHtml);
   const [activeTab, setActiveTab] = useState("html");
   const [isVerticalLayout, setIsVerticalLayout] = useState(false);
-
-  // function handleRun() {
-  //   setOutput(`
-  //     <html>
-  //       <head><style>${css}</style></head>
-  //       <body>
-  //         ${html}
-  //         <script>${js.replace(/<\/script>/gi, "<\\/script>")}</script>
-  //       </body>
-  //     </html>
-  //   `);
-  // }
+  const [editTitle, setEditTitle] = useState({
+    isInEditingMode: false,
+    value: title,
+  });
 
   useEffect(() => {
-    const timeout = setTimeout(()=>{
+    const timeout = setTimeout(() => {
       setOutput(`
         <html>
           <head><style>${css}</style></head>
@@ -45,12 +37,11 @@ export default function Codet() {
           </body>
         </html>
       `);
-    },500)
+    }, 500);
 
-    return ()=>{
-      clearTimeout(timeout)
-    }
-   
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [html, css, js]);
 
   useEffect(() => {
@@ -103,8 +94,11 @@ export default function Codet() {
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent tracking-tight">
               Codet
             </span>{" "}
-            <Link to="/" ><span className="text-slate-500 text-lg">by softet</span></Link>
+            <Link to="/">
+              <span className="text-slate-500 text-lg">by softet</span>
+            </Link>
           </div>
+
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsVerticalLayout(!isVerticalLayout)}
@@ -115,8 +109,41 @@ export default function Codet() {
             </button>
           </div>
         </div>
+
+        <div className="flex items-center">
+          {editTitle.isInEditingMode ? (
+            <input
+              value={editTitle.value}
+              onChange={(e) => {
+                if (e.key === "Enter") {
+                  console.log("Hi The enter is pressed", e.key);
+                  setEditTitle((prevState) => ({
+                    ...prevState,
+                    isInEditingMode: false,
+                  }));
+                } else {
+                  setEditTitle((prevState) => ({
+                    ...prevState,
+                    value: e.target.value,
+                  }));
+                }
+              }}
+            />
+          ) : (
+            <div
+              onClick={() => {
+                setEditTitle((prevState) => ({
+                  ...prevState,
+                  isInEditingMode: true,
+                }));
+              }}
+            >
+              {title}
+            </div>
+          )}
+        </div>
+
         <div className="flex gap-1.5 items-center mr-3">
-          
           <button
             onClick={handleClearAll}
             className="h-10 flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-md hover:shadow-lg hover:cursor-pointer active:scale-110"
@@ -227,10 +254,7 @@ export default function Codet() {
 
             {/* Preview */}
             <Panel defaultSize={50} minSize={30}>
-              <IFramePreview 
-                    src={output}
-                    title="Preview"
-                  />
+              <IFramePreview src={output} title="Preview" />
             </Panel>
           </PanelGroup>
         </div>
