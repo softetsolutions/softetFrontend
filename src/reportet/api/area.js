@@ -40,7 +40,7 @@ export const getAreas = async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed to fetch areas");
 
-    return data;
+    return data.data;
   } catch (err) {
     console.error("Get Areas Error:", err);
     throw err;
@@ -95,7 +95,8 @@ export const getAreaByMrId = async (mrId) => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch assigned areas");
+    if (!res.ok)
+      throw new Error(data.message || "Failed to fetch assigned areas");
 
     return data; // Array of assigned areas
   } catch (err) {

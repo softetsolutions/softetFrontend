@@ -31,7 +31,7 @@ export const loginUser = async (credentialsData) => {
     credentials: "include",
   });
 
-  if (res.status === 401) await handleUnauthorized();
+  // if (res.status === 401) await handleUnauthorized();
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Login failed");
 
@@ -57,4 +57,3 @@ export const logoutUser = async () => {
   localStorage.removeItem("userToken"); // clear from storage
   return data;
 };
-
