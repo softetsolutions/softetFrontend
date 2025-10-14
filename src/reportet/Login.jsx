@@ -14,12 +14,17 @@ const Login = () => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
       await loginUser(form);
+          const data = await loginUser(form);
+    console.log("LOGIN RESPONSE:", data); // 👈 Add this line
+
+    
       toast.success("Login successful!");
       navigate("/admin");
     } catch (err) {
@@ -29,6 +34,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-100 text-black flex flex-col">
