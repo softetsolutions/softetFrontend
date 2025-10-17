@@ -7,6 +7,7 @@ import AreaMaster from "./admin/AreaMaster";
 import AssignArea from "./admin/AssignArea";
 import CreateStockist from "./admin/CreateStockist";
 import AssignDoctor from "./admin/AssignDoctor";
+import AllMR from "./admin/AllMR";
 import {
   ClipboardList,
   Package,
@@ -34,7 +35,15 @@ export const sidebarTabs = [
   ]
   
    },
-  { id: "create-user", label: "Create MR",icon: <UserPlus size={20} />, component: <CreateUser /> },
+  {
+     id: "mr", 
+    label: "MR", 
+    icon: <Users size={20} />,
+    dropdown:[
+      {id: "create-user", label: "Create MR",icon: <UserPlus size={20}/> , component: <CreateUser/>},
+      {id: "mr-list", label: "MR List",icon: <UserPlus size={20}/> , component: <AllMR/>}
+    ] 
+ },
   { 
     id: "doctors", 
     label: "Doctor", 

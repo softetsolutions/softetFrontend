@@ -40,7 +40,7 @@ export const getAreas = async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed to fetch areas");
 
-    return data.data;
+    return data.data||data;
   } catch (err) {
     console.error("Get Areas Error:", err);
     throw err;

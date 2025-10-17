@@ -6,6 +6,7 @@ const StockistMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [stockists, setStockists] = useState([]);
   const [loading, setLoading] = useState(true);
+ 
 
   // Fetch stockists from API
   useEffect(() => {
@@ -28,6 +29,7 @@ const StockistMaster = () => {
   const filteredStockists = stockists.filter(
     (stockist) =>
       stockist.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    stockist.address?.toLowerCase().includes(searchTerm.toLocaleLowerCase())||
       stockist.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       stockist.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -36,6 +38,7 @@ const StockistMaster = () => {
     <div className="bg-gray-100 p-8 min-h-screen">
       {/* Header Section */}
       <header className="mb-8 flex justify-between items-center">
+     
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">Stockist Master</h1>
           <p className="text-gray-500 mt-1 italic">

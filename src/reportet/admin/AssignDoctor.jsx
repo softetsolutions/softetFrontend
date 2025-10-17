@@ -10,6 +10,14 @@ const AssignDoctor = () => {
   const [selectedMr, setSelectedMr] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
+      useEffect(() => {
+      if (message.text) {
+        const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+        return () => clearTimeout(timer); // cleanup if message changes before 5s
+      }
+    }, [message]);
+
 
   // Fetch MRs & Doctors
   useEffect(() => {
@@ -30,16 +38,19 @@ const AssignDoctor = () => {
 
   const handleAssign = async () => {
     if (!selectedMr || !selectedDoctor) {
+      setMessage({text:"Please Select Both MR and Doctor",type:"error"})
       toast.error("Please select both MR and Doctor");
       return;
     }
     setLoading(true);
     try {
       await assignDoctorToMR(selectedMr, selectedDoctor);
+      setMessage({text:"Doctor assigned successfully!",type:"success"})
       toast.success("Doctor assigned successfully!");
       setSelectedMr("");
       setSelectedDoctor("");
     } catch (err) {
+      setMessage({text:"Failed to assign Doctor",type:"error"})
       toast.error(err.message || "Failed to assign doctor");
     } finally {
       setLoading(false);
@@ -48,6 +59,18 @@ const AssignDoctor = () => {
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
+               {/* Success / Error message */}
+    {message.text && (
+      <div
+        className={`mb-4 p-2 rounded text-sm ${
+          message.type === "success"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {message.text}
+      </div>
+    )}
       <h2 className="text-2xl font-bold text-gray-800">Assign Doctor to MR</h2>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Select an MR and assign a doctor to them.
