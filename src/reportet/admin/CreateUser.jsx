@@ -9,127 +9,138 @@ const CreateUser = () => {
     firstName: "",
     lastName: "",
     userName: "",
-    mobile: "",
-    address: "",
-    area: "",
     password: "",
-    status: "",
+    email: "",
   });
+  const [message, setMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
 
-  // Fetch users from backend
+
+
+
+
+
+  // Fetch MRs on component mount
+  useEffect(() => {
+  if (message.text) {
+    const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+    return () => clearTimeout(timer); // cleanup if message changes before 5s
+  }
+}, [message]);
+
   useEffect(() => {
     fetchUsers();
   }, []);
 
+  // Fetch all MRs
   const fetchUsers = async () => {
     try {
       const data = await getAllMrs();
+       console.log("Fetched MRs:", data); // returns array of MRs
       setUsers(data);
     } catch (error) {
       toast.error(error.message || "Failed to load users");
     }
   };
 
-  // Create a new MR
+  // Handle creating a new MR
   const handleSave = async () => {
     try {
-      if (!formData.firstName || !formData.lastName || !formData.userName || !formData.password) {
+      const { firstName, lastName, userName, password,email } = formData;
+      if (!firstName || !lastName || !userName || !password ) {
+        setMessage({ text: "All fields are required", type: "error" });
         toast.error("Please fill all required fields");
         return;
       }
-      await createMr({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        userName: formData.userName,
-        password: formData.password,
-      });
-      toast.success("User created successfully");
-      setFormData({
-        firstName: "",
-        lastName: "",
-        userName: "",
-        password: "",
-      });
-      fetchUsers(); 
+
+      const newMr = await createMr(formData); // API returns created MR
+      toast.success("MR created successfully");
+
+      // Update UI without refetching
+      setUsers(prev => [newMr, ...prev]);
+
+      // Clear form
+      setFormData({ firstName: "", lastName: "", userName: "", password: "", email: "" });
+      setMessage({ text: "MR created successfully", type: "success" });
     } catch (error) {
-      toast.error(error.message || "Failed to create user");
+      setMessage({ text: error.message || "Failed to create MR", type: "error" });
+      toast.error(error.message || "Failed to create MR");
     }
   };
 
   // Filter users by search query
-  const filteredUsers = users.filter(user =>
-    (user.displayName || "").toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = users.filter(user => {
+    const displayName = `${user?.firstName} ${user?.lastName}`;
+    return displayName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   return (
     <div className="max-w-3xl mx-auto mt-8">
-      <h2 className="text-2xl font-bold text-gray-800 ">Create MR</h2>
-      <p className="text-gray-600 mb-6 pb-2 italic">
-        Please fill in the details below to create or update a user.
-      </p>
+      <h2 className="text-2xl font-bold mb-4">Create MR</h2>
+       {/* Success / Error message */}
+    {message.text && (
+      <div
+        className={`mb-4 p-2 rounded text-sm ${
+          message.type === "success"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {message.text}
+      </div>
+    )}
 
-      <div className="space-y-4 bg-white p-6 rounded-lg shadow-md">
+      {/* Form */}
+      <div className="space-y-4 bg-white p-6 rounded shadow">
         <Input
           label="First Name"
-          placeholder="Enter first name"
           value={formData.firstName}
           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
         />
         <Input
           label="Last Name"
-          placeholder="Enter last name"
           value={formData.lastName}
           onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
         />
         <Input
           label="User Name"
-          placeholder="Enter user name"
           value={formData.userName}
           onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
         />
         <Input
+          label="Email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+        <Input
           label="Password"
           type="password"
-          placeholder="Enter password"
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
-
-
-        <div className="flex justify-end space-x-4 mt-6">
-          <button
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
-            onClick={handleSave}
-          >
-            Save
-          </button>
-        </div>
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Save
+        </button>
       </div>
 
-      {/* Search bar */}
-      <div className="mt-8 space-y-4 bg-white p-6 rounded-lg shadow-md">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Search MR
-        </label>
+      {/* Search */}
+      <div className="mt-6">
         <input
           type="text"
-          placeholder="Search by user name"
-          className="w-full px-3 py-2 border rounded-md shadow-sm"
+          placeholder="Search MR..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-2 border rounded mb-2"
         />
-
-        {/* User list */}
-        <ul className="mt-4 border rounded-md max-h-48 overflow-y-auto">
+        <ul className="border rounded max-h-48 overflow-y-auto">
           {filteredUsers.length === 0 ? (
-            <li className="p-3 text-gray-500">No users found.</li>
+            <li className="p-2 text-gray-500">No MRs found.</li>
           ) : (
-            filteredUsers.map((user) => (
-              <li
-                key={user._id}
-                className="p-3 border-b last:border-b-0 hover:bg-gray-100 cursor-pointer"
-              >
-                <strong>{user.displayName}</strong>
+            filteredUsers.map(user => (
+              <li key={user?._id || user?.id} className="p-2 border-b last:border-b-0">
+                {user?.firstName} {user?.lastName}
               </li>
             ))
           )}
@@ -139,15 +150,15 @@ const CreateUser = () => {
   );
 };
 
-const Input = ({ label, placeholder, type = "text", value, onChange }) => (
+// Reusable Input component
+const Input = ({ label, type = "text", value, onChange }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-700">{label}</label>
+    <label className="block text-sm font-medium">{label}</label>
     <input
       type={type}
-      placeholder={placeholder}
       value={value}
       onChange={onChange}
-      className="w-full mt-1 px-3 py-2 border rounded-md shadow-sm"
+      className="w-full p-2 border rounded mt-1"
     />
   </div>
 );

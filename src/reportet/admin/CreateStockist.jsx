@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { createStockist } from "../api/stockist";
 
 function CreateStockist() {
@@ -9,6 +9,14 @@ function CreateStockist() {
     gstNo: "",
   });
   const [loading, setLoading] = useState(false);
+   const [message,setMessage]=useState({text:"",type:""});
+
+    useEffect(()=>{
+      if(message.text){
+        const timer=setTimeout(() => setMessage({text:"",type:""}),3000);
+        return ()=>clearTimeout(timer)
+      }
+    },[message])
 
   const handleChange = (e) => {
     setFormData({
@@ -19,12 +27,21 @@ function CreateStockist() {
 
   const handleSubmit = async () => {
     try {
+      const { name,address,state,gstNo } = formData;
+      if (!name || !address || !state || !gstNo ) {
+        setMessage({ text: "All fields are required", type: "error" });
+        
+        return;
+      }
       setLoading(true);
       const data = await createStockist(formData);
-      alert(`Stockist created successfully: ${data.name}`);
+      
+      setMessage({text:`Stockist created successfully: ${data.name}`,type:"success"})
       setFormData({ name: "", address: "", state: "", gstNo: "" });
     } catch (err) {
-      alert(err.message || "Error creating stockist");
+    
+      setMessage({text:err.message||"Error creating stockist",type:"Error"})
+
     } finally {
       setLoading(false);
     }
@@ -32,6 +49,14 @@ function CreateStockist() {
 
   return (
     <div className="max-w-3xl mx-auto mt-8">
+       {message.text&&
+      <div className={`mb-4 p-2 rounded text-sm ${
+          message.type === "success"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}>
+        {message.text}
+        </div>}
       <h2 className="text-2xl font-bold text-gray-800">
         Stockist Master
       </h2>

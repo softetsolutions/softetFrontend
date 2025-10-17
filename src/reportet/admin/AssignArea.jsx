@@ -10,18 +10,26 @@ const AssignArea = () => {
     const [selectedArea, setSelectedArea] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [message, setMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
+      useEffect(() => {
+      if (message.text) {
+        const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+        return () => clearTimeout(timer); // cleanup if message changes before 5s
+      }
+    }, [message]);
+
     // Fetch MRs & Areas
     useEffect(() => {
         (async () => {
             try {
                 const mrData = await getAllMrs();
                 setMrs(mrData);
-                console.log(mrData);
+               // console.log(mrData);
                 
 
                 const areaData = await getAreas();
                 setAreas(areaData);
-                console.log(areaData);
+                //console.log(areaData);
                 
             } catch (err) {
                 toast.error("Failed to load MRs or Areas");
@@ -31,6 +39,7 @@ const AssignArea = () => {
 
     const handleAssign = async () => {
         if (!selectedMr || !selectedArea) {
+            setMessage({text:"Please select both MR and Area",type:"error"})
             toast.error("Please select both MR and Area");
             return;
         }
@@ -38,10 +47,12 @@ const AssignArea = () => {
         try {
             
             await assignAreaToMR(selectedMr, selectedArea);
+            setMessage({text:"Area assigned successfully",type:"success"})
             toast.success("Area assigned successfully!");
             setSelectedMr("");
             setSelectedArea("");
         } catch (err) {
+            setMessage({text:"Failed to assign area",type:"error"})
             toast.error(err.message || "Failed to assign area");
         } finally {
             setLoading(false);
@@ -50,6 +61,18 @@ const AssignArea = () => {
 
     return (
         <div className="max-w-2xl mx-auto mt-8">
+                {/* Success / Error message */}
+    {message.text && (
+      <div
+        className={`mb-4 p-2 rounded text-sm ${
+          message.type === "success"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {message.text}
+      </div>
+    )}
             <h2 className="text-2xl font-bold text-gray-800">Assign Area to MR</h2>
             <p className="text-gray-600 mb-6 pb-2 italic">
                 Add multiple doctors to the list, then submit them all together.
