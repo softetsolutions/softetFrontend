@@ -1,6 +1,7 @@
-import { API_BASE_URL } from "./config";
+//import { API_BASE_URL } from "./config";
 
 // Fetch all MRs
+const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const getAllMrs = async () => {
   const res = await fetch(`${API_BASE_URL}/mr/getall`, {
     method: "GET",

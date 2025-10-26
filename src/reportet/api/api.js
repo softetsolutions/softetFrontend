@@ -1,13 +1,14 @@
-import { API_BASE_URL } from "./config";
+//import { API_BASE_URL } from "./config";
 import { handleUnauthorized } from "../utils/auth";
 
 // Signup API
+const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const signupUser = async (userData) => {
   const res = await fetch(`${API_BASE_URL}/orgauth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
-    credentials: "include",
+    credentials: "include", 
   });
 
   if (res.status === 401) await handleUnauthorized();

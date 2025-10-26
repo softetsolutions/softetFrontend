@@ -163,7 +163,7 @@ const handleReportSearch = async () => {
               </tbody>
             </table>
           ) : (
-            <p className="text-gray-500 text-xs">No records found</p>
+            <p className="text-gray-500 text-xs">No Visit found</p>
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
-import { API_BASE_URL } from "./config";
+//import { API_BASE_URL } from "./config";
 
+const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const createArea = async (data) => {
   const res = await fetch(`${API_BASE_URL}/area/add`, {
     method: "POST",
