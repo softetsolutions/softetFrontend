@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { getAllMrs } from "../api/mr"; // your MR API file
+import MrDialogBox from "../../components/MrDialogBox";
 
 const AllMR = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [mrs, setMrs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const [selectedMR, setSelectedMR] = useState(null);
 
   // Fetch all MRs
   const fetchMRs = async () => {
@@ -29,12 +33,31 @@ const AllMR = () => {
   // Filter MRs based on search term
   const filteredMRs = mrs.filter(
     (mr) =>
-      (`${mr.firstName} ${mr.lastName}`).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${mr.firstName} ${mr.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       mr.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // To Get MR Information
+  const getInfo = (mr) => {
+    setSelectedMR(mr);
+    setOpenDialog(true);
+  };
+
   return (
     <div className="bg-gray-100 p-8 min-h-screen">
+      <MrDialogBox
+        open={openDialog}
+        close={() => setOpenDialog(false)}
+        firstName={selectedMR?.firstName}
+        lastName={selectedMR?.lastName}
+        username={selectedMR?.userName}
+        email={selectedMR?.email ? selectedMR?.email : "Not available"}
+        password={selectedMR?.password}
+        mr={selectedMR}
+      />
+
       {/* Header */}
       <header className="mb-8 flex justify-between items-center">
         <div>
@@ -80,23 +103,42 @@ const AllMR = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Email
                   </th>
+
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    MR info
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredMRs.length > 0 ? (
                   filteredMRs.map((mr) => (
-                    <tr key={mr._id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={mr._id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {mr.firstName} {mr.lastName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {mr.email || "-"}
+                        {mr.email || "Not available"}
+                      </td>
+
+                      <td>
+                        <button
+                          onClick={() => getInfo(mr)}
+                          className="border-gray-500 border ml-5 text-sm text-gray-800 px-3 py-1 rounded-full cursor-pointer hover:bg-[#155DFC] hover:text-white transition-all duration-200"
+                        >
+                          Profile
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="2" className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td
+                      colSpan="2"
+                      className="px-6 py-4 text-center text-sm text-gray-500"
+                    >
                       No MRs found.
                     </td>
                   </tr>

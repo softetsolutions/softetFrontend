@@ -1,4 +1,4 @@
-import { useState, cloneElement } from "react";
+import { useState, cloneElement, useEffect } from "react";
 import { sidebarTabs } from "./sidebarTabs";
 import { ChevronRight, ChevronLeft, ChevronDown, LogOut } from "lucide-react";
 import VisitReport from "./admin/VisitReport";
@@ -14,6 +14,12 @@ const Sidebar = () => {
   const toggleDropdown = (id) => {
     setOpenDropdown(openDropdown === id ? null : id);
   };
+
+  useEffect(() => {
+    const handler = (e) => setActiveTabId(e.detail);
+    window.addEventListener("switch-tab", handler);
+    return () => window.removeEventListener("switch-tab", handler);
+  }, []);
 
   const renderActiveComponent = () => {
     // Flatten all tabs and sub-tabs to find the active component
@@ -47,15 +53,14 @@ const Sidebar = () => {
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
         <div
-          className={`${collapsed ? "w-20" : "w-72"
-            } transition-all duration-300 bg-white shadow-lg flex flex-col`}
+          className={`${
+            collapsed ? "w-20" : "w-72"
+          } transition-all duration-300 bg-white shadow-lg flex flex-col`}
         >
           {/* Logo and collapse button */}
           <div className="p-2 flex justify-between items-center bg-blue-600">
             {!collapsed && (
-              <span
-                className="flex items-center gap-2 text-white font-bold text-xl "
-              >
+              <span className="flex items-center gap-2 text-white font-bold text-xl ">
                 Admin
               </span>
             )}
@@ -82,14 +87,17 @@ const Sidebar = () => {
                     <div
                       onClick={() => {
                         toggleDropdown(tab.id);
-                        if (!tab.dropdown.some((sub) => sub.id === activeTabId)) {
+                        if (
+                          !tab.dropdown.some((sub) => sub.id === activeTabId)
+                        ) {
                           setActiveTabId(tab.dropdown[0].id);
                         }
                       }}
-                      className={`flex items-center justify-between cursor-pointer px-6 py-3 transition-colors duration-200 ${openDropdown === tab.id
-                        ? "bg-gray-200 text-gray-900 font-semibold"
-                        : "text-gray-600 hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center justify-between cursor-pointer px-6 py-3 transition-colors duration-200 ${
+                        openDropdown === tab.id
+                          ? "bg-gray-200 text-gray-900 font-semibold"
+                          : "text-gray-600 hover:bg-gray-100"
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         {/* Always show icon */}
@@ -125,10 +133,11 @@ const Sidebar = () => {
                               e.stopPropagation();
                               setActiveTabId(subTab.id);
                             }}
-                            className={`cursor-pointer flex items-center px-6 py-3 transition-colors duration-200 ${activeTabId === subTab.id
-                              ? "bg-blue-200 text-blue-800 font-semibold border-l-4 border-blue-600 -ml-1 pl-[23px]"
-                              : "text-gray-600 hover:bg-gray-200"
-                              }`}
+                            className={`cursor-pointer flex items-center px-6 py-3 transition-colors duration-200 ${
+                              activeTabId === subTab.id
+                                ? "bg-blue-200 text-blue-800 font-semibold border-l-4 border-blue-600 -ml-1 pl-[23px]"
+                                : "text-gray-600 hover:bg-gray-200"
+                            }`}
                           >
                             {/* Show icon */}
                             {subTab.icon &&
@@ -145,16 +154,18 @@ const Sidebar = () => {
                   // Single Tab
                   <div
                     onClick={() => setActiveTabId(tab.id)}
-                    className={`cursor-pointer flex items-center px-6 py-3 transition-colors duration-200 ${activeTabId === tab.id
-                      ? "bg-blue-200 text-blue-800 font-semibold"
-                      : "text-gray-600 hover:bg-gray-100"
-                      }`}
+                    className={`cursor-pointer flex items-center px-6 py-3 transition-colors duration-200 ${
+                      activeTabId === tab.id
+                        ? "bg-blue-200 text-blue-800 font-semibold"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
                   >
                     {/* Always show icon */}
                     {tab.icon &&
                       cloneElement(tab.icon, {
-                        className: `w-5 h-5 flex-shrink-0 ${!collapsed ? "mr-3" : ""
-                          }`,
+                        className: `w-5 h-5 flex-shrink-0 ${
+                          !collapsed ? "mr-3" : ""
+                        }`,
                       })}
                     {/* Show label only if NOT collapsed */}
                     {!collapsed && <span>{tab.label}</span>}
@@ -186,8 +197,9 @@ const Sidebar = () => {
           <div className="p-4 mt-auto border-t bg-white">
             <div className="flex items-center space-x-3">
               <button
-                className={`flex items-center text-md font-semibold text-red-500 hover:text-red-700 transition-colors ${collapsed ? "justify-center w-full" : ""
-                  }`}
+                className={`flex items-center text-md font-semibold text-red-500 hover:text-red-700 transition-colors ${
+                  collapsed ? "justify-center w-full" : ""
+                }`}
                 onClick={() => {
                   localStorage.removeItem("userToken");
                   navigate("/reportet");
@@ -198,11 +210,12 @@ const Sidebar = () => {
               </button>
             </div>
           </div>
-
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto">{renderActiveComponent()}</div>
+        <div className="flex-1 p-6 overflow-y-auto">
+          {renderActiveComponent()}
+        </div>
       </div>
     </>
   );

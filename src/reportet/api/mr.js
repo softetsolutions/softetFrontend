@@ -2,6 +2,7 @@
 
 // Fetch all MRs
 const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
+
 export const getAllMrs = async () => {
   const res = await fetch(`${API_BASE_URL}/mr/getall`, {
     method: "GET",
@@ -22,6 +23,21 @@ export const createMr = async (mrData) => {
     body: JSON.stringify(mrData),
   });
   const data = await res.json();
+
   if (!res.ok) throw new Error(data.message || "Failed to create MR");
   return data.data||data;
 };
+
+export const updateMr = async (id, mrData) => {
+  const res = await fetch(`${API_BASE_URL}/mr/update/${id}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(mrData),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to update MR");
+  return data.data || data;
+};
+
