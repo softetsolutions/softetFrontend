@@ -1,6 +1,7 @@
-import { API_BASE_URL } from "./config";
+//import { API_BASE_URL } from "./config";
 
 // 1. Add multiple doctors
+const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const addDoctors = async (doctorData) => {
   const res = await fetch(`${API_BASE_URL}/doctor/add`, {
     method: "POST",

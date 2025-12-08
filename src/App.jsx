@@ -6,6 +6,9 @@ import Home from "./pages/Home";
 // import JsonDiffet from './pages/JsonDiffet';
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./reportet/admin/ProtectedRoute";
+import MrContextProvider from "./reportet/context/MrContext";
+import { Toaster } from "react-hot-toast";
+
 
 {
   /* ReportEt path */
@@ -22,32 +25,36 @@ const JsonDiffet = lazy(() => import("./pages/JsonDiffet"));
 function App() {
   return (
     <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tools/codet" element={<Codet />} />
-        {/* Temprory frontent route */}
-        <Route path="/tools/Frontet" element={<Frontet />} />
-        <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
+      <MrContextProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tools/codet" element={<Codet />} />
+          {/* Temprory frontent route */}
+          <Route path="/tools/Frontet" element={<Frontet />} />
+          <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
 
-        {/* -------------------ReportEt Routes-------------------------*/}
+          {/* -------------------ReportEt Routes-------------------------*/}
 
-        <Route path="/reportet" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<UserSignupPage />} />
-        {/* <Route path="/admin" element={<Sidebar />} /> */}
+          <Route path="/reportet" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<UserSignupPage />} />
+          {/* <Route path="/admin" element={<Sidebar />} /> */}
 
-        {/* Protected admin route */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute routeName="admin" requireRole="admin">
-              <Sidebar />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected admin route */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute routeName="admin" requireRole="admin">
+                <Sidebar />
+              </ProtectedRoute>
+            }
+          />
 
-        {/*------------------------------------------------------------------- */}
-      </Routes>
+          {/*------------------------------------------------------------------- */}
+        </Routes>
+        <Toaster position="top-right" />
+
+      </MrContextProvider>
     </>
   );
 }
