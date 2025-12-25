@@ -1,45 +1,10 @@
-import React, { useRef } from "react";
 import { Navbar } from "../components/Navbar";
-import { Hero } from "../components/Hero";
-import { Services } from "../components/Services";
-import { Testimonial } from "../components/Testimonial";
-import { AboutUs } from "../components/AboutUs";
-import { ContactUs } from "../components/ContactUs";
-import { Footer } from "../components/Footer";
-import { Tools } from "../components/Tools";
 
-const Policy = () => {
-  // refs for scrolling (optional if needed)
-  const heroRef = useRef(null);
-  const servicesRef = useRef(null);
-  const testimonialsRef = useRef(null);
-  const contactRef = useRef(null);
-  const aboutUsRef = useRef(null);
-  const toolsRef = useRef(null);
-
-  // smooth scrolling function
-  const scrollToSection = (ref) => {
-    if (ref?.current) {
-      window.scrollTo({
-        top: ref.current.offsetTop,
-        behavior: "smooth",
-      });
-    }
-  };
-
+const Privacy = () => {
   return (
     <div className="flex flex-col">
       {/* Navbar */}
-      <Navbar
-        scrollToSection={scrollToSection}
-        heroRef={heroRef}
-        servicesRef={servicesRef}
-        testimonialsRef={testimonialsRef}
-        contactRef={contactRef}
-        toolsRef={toolsRef}
-        aboutUsRef={aboutUsRef}
-        isLoginRequired={false}
-      />
+      <Navbar showoptions={false} />
 
       {/* Main Privacy Policy content */}
       <div className="min-h-screen bg-blue-50 py-10 px-4">
@@ -140,27 +105,16 @@ const Policy = () => {
               </li>
 
               <li>
-                <strong>Grievance Officer:</strong> Insert Name of the Office,
-                Designation, Company Name and Address, Contact details, Phone,
-                Time: Monday - Friday (9:00 - 18:00)
+                <strong>Grievance Officer:</strong> Akash Tripathi, CEO, Softet
+                Solutions, support@softetsolutions.com, Time: Monday - Friday
+                (9:00 - 18:00)
               </li>
             </ol>
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <Footer
-        scrollToSection={scrollToSection}
-        heroRef={heroRef}
-        servicesRef={servicesRef}
-        testimonialsRef={testimonialsRef}
-        contactRef={contactRef}
-        toolsRef={toolsRef}
-        aboutUsRef={aboutUsRef}
-      />
     </div>
   );
 };
 
-export default Policy;
+export default Privacy;
