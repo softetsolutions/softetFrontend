@@ -19,7 +19,7 @@
     "ace-builds": "^1.38.0",
     "deep-diff": "^1.0.2",
     "framer-motion": "^12.4.0",
-    "jsondiffpatch": "^0.6.0",
+    "jsondiffpatch": "^0.7.3",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.474.0",
     "react": "^18.3.1",

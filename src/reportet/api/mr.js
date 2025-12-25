@@ -1,7 +1,4 @@
-//import { API_BASE_URL } from "./config";
-
-// Fetch all MRs
-const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getAllMrs = async () => {
   const res = await fetch(`${API_BASE_URL}/mr/getall`, {
@@ -11,7 +8,7 @@ export const getAllMrs = async () => {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to fetch MRs");
-  return data.data||data;
+  return data.data || data;
 };
 
 // Create a new MR
@@ -25,7 +22,7 @@ export const createMr = async (mrData) => {
   const data = await res.json();
 
   if (!res.ok) throw new Error(data.message || "Failed to create MR");
-  return data.data||data;
+  return data.data || data;
 };
 
 export const updateMr = async (id, mrData) => {
@@ -40,4 +37,3 @@ export const updateMr = async (id, mrData) => {
   if (!res.ok) throw new Error(data.message || "Failed to update MR");
   return data.data || data;
 };
-

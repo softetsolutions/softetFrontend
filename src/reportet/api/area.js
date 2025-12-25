@@ -1,6 +1,5 @@
-//import { API_BASE_URL } from "./config";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const createArea = async (data) => {
   const res = await fetch(`${API_BASE_URL}/area/add`, {
     method: "POST",
@@ -41,7 +40,7 @@ export const getAreas = async () => {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Failed to fetch areas");
 
-    return data.data||data;
+    return data.data || data;
   } catch (err) {
     console.error("Get Areas Error:", err);
     throw err;

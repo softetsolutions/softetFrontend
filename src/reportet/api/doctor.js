@@ -1,7 +1,5 @@
-//import { API_BASE_URL } from "./config";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// 1. Add multiple doctors
-const API_BASE_URL=import.meta.env.VITE_API_BASE_URL;
 export const addDoctors = async (doctorData) => {
   const res = await fetch(`${API_BASE_URL}/doctor/add`, {
     method: "POST",
@@ -14,8 +12,6 @@ export const addDoctors = async (doctorData) => {
   if (!res.ok) throw new Error(data.message || "Failed to add doctor");
   return data;
 };
-
-
 
 // 2. Get all doctors
 export const getAllDoctors = async () => {
@@ -69,8 +65,12 @@ export const importDoctorsFromExcel = async (file) => {
   return data;
 };
 
-
-export const getDoctorsWithRemarks = async (mrId, areaId, startDate, endDate) => {
+export const getDoctorsWithRemarks = async (
+  mrId,
+  areaId,
+  startDate,
+  endDate
+) => {
   try {
     if (!mrId || !areaId || !startDate || !endDate) {
       throw new Error("mrId, areaId, startDate, and endDate are required");
@@ -80,16 +80,20 @@ export const getDoctorsWithRemarks = async (mrId, areaId, startDate, endDate) =>
       mrId,
       areaId,
       startDate,
-      endDate
+      endDate,
     });
 
-    const res = await fetch(`${API_BASE_URL}/daily-visit/visitReport?${queryParams.toString()}`, {
-      method: "GET",
-      credentials: "include",
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/daily-visit/visitReport?${queryParams.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch doctors with remarks");
+    if (!res.ok)
+      throw new Error(data.message || "Failed to fetch doctors with remarks");
 
     return data; // Array of visits with doctorId & remark
   } catch (err) {
