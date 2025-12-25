@@ -7,6 +7,7 @@ import { Routes, Route } from "react-router-dom";
 import Term from "./pages/Term";
 import Policy from "./pages/Privacy";
 import RefundPolicy from "./pages/RefundPolicy";
+import IndustrialTraining from "./pages/IndustrialTraining";
 function App() {
   return (
     <>
@@ -16,6 +17,7 @@ function App() {
         <Route path="/terms" element={<Term />} />
         <Route path="/privacy" element={<Policy />} />
         <Route path="/refund_policy" element={<RefundPolicy />} />
+        <Route path="/industrial-training" element={<IndustrialTraining />} />
         <Route />
         {/* Temprory frontent route */}
         <Route path="/tools/Frontet" element={<Frontet />} />
