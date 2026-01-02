@@ -2,10 +2,12 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
+ import { Link } from "react-router-dom";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
   { label: "Our Tools", refKey: "toolsRef" },
+     { label: "Projects", refKey: "projectsRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About Us", refKey: "aboutUsRef" },
   { label: "Contact", refKey: "contactRef" },
@@ -64,6 +66,7 @@ export function Navbar({
   showoptions = true,
   scrollToSection,
   heroRef,
+   projectsRef,
   servicesRef,
   testimonialsRef,
   aboutUsRef,
@@ -77,6 +80,7 @@ export function Navbar({
   const refMap = {
     heroRef,
     servicesRef,
+     projectsRef,
     testimonialsRef,
     aboutUsRef,
     toolsRef,

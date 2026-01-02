@@ -7,6 +7,7 @@ import { AboutUs } from "../components/AboutUs";
 import { ContactUs } from "../components/ContactUs";
 import { Footer } from "../components/Footer";
 import { Tools } from "../components/Tools";
+import ProjectSection from "../components/ProjectSection.jsx";
 import { Link } from "react-router-dom";
 
 function Home() {
@@ -16,15 +17,17 @@ function Home() {
   const contactRef = useRef(null);
   const aboutUsRef = useRef(null);
   const toolsRef = useRef(null);
+  const projectsRef = useRef(null);
   // smooth scrolling
   const scrollToSection = (ref) => {
-    if (ref?.current) {
-      window.scrollTo({
-        top: ref.current.offsetTop,
-        behavior: "smooth",
-      });
-    }
+     if (!ref?.current) return;
+
+    ref.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
+
 
   return (
     <>
@@ -33,31 +36,42 @@ function Home() {
           scrollToSection={scrollToSection}
           heroRef={heroRef}
           servicesRef={servicesRef}
+            projectsRef={projectsRef}
           testimonialsRef={testimonialsRef}
           contactRef={contactRef}
           toolsRef={toolsRef}
           aboutUsRef={aboutUsRef}
           isLoginRequired={false}
         />
-        <div ref={heroRef}>
-          <Hero targetRef={servicesRef} scrollToSection={scrollToSection} />
-        </div>
+        {/* Add id AND ref to each section */}
+      <div ref={heroRef} id="hero">
+        <Hero targetRef={servicesRef} scrollToSection={scrollToSection} />
+      </div>
 
-        <div ref={servicesRef}>
-          <Services />
-        </div>
-        <div ref={toolsRef}>
-          <Tools />
-        </div>
-        <div ref={testimonialsRef}>
-          <Testimonial />
-        </div>
-        <div ref={aboutUsRef}>
-          <AboutUs />
-        </div>
-        <div ref={contactRef}>
-          <ContactUs />
-        </div>
+        <div ref={servicesRef} id="services">
+        <Services />
+      </div>
+      
+      <div ref={projectsRef} id="projects">
+        <ProjectSection />
+      </div>
+      
+      <div ref={toolsRef} id="tools">
+        <Tools />
+      </div>
+      
+      <div ref={testimonialsRef} id="testimonials">
+        <Testimonial />
+      </div>
+      
+      <div ref={aboutUsRef} id="about">
+        <AboutUs />
+      </div>
+      
+      <div ref={contactRef} id="contact">
+        <ContactUs />
+      </div>
+
         <div>
           <Footer
             scrollToSection={scrollToSection}
@@ -86,7 +100,7 @@ function Home() {
   "
       >
         <span className="text-sm font-medium opacity-90">
-          🚀 Industrial Training
+          :rocket: Industrial Training
         </span>
         <span className="text-base font-bold">MERN Stack • Live</span>
         <span className="text-xs opacity-80">Become Job-Ready → ₹4,999</span>

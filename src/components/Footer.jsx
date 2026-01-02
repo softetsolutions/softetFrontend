@@ -1,4 +1,4 @@
-import {Mail, Phone} from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import logo from "../assets/logo.jpeg";
 import React from "react";
 import PropTypes from "prop-types";
@@ -12,7 +12,6 @@ const quickLinks = [
 ];
 
 const socialLinks = [
-
   {
     name: "LinkedIn",
     href: "https://www.linkedin.com/company/softet-solutions/",
@@ -23,7 +22,7 @@ const socialLinks = [
         className="h-6 w-6"
         fill="currentColor"
       >
-        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
       </svg>
     ),
   },
@@ -78,7 +77,7 @@ export function Footer({
               Quick Links
             </h3>
             <ul className="mt-4 space-y-3">
-              {quickLinks.map((link) => (
+             {/*  {quickLinks.map((link) => (
                 <li key={link.refKey}>
                   <button
                     onClick={() => scrollToSection(refMap[link.refKey])}
@@ -86,6 +85,17 @@ export function Footer({
                   >
                     {link.label}
                   </button>
+                </li>
+              ))} */}
+
+              {quickLinks.map((link) => (
+                <li key={link.refKey}>
+                  <a
+                    href={`/#${link.refKey.replace('Ref', '').toLowerCase()}`}
+                    className="inline-flex text-sm text-white/90 hover:text-white hover:cursor-pointer"
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
