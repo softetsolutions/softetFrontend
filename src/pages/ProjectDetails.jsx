@@ -1099,7 +1099,11 @@ function ProjectDetails() {
       </section>
 
       {/* ========== ABOUT SOFTET SOLUTION ========== */}
-      <section id="about" ref={aboutUsRef} className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <section
+        id="about"
+        ref={aboutUsRef}
+        className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50"
+      >
         <div className="max-w-7xl mx-auto">
           <div className="rounded-3xl overflow-hidden shadow-2xl border border-gray-200">
             <div className="md:flex">
@@ -1186,7 +1190,11 @@ function ProjectDetails() {
       </section>
 
       {/* ========== CALL TO ACTION ========== */}
-      <section id="contact" ref={contactRef} className="py-20 px-4 sm:px-6 lg:px-8">
+      <section
+        id="contact"
+        ref={contactRef}
+        className="py-20 px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-white rounded-3xl p-12 shadow-xl border border-gray-200">
             <RocketLaunchIcon className="text-5xl text-blue-600 mb-6 mx-auto" />
