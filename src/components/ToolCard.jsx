@@ -1,7 +1,7 @@
-import { motion, useInView } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { useRef } from 'react';
+import { motion, useInView } from "framer-motion";
+import { Link } from "react-router-dom";
+import PropTypes from "prop-types";
+import { useRef } from "react";
 
 export const ToolCard = ({ tool, index, redirectUrl }) => {
   const ref = useRef(null);
@@ -16,14 +16,14 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
         type: "spring",
         stiffness: 120,
         damping: 20,
-        delay: index * 0.2
+        delay: index * 0.2,
       }}
       className="group relative overflow-hidden rounded-3xl bg-white p-10 shadow-3xl hover:shadow-4xl transition-all duration-500 w-full"
       whileHover={{
         y: -15,
         scale: 1.05,
         rotateX: 10,
-        transition: { type: "spring", stiffness: 500, damping: 15 }
+        transition: { type: "spring", stiffness: 500, damping: 15 },
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#0B3B6A]/10 to-[#2196F3]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
@@ -31,12 +31,16 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
       <div className="relative z-10 flex flex-col md:flex-row gap-6 items-center w-full">
         {/* Left Side: Logo */}
         <motion.div
-        //   className="w-full md:w-1/2 flex justify-center items-center mb-6 md:mb-0"
-        className="w-68 h-68 md:w-72 md:h-72 flex justify-center items-center mb-6 md:mb-0"
-          animate={isInView ? {
-            rotate: [0, 10, -10, 0],
-            scale: [1, 1.2, 1, 1]
-          } : {}}
+          //   className="w-full md:w-1/2 flex justify-center items-center mb-6 md:mb-0"
+          className="w-68 h-68 md:w-72 md:h-72 flex justify-center items-center mb-6 md:mb-0"
+          animate={
+            isInView
+              ? {
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.2, 1, 1],
+                }
+              : {}
+          }
           transition={{ delay: 0.4, duration: 0.6 }}
         >
           {tool.icon}
@@ -77,7 +81,7 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
                 whileHover={{
                   scale: 1.1,
                   background: "linear-gradient(45deg, #0B3B6A, #2196F3)",
-                  color: "white"
+                  color: "white",
                 }}
                 className="px-4 py-2 text-md bg-blue-50 text-[#0B3B6A] rounded-full cursor-pointer transition-all duration-300 shadow-md"
                 initial={{ x: -20 }}
@@ -89,7 +93,7 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
           </motion.div>
 
           {/* Redirect Button */}
-          <Link to={redirectUrl}>
+          {/* <Link to={redirectUrl}>
           <motion.a
             // href={redirectUrl}
             className="inline-block mt-6 bg-gradient-to-r from-sky-500 to-indigo-600 text-white py-3 px-6 rounded-full font-semibold text-lg transition-all duration-300 hover:bg-gradient-to-l"
@@ -99,6 +103,19 @@ export const ToolCard = ({ tool, index, redirectUrl }) => {
           >
             Go to Compiler
           </motion.a>
+          </Link> */}
+
+          <Link to={redirectUrl}>
+            <motion.div
+              className="inline-block mt-6 bg-gradient-to-r from-sky-500 to-indigo-600
+               text-white py-3 px-6 rounded-full font-semibold text-lg
+               transition-all duration-300 hover:bg-gradient-to-l"
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ delay: 0.8, duration: 0.6 }}
+            >
+              Go to Compiler
+            </motion.div>
           </Link>
         </div>
       </div>

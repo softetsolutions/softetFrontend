@@ -8,12 +8,14 @@ import Term from "./pages/Term";
 import Policy from "./pages/Privacy";
 import RefundPolicy from "./pages/RefundPolicy";
 import IndustrialTraining from "./pages/IndustrialTraining";
+import ProjectDetails from "./pages/ProjectDetails.jsx";
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tools/codet" element={<Codet />} />
+         <Route path="/:projectSlug" element={<ProjectDetails />} />
         <Route path="/terms" element={<Term />} />
         <Route path="/privacy" element={<Policy />} />
         <Route path="/refund_policy" element={<RefundPolicy />} />
