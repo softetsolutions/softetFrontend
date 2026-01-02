@@ -20,14 +20,13 @@ function Home() {
   const projectsRef = useRef(null);
   // smooth scrolling
   const scrollToSection = (ref) => {
-     if (!ref?.current) return;
+    if (!ref?.current) return;
 
     ref.current.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
   };
-
 
   return (
     <>
@@ -36,7 +35,7 @@ function Home() {
           scrollToSection={scrollToSection}
           heroRef={heroRef}
           servicesRef={servicesRef}
-            projectsRef={projectsRef}
+          projectsRef={projectsRef}
           testimonialsRef={testimonialsRef}
           contactRef={contactRef}
           toolsRef={toolsRef}
@@ -44,33 +43,33 @@ function Home() {
           isLoginRequired={false}
         />
         {/* Add id AND ref to each section */}
-      <div ref={heroRef} id="hero">
-        <Hero targetRef={servicesRef} scrollToSection={scrollToSection} />
-      </div>
+        <div ref={heroRef} id="hero">
+          <Hero targetRef={servicesRef} scrollToSection={scrollToSection} />
+        </div>
 
         <div ref={servicesRef} id="services">
-        <Services />
-      </div>
-      
-      <div ref={projectsRef} id="projects">
-        <ProjectSection />
-      </div>
-      
-      <div ref={toolsRef} id="tools">
-        <Tools />
-      </div>
-      
-      <div ref={testimonialsRef} id="testimonials">
-        <Testimonial />
-      </div>
-      
-      <div ref={aboutUsRef} id="about">
-        <AboutUs />
-      </div>
-      
-      <div ref={contactRef} id="contact">
-        <ContactUs />
-      </div>
+          <Services />
+        </div>
+
+        <div ref={projectsRef} id="projects">
+          <ProjectSection />
+        </div>
+
+        <div ref={toolsRef} id="tools">
+          <Tools />
+        </div>
+
+        <div ref={testimonialsRef} id="testimonials">
+          <Testimonial />
+        </div>
+
+        <div ref={aboutUsRef} id="about">
+          <AboutUs />
+        </div>
+
+        <div ref={contactRef} id="contact">
+          <ContactUs />
+        </div>
 
         <div>
           <Footer
@@ -100,7 +99,7 @@ function Home() {
   "
       >
         <span className="text-sm font-medium opacity-90">
-          :rocket: Industrial Training
+          Industrial Training
         </span>
         <span className="text-base font-bold">MERN Stack • Live</span>
         <span className="text-xs opacity-80">Become Job-Ready → ₹4,999</span>
