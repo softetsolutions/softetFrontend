@@ -2,6 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
+import { useLocation, Link } from "react-router-dom";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -72,6 +73,7 @@ export function Navbar({
   isLoginRequired,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   // Mapping refKey to actual useRef
   const refMap = {
@@ -104,6 +106,29 @@ export function Navbar({
               </span>
             </div>
           </a>
+          {location.pathname.startsWith("/industrial-training") && (
+            <div className="flex items-center gap-3 ml-2">
+              <Link
+                to="/industrial-training"
+                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+              >
+                Training
+              </Link>
+              <Link
+                to="/industrial-training/login"
+                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/industrial-training/signup"
+                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+              >
+                Signup
+              </Link>
+            </div>
+          )}
 
           {showoptions && (
             <>

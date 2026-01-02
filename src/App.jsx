@@ -8,6 +8,11 @@ import Term from "./pages/Term";
 import Policy from "./pages/Privacy";
 import RefundPolicy from "./pages/RefundPolicy";
 import IndustrialTraining from "./pages/IndustrialTraining";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Referral from "./pages/Referral";
+//import Profile from "./pages/Profile";
+import Classes from "./pages/Classes";
 function App() {
   return (
     <>
@@ -18,6 +23,11 @@ function App() {
         <Route path="/privacy" element={<Policy />} />
         <Route path="/refund_policy" element={<RefundPolicy />} />
         <Route path="/industrial-training" element={<IndustrialTraining />} />
+        <Route path="/industrial-training/login" element={<Login />} />
+        <Route path="/industrial-training/signup" element={<Signup />} />
+        <Route path="/industrial-training/referral" element={<Referral />} />
+        {/* <Route path="/industrial-training/profile" element={<Profile />} /> */}
+        <Route path="/industrial-training/classes" element={<Classes />} />
         <Route />
         {/* Temprory frontent route */}
         <Route path="/tools/Frontet" element={<Frontet />} />
