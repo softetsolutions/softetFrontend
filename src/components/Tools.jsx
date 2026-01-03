@@ -1,6 +1,6 @@
-import { useRef } from 'react';
-import { useInView, motion } from 'framer-motion';
-import { ToolCard } from './ToolCard'; 
+import { useRef } from "react";
+import { useInView, motion } from "framer-motion";
+import { ToolCard } from "./ToolCard";
 
 export function Tools() {
   const ref = useRef(null);
@@ -34,7 +34,7 @@ export function Tools() {
                 transition={{
                   duration: 1.2,
                   ease: [0.22, 1, 0.36, 1],
-                  delay: 0.3
+                  delay: 0.3,
                 }}
                 className="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-sky-500 to-indigo-600 origin-left rounded-full"
               />
@@ -46,7 +46,8 @@ export function Tools() {
             transition={{ delay: 0.3 }}
             className="text-black max-w-3xl mx-auto text-xl"
           >
-            Discover the powerful tools we offer to make your development smoother and more efficient.
+            Discover the powerful tools we offer to make your development
+            smoother and more efficient.
           </motion.p>
         </motion.div>
 
@@ -56,7 +57,8 @@ export function Tools() {
             key={0}
             tool={{
               title: "Compiler",
-              description: "An online compiler used for web development without installing any software.",
+              description:
+                "An online compiler used for web development without installing any software.",
               technologies: ["HTML", "CSS", "JavaScript"],
               icon: (
                 <motion.svg
@@ -68,7 +70,13 @@ export function Tools() {
                   transition={{ duration: 1.5, ease: "easeInOut" }}
                 >
                   <defs>
-                    <linearGradient id="compilerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient
+                      id="compilerGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
                       <stop offset="0%" stopColor="#0B3B6A" />
                       <stop offset="100%" stopColor="#FF9800" />
                     </linearGradient>
@@ -84,7 +92,7 @@ export function Tools() {
               ),
             }}
             index={0}
-            redirectUrl="/tools/codet"  /* Replace with the actual URL for the compiler when it's created */
+            redirectUrl="/tools/codet" /* Replace with the actual URL for the compiler when it's created */
           />
         </div>
       </div>

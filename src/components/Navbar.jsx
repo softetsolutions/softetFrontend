@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
@@ -7,6 +7,7 @@ import { useLocation, Link } from "react-router-dom";
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
   { label: "Our Tools", refKey: "toolsRef" },
+  { label: "Projects", refKey: "projectsRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About Us", refKey: "aboutUsRef" },
   { label: "Contact", refKey: "contactRef" },
@@ -65,6 +66,7 @@ export function Navbar({
   showoptions = true,
   scrollToSection,
   heroRef,
+  projectsRef,
   servicesRef,
   testimonialsRef,
   aboutUsRef,
@@ -74,11 +76,24 @@ export function Navbar({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    Boolean(localStorage.getItem("token"))
+  );
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(Boolean(localStorage.getItem("token")));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   // Mapping refKey to actual useRef
   const refMap = {
     heroRef,
     servicesRef,
+    projectsRef,
     testimonialsRef,
     aboutUsRef,
     toolsRef,
@@ -106,27 +121,40 @@ export function Navbar({
               </span>
             </div>
           </a>
+          {/* isLoggedIn */}
           {location.pathname.startsWith("/industrial-training") && (
             <div className="flex items-center gap-3 ml-2">
-              <Link
-                to="/industrial-training"
-                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-              >
-                Training
-              </Link>
-              <Link
-                to="/industrial-training/login"
-                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-              >
-                Login
-              </Link>
+              {!isLoggedIn ? (
+                <>
+                  <Link
+                    to="/industrial-training"
+                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+                  >
+                    Training
+                  </Link>
 
-              <Link
-                to="/industrial-training/signup"
-                className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-              >
-                Signup
-              </Link>
+                  <Link
+                    to="/industrial-training/login"
+                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+                  >
+                    Login
+                  </Link>
+
+                  <Link
+                    to="/industrial-training/signup"
+                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+                  >
+                    Signup
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  to="/industrial-training/dashboard"
+                  className="px-4 xl:px-6 py-2 xl:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                >
+                  Dashboard
+                </Link>
+              )}
             </div>
           )}
 
@@ -214,7 +242,8 @@ Navbar.propTypes = {
   testimonialsRef: PropTypes.object.isRequired,
   aboutUsRef: PropTypes.object.isRequired,
   toolsRef: PropTypes.object.isRequired,
-  coursesRef: PropTypes.object.isRequired,
+  projectsRef: PropTypes.object.isRequired,
+  // coursesRef: PropTypes.object.isRequired,
   isLoginRequired: PropTypes.bool.isRequired,
   contactRef: PropTypes.object.isRequired,
 };

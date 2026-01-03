@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 export default function Classes() {
   // Sample class data — replace links later with real ones
@@ -22,18 +21,8 @@ export default function Classes() {
   ]);
 
   return (
-    <div className="min-h-screen bg-blue-50 py-12 px-6 flex justify-center">
-      <div className="max-w-4xl w-full bg-white rounded-2xl shadow p-8 space-y-8">
-        {/* Back Button */}
-        <div>
-          <Link
-            to="/industrial-training"
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-900 transition"
-          >
-            ← Back to Main Page
-          </Link>
-        </div>
-
+    <div className="h-full overflow-y-auto p-6">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Page Title */}
         <h1 className="text-3xl font-bold text-blue-700 text-center">
           Recorded Classes
@@ -43,19 +32,19 @@ export default function Classes() {
           Access your recorded lectures anytime
         </p>
 
-        <hr />
+        <hr className="border-blue-100" />
 
         {/* Classes List */}
-        {classes.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No recorded classes available yet.
-          </p>
-        ) : (
-          <ul className="space-y-4">
-            {classes.map((c) => (
-              <li
+        <div className="space-y-4">
+          {classes.length === 0 ? (
+            <p className="text-center text-gray-500">
+              No recorded classes available yet.
+            </p>
+          ) : (
+            classes.map((c) => (
+              <div
                 key={c.id}
-                className="border rounded-xl p-4 flex justify-between items-center bg-gray-50"
+                className="border rounded-2xl p-4 flex justify-between items-center bg-gray-50 shadow-sm"
               >
                 <span className="font-semibold text-gray-800">{c.title}</span>
 
@@ -67,10 +56,10 @@ export default function Classes() {
                 >
                   ▶ Watch
                 </a>
-              </li>
-            ))}
-          </ul>
-        )}
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

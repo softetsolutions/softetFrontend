@@ -3,19 +3,8 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Login from "./Login";
 import Signup from "./Signup";
-import Profile from "./Profile";
+
 export default function IndustrialTraining() {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "9876543210",
-  };
-
-  const dropdownRef = useRef();
-
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -28,41 +17,6 @@ export default function IndustrialTraining() {
   return (
     <>
       <Navbar showoptions={false} />
-      <div className="fixed top-1/2 left-0 z-50 transform -translate-y-1/2">
-        <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="bg-white text-blue-700 text-xl font-bold p-4 rounded-r-full shadow hover:bg-blue-400 transition"
-        >
-          {dropdownOpen ? "<" : ">"}
-        </button>
-
-        {dropdownOpen && (
-          <div className="absolute left-full top-0 ml-2 w-48 bg-white rounded-xl shadow-lg border py-2">
-            <Link
-              to="#"
-              className="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition"
-              onClick={() => setIsProfileModalOpen(true)}
-            >
-              Profile
-            </Link>
-
-            <Link
-              to="/industrial-training/referral"
-              className="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition"
-              onClick={() => setDropdownOpen(false)}
-            >
-              Referral
-            </Link>
-            <Link
-              to="/industrial-training/classes"
-              className="block px-4 py-2 text-gray-800 hover:bg-blue-50 transition"
-              onClick={() => setDropdownOpen(false)}
-            >
-              Classes
-            </Link>
-          </div>
-        )}
-      </div>
 
       <main className="bg-slate-50 text-gray-900">
         {/* HERO */}
@@ -190,11 +144,6 @@ export default function IndustrialTraining() {
           </p>
         </footer>
       </main>
-      <Profile
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        user={user}
-      />
     </>
   );
 }
