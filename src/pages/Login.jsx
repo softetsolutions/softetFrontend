@@ -39,8 +39,8 @@ export default function Login() {
 
         course: data.user.course || "Not Selected",
       };
-      console.log("Logged in user:", user);
-      console.log(user._id);
+      // console.log("Logged in user:", user);
+      // console.log(user._id);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(user));

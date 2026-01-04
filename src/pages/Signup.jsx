@@ -16,7 +16,7 @@ export default function Signup() {
 
   const [searchParams] = useSearchParams();
   const refferedBy = searchParams.get("referredBy") || null;
-  console.log("Referred By:", refferedBy);
+  // console.log("Referred By:", refferedBy);
 
   const handleSignup = async (e) => {
     e.preventDefault();
