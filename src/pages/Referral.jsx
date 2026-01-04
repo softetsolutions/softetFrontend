@@ -9,9 +9,12 @@ export default function ReferralPage() {
 
   const fetchReferralData = async () => {
     try {
-      const res = await fetch("http://207.180.250.79:5005/api/auth/user/me", {
-        credentials: "include",
-      });
+      const res = await fetch(
+        "https://vps.softetsolutions.com/api/auth/user/me",
+        {
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
 
@@ -43,7 +46,7 @@ export default function ReferralPage() {
   const fetchReferredUsers = async () => {
     try {
       const res = await fetch(
-        "http://207.180.250.79:5005/api/auth/user/referrals",
+        "https://vps.softetsolutions.com/api/auth/user/referrals",
         {
           credentials: "include",
         }

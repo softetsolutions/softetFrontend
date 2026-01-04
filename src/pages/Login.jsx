@@ -16,14 +16,17 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://207.180.250.79:5005/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // important for cookies
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        "https://vps.softetsolutions.com/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // important for cookies
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await res.json();
 
