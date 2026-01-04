@@ -1,9 +1,23 @@
 import Navbar from "../components/Navbar";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Login from "./Login";
+import Signup from "./Signup";
+
 export default function IndustrialTraining() {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <>
       <Navbar showoptions={false} />
+
       <main className="bg-slate-50 text-gray-900">
         {/* HERO */}
         <section className="bg-gradient-to-b from-blue-600 to-blue-500 py-24 px-6 text-center">
