@@ -7,8 +7,8 @@ const quickLinks = [
   { label: "Services", refKey: "servicesRef" },
   { label: "Our Tools", refKey: "toolsRef" },
   { label: "Testimonials", refKey: "testimonialsRef" },
-  { label: "About Us", refKey: "aboutUsRef" },
-  { label: "Contact", refKey: "contactRef" },
+  { label: "About us", refKey: "aboutUsRef" },
+  { label: "Contact us", refKey: "contactRef" },
 ];
 
 const socialLinks = [
@@ -77,7 +77,7 @@ export function Footer({
               Quick Links
             </h3>
             <ul className="mt-4 space-y-3">
-             {/*  {quickLinks.map((link) => (
+               {/* {quickLinks.map((link) => (
                 <li key={link.refKey}>
                   <button
                     onClick={() => scrollToSection(refMap[link.refKey])}
@@ -91,7 +91,7 @@ export function Footer({
               {quickLinks.map((link) => (
                 <li key={link.refKey}>
                   <a
-                    href={`/#${link.refKey.replace('Ref', '').toLowerCase()}`}
+                    href={`${link.refKey.replace("Ref", "").toLowerCase()}`}
                     className="inline-flex text-sm text-white/90 hover:text-white hover:cursor-pointer"
                   >
                     {link.label}
