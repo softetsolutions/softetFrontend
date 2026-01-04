@@ -9,6 +9,9 @@ import Policy from "./pages/Privacy";
 import RefundPolicy from "./pages/RefundPolicy";
 import IndustrialTraining from "./pages/IndustrialTraining";
 import ProjectDetails from "./pages/ProjectDetails.jsx";
+import AboutUsPage from "./components/AboutUsPage.jsx";
+import ContectUsPage from "./components/ContectUsPage.jsx";
+
 function App() {
   return (
     <>
@@ -16,6 +19,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/tools/codet" element={<Codet />} />
          <Route path="/:projectSlug" element={<ProjectDetails />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/contact" element={<ContectUsPage />} />
         <Route path="/terms" element={<Term />} />
         <Route path="/privacy" element={<Policy />} />
         <Route path="/refund_policy" element={<RefundPolicy />} />
