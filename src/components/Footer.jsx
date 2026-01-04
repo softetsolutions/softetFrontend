@@ -9,6 +9,8 @@ const quickLinks = [
   { label: "Testimonials", refKey: "testimonialsRef" },
   { label: "About us", refKey: "aboutUsRef" },
   { label: "Contact us", refKey: "contactRef" },
+  { label: "About us", refKey: "aboutUsRef" },
+  { label: "Contact us", refKey: "contactRef" },
 ];
 
 const socialLinks = [
