@@ -25,18 +25,21 @@ export default function Signup() {
     setSuccess("");
 
     try {
-      const res = await fetch("http://207.180.250.79:5005/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: `${firstName} ${lastName}`,
-          email,
-          number: phone,
-          password,
-          referredBy: refferedBy,
-          course,
-        }),
-      });
+      const res = await fetch(
+        "https://vps.softetsolutions.com/api/auth/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: `${firstName} ${lastName}`,
+            email,
+            number: phone,
+            password,
+            referredBy: refferedBy,
+            course,
+          }),
+        }
+      );
 
       const data = await res.json();
 

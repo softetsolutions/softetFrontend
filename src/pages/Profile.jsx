@@ -24,7 +24,7 @@ const ProfileModal = () => {
       }
 
       const res = await fetch(
-        `http://207.180.250.79:5005/api/download-appointment-letter/${userData._id}`,
+        `https://vps.softetsolutions.com/api/download-appointment-letter/${userData._id}`,
         {
           method: "GET",
           credentials: "include",
