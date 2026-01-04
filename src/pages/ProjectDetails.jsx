@@ -1211,12 +1211,12 @@ function ProjectDetails() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => scrollToSection(contactRef)}
+              <a
+                href="/contact"
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-10 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
               >
-                Start Your Project
-              </button>
+                Contact Us
+              </a>
 
               <a
                 href="/#projects"

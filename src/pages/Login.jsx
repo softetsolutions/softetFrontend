@@ -31,11 +31,16 @@ export default function Login() {
         return;
       }
       const user = {
+        _id: data.user._id,
         name: data.user.name,
         email: data.user.email,
-        phone: data.user.number || "", // map number to phone
+        phone: data.user.number || "",
+        firstInstallmentPaid: data.user.firstInstallmentPaid,
+
+        course: data.user.course || "Not Selected",
       };
       console.log("Logged in user:", user);
+      console.log(user._id);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(user));

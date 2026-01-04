@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
 import { useLocation, Link } from "react-router-dom";
+import Payment from "../pages/Payment";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -76,18 +77,24 @@ export function Navbar({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const [firstInstallmentPaid, setFirstInstallmentPaid] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
     Boolean(localStorage.getItem("token"))
   );
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(Boolean(localStorage.getItem("token")));
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser?.firstInstallmentPaid) {
+      setFirstInstallmentPaid(true);
+    }
   }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setFirstInstallmentPaid(false);
+    window.location.href = "/industrial-training";
+  };
 
   // Mapping refKey to actual useRef
   const refMap = {
@@ -127,10 +134,10 @@ export function Navbar({
               {!isLoggedIn ? (
                 <>
                   <Link
-                    to="/industrial-training"
+                    to="/industrial-training/payment"
                     className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
                   >
-                    Training
+                    Payment
                   </Link>
 
                   <Link
@@ -147,6 +154,21 @@ export function Navbar({
                     Signup
                   </Link>
                 </>
+              ) : !firstInstallmentPaid ? (
+                <div className="flex items-center gap-3">
+                  <Link
+                    to="/industrial-training/payment"
+                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
+                  >
+                    Payment
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 xl:px-6 py-2 xl:py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all"
+                  >
+                    Logout
+                  </button>
+                </div>
               ) : (
                 <Link
                   to="/industrial-training/dashboard"

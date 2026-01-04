@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export default function Signup() {
   const [firstName, setFirstName] = useState("");
@@ -11,6 +12,11 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [course, setCourse] = useState("");
+
+  const [searchParams] = useSearchParams();
+  const refferedBy = searchParams.get("referredBy") || null;
+  console.log("Referred By:", refferedBy);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -27,6 +33,8 @@ export default function Signup() {
           email,
           number: phone,
           password,
+          referredBy: refferedBy,
+          course,
         }),
       });
 
@@ -35,8 +43,8 @@ export default function Signup() {
       if (!res.ok) {
         setError(data.message || "Signup failed");
       } else {
-        setSuccess(data.message);
-        // optional: redirect to login after 1-2 seconds
+        setSuccess(`${data.message}. You have enrolled for ${course} course.`);
+
         setTimeout(
           () => (window.location.href = "/industrial-training/login"),
           1500
@@ -136,6 +144,19 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              {/* Course Selection */}
+              <select
+                value={course}
+                onChange={(e) => setCourse(e.target.value)}
+                required
+                className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+              >
+                <option value="" disabled>
+                  Select Course
+                </option>
+                <option value="Java Full Stack">Java Full Stack</option>
+                <option value="MERN">MERN</option>
+              </select>
 
               {/* Terms */}
               <div className="flex items-start gap-2 text-sm">
@@ -156,6 +177,11 @@ export default function Signup() {
               {error && <p className="text-red-600 text-center">{error}</p>}
               {success && (
                 <p className="text-green-600 text-center">{success}</p>
+              )}
+              {refferedBy && (
+                <p className="text-sm text-green-700 text-center">
+                  You are joining using referral code: <b>{refferedBy}</b>
+                </p>
               )}
 
               {/* Submit */}
