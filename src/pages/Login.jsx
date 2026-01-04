@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,7 +16,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5005/api/auth/login", {
+      const res = await fetch("http://207.180.250.79:5005/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,8 +46,7 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      window.location.href = "/industrial-training";
+      navigate("/industrial-training");
     } catch (err) {
       setError("Server not responding");
     } finally {

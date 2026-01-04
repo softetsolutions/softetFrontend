@@ -9,7 +9,7 @@ export default function DashboardNavbar() {
   const handleLogout = async () => {
     try {
       setLoading(true); // start loading
-      const res = await fetch("http://localhost:5005/api/auth/logout", {
+      const res = await fetch("http://207.180.250.79:5005/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

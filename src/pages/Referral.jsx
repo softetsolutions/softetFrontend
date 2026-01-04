@@ -9,7 +9,7 @@ export default function ReferralPage() {
 
   const fetchReferralData = async () => {
     try {
-      const res = await fetch("http://localhost:5005/api/auth/user/me", {
+      const res = await fetch("http://207.180.250.79:5005/api/auth/user/me", {
         credentials: "include",
       });
 
@@ -42,9 +42,12 @@ export default function ReferralPage() {
 
   const fetchReferredUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5005/api/auth/user/referrals", {
-        credentials: "include",
-      });
+      const res = await fetch(
+        "http://207.180.250.79:5005/api/auth/user/referrals",
+        {
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
 

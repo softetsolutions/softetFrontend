@@ -133,12 +133,12 @@ export function Navbar({
             <div className="flex items-center gap-3 ml-2">
               {!isLoggedIn ? (
                 <>
-                  <Link
+                  {/* <Link
                     to="/industrial-training/payment"
                     className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
                   >
                     Payment
-                  </Link>
+                  </Link> */}
 
                   <Link
                     to="/industrial-training/login"
