@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 const ProfileModal = () => {
   const storedUser = JSON.parse(localStorage.getItem("user")) || {
@@ -24,7 +25,7 @@ const ProfileModal = () => {
       }
 
       const res = await fetch(
-        `https://vps.softetsolutions.com/api/download-appointment-letter/${userData._id}`,
+        `${API}/api/download-appointment-letter/${userData._id}`,
         {
           method: "GET",
           credentials: "include",

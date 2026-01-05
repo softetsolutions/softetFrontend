@@ -2,12 +2,15 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [feeMessage, setFeeMessage] = useState("");
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -16,23 +19,28 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch(
-        "https://vps.softetsolutions.com/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // important for cookies
-          body: JSON.stringify({ email, password }),
-        }
-      );
+      const res = await fetch(`${API}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // important for cookies
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await res.json();
 
       if (!res.ok) {
         setError(data.message || "Login failed");
         setLoading(false);
+        return;
+      }
+      if (!data.user.firstInstallmentPaid) {
+        setFeeMessage(
+          "⚠️ Your first installment is pending. Please pay your fee to get dashboard access."
+        );
+        setLoading(false);
+        navigate("/industrial-training/payment");
         return;
       }
       const user = {
@@ -100,6 +108,11 @@ export default function Login() {
                 {/* Error Message */}
                 {error && (
                   <p className="text-red-600 text-sm text-center">{error}</p>
+                )}
+                {feeMessage && (
+                  <p className="text-yellow-600 font-semibold text-center bg-yellow-100 border border-yellow-300 rounded-lg p-2">
+                    {feeMessage}
+                  </p>
                 )}
 
                 {/* Email */}

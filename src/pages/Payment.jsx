@@ -3,7 +3,8 @@ import Navbar from "../components/Navbar";
 import qrCode from "../assets/qrCode.jpg";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import DashboardNavbar from "../components/DashboardNavbar";
 
 function PaymentDash() {
   return (
@@ -25,6 +26,30 @@ function PaymentDash() {
 }
 
 export default function BankDetailsPage() {
+  const navigate = useNavigate();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [firstPaid, setFirstPaid] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+
+    setIsLoggedIn(Boolean(token));
+
+    if (storedUser?.firstInstallment?.paid === true) {
+      setFirstPaid(true);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setFirstPaid(false);
+    navigate("/industrial-training");
+  };
+
   return (
     <>
       <PaymentDash />
@@ -81,6 +106,14 @@ export default function BankDetailsPage() {
               Back to Home
             </a>
           </div>
+          {isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="px-6 py-2 rounded-xl bg-gray-700 text-white"
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </>

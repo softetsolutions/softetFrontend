@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function Signup() {
   const [firstName, setFirstName] = useState("");
@@ -25,21 +26,18 @@ export default function Signup() {
     setSuccess("");
 
     try {
-      const res = await fetch(
-        "https://vps.softetsolutions.com/api/auth/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: `${firstName} ${lastName}`,
-            email,
-            number: phone,
-            password,
-            referredBy: refferedBy,
-            course,
-          }),
-        }
-      );
+      const res = await fetch(`${API}/api/auth/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`,
+          email,
+          number: phone,
+          password,
+          referredBy: refferedBy,
+          course,
+        }),
+      });
 
       const data = await res.json();
 

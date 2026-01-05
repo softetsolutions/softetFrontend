@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function ReferralPage() {
   const [referralCode, setReferralCode] = useState("");
@@ -9,12 +10,9 @@ export default function ReferralPage() {
 
   const fetchReferralData = async () => {
     try {
-      const res = await fetch(
-        "https://vps.softetsolutions.com/api/auth/user/me",
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${API}/api/auth/user/me`, {
+        credentials: "include",
+      });
 
       const data = await res.json();
 
@@ -45,12 +43,9 @@ export default function ReferralPage() {
 
   const fetchReferredUsers = async () => {
     try {
-      const res = await fetch(
-        "https://vps.softetsolutions.com/api/auth/user/referrals",
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${API}/api/auth/user/referrals`, {
+        credentials: "include",
+      });
 
       const data = await res.json();
 

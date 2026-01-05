@@ -32,8 +32,11 @@ export default function IndustrialTraining() {
             job-ready. Learn directly from working software developers.
           </p>
 
-          <Link className="inline-block mt-10 bg-white text-blue-600 px-10 py-3 rounded-xl font-semibold shadow hover:bg-blue-50 transition">
-            Apply Now(Coming Soon..)
+          <Link
+            to="/industrial-training/payment"
+            className="inline-block mt-10 bg-white text-blue-600 px-10 py-3 rounded-xl font-semibold shadow hover:bg-blue-50 transition"
+          >
+            Apply Now
           </Link>
         </section>
 
@@ -114,8 +117,11 @@ export default function IndustrialTraining() {
               One-time fee • Industry-grade training
             </p>
 
-            <Link className="inline-block bg-blue-600 text-white px-12 py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
-              Enroll Now(Coming Soon...)
+            <Link
+              to="/industrial-training/payment"
+              className="inline-block bg-blue-600 text-white px-12 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+            >
+              Enroll Now
             </Link>
           </div>
         </section>
