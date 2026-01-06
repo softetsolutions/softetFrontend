@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function DashboardNavbar() {
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       setLoading(true); // start loading
-      const res = await fetch(
-        "https://vps.softetsolutions.com/api/auth/logout",
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${API}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       const data = await res.json();
 

@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
 import { useLocation, Link } from "react-router-dom";
-import Payment from "../pages/Payment";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -73,7 +72,6 @@ export function Navbar({
   aboutUsRef,
   toolsRef,
   contactRef,
-  isLoginRequired,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -130,7 +128,7 @@ export function Navbar({
           </a>
           {/* isLoggedIn */}
           {location.pathname.startsWith("/industrial-training") && (
-            <div className="flex items-center gap-3 ml-2">
+            <div className="hidden lg:flex items-center gap-3 ml-2">
               {!isLoggedIn ? (
                 <>
                   {/* <Link
@@ -180,28 +178,22 @@ export function Navbar({
             </div>
           )}
 
-          {showoptions && (
+          {(showoptions ||
+            location.pathname.startsWith("/industrial-training")) && (
             <>
-              <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
-                {navItems.map((item, i) => (
-                  <button
-                    key={item.label}
-                    onClick={() => scrollToSection(refMap[item.refKey])}
-                    className="nav-item text-sm xl:text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A] hover:underline hover:cursor-pointer whitespace-nowrap"
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                {isLoginRequired && (
-                  <button
-                    className="nav-item ml-2 px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white text-sm xl:text-base rounded-lg hover:bg-[#165490] active:bg-[#0A2E4D] focus:outline-none focus:ring-2 focus:ring-[#165490] focus:ring-opacity-75 hover:shadow-md active:scale-95 transition-all font-medium whitespace-nowrap"
-                    style={{ animationDelay: `${navItems.length * 0.1}s` }}
-                  >
-                    Login
-                  </button>
-                )}
-              </nav>
+              {showoptions && (
+                <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
+                  {navItems.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => scrollToSection(refMap[item.refKey])}
+                      className="nav-item text-sm xl:text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A]"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </nav>
+              )}
 
               <div className="lg:hidden flex items-center">
                 <MenuButton
@@ -227,27 +219,78 @@ export function Navbar({
         >
           {mobileMenuOpen && (
             <nav className="flex flex-col gap-4 py-4">
-              {navItems.map((item, i) => (
-                <button
-                  key={item.label}
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setTimeout(() => {
-                      scrollToSection(refMap[item.refKey]);
-                    }, 100);
-                  }}
-                  className="nav-item text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A] hover:underline py-2"
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <button
-                className="nav-item mt-2 px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl hover:bg-[#165490] focus:outline-none focus:ring-2 focus:ring-[#165490] focus:ring-opacity-75 transition-colors shadow-md active:scale-95 text-base font-medium"
-                style={{ animationDelay: `${navItems.length * 0.1}s` }}
-              >
-                Login
-              </button>
+              {location.pathname.startsWith("/industrial-training") ? (
+                <>
+                  {!isLoggedIn ? (
+                    <>
+                      <Link
+                        to="/industrial-training/payment"
+                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Payment
+                      </Link>
+
+                      <Link
+                        to="/industrial-training/login"
+                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Login
+                      </Link>
+
+                      <Link
+                        to="/industrial-training/signup"
+                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Signup
+                      </Link>
+                    </>
+                  ) : !firstInstallmentPaid ? (
+                    <>
+                      <Link
+                        to="/industrial-training/payment"
+                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Payment
+                      </Link>
+
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-2.5 bg-gray-700 text-white rounded-xl text-center"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      to="/industrial-training/dashboard"
+                      className="px-4 py-2.5 bg-green-600 text-white rounded-xl text-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                </>
+              ) : (
+                /* ⭐ default website mobile nav ⭐ */
+                <>
+                  {navItems.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        scrollToSection(refMap[item.refKey]);
+                      }}
+                      className="text-left text-gray-700 font-medium py-2"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </>
+              )}
             </nav>
           )}
         </motion.div>

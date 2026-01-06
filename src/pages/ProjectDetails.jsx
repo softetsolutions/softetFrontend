@@ -17,7 +17,6 @@ import SeoIcon from "@mui/icons-material/Search";
 import AccessibilityIcon from "@mui/icons-material/AccessibilityNew";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import BuildIcon from "@mui/icons-material/Build";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
@@ -70,10 +69,6 @@ function ProjectDetails() {
     return () => observerRef.current?.disconnect();
   }, []);
 
-  if (!project) {
-    return <h1 className="text-center text-3xl mt-20">Project Not Found</h1>;
-  }
-
   const images = project.image || [];
   const isSingleImage = images.length === 1;
 
@@ -88,7 +83,12 @@ function ProjectDetails() {
     if (isSingleImage || images.length <= 1) return;
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, isSingleImage, images.length]);
+
+  if (!project) {
+    return <h1 className="text-center text-3xl mt-20">Project Not Found</h1>;
+  }
 
   // Enhanced project data with defaults
   const enhancedProject = {
@@ -392,7 +392,7 @@ function ProjectDetails() {
               </h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 Detailed features and benefits are being documented. Check back
-                soon for comprehensive information about this project's
+                soon for comprehensive information about this project
                 capabilities.
               </p>
             </div>
@@ -1205,8 +1205,8 @@ function ProjectDetails() {
               Ready to Build Your Next Project?
             </h2>
             <p className="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
-              Let's discuss how Softet Solution can transform your vision into a
-              high-performance digital product that delivers real business
+              Let us discuss how Softet Solution can transform your vision into
+              a high-performance digital product that delivers real business
               value.
             </p>
 

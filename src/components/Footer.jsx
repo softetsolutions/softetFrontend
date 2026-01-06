@@ -4,11 +4,6 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const quickLinks = [
-  { label: "Services", refKey: "servicesRef" },
-  { label: "Our Tools", refKey: "toolsRef" },
-  { label: "Testimonials", refKey: "testimonialsRef" },
-  { label: "About us", refKey: "aboutUsRef" },
-  { label: "Contact us", refKey: "contactRef" },
   { label: "About us", refKey: "aboutUsRef" },
   { label: "Contact us", refKey: "contactRef" },
 ];
@@ -30,25 +25,7 @@ const socialLinks = [
   },
 ];
 
-export function Footer({
-  scrollToSection,
-  heroRef,
-  servicesRef,
-  testimonialsRef,
-  aboutUsRef,
-  toolsRef,
-  contactRef,
-}) {
-  // Mapping refKey to actual useRef
-  const refMap = {
-    heroRef,
-    servicesRef,
-    testimonialsRef,
-    aboutUsRef,
-    toolsRef,
-    contactRef,
-  };
-
+export function Footer() {
   return (
     <footer className="bg-[#0040c1] shadow-lg">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
