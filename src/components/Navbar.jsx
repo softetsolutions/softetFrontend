@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/logo.jpeg";
 import { motion } from "framer-motion";
-import { useLocation, Link, useNavigate } from "react-router-dom";
-import Payment from "../pages/Payment";
-import { Navigate } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
   { label: "Our Tools", refKey: "toolsRef" },
@@ -73,7 +72,6 @@ export function Navbar({
   aboutUsRef,
   toolsRef,
   contactRef,
-  isLoginRequired,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -81,7 +79,6 @@ export function Navbar({
   const [isLoggedIn, setIsLoggedIn] = useState(
     Boolean(localStorage.getItem("token"))
   );
-  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -186,7 +183,7 @@ export function Navbar({
             <>
               {showoptions && (
                 <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
-                  {navItems.map((item, i) => (
+                  {navItems.map((item) => (
                     <button
                       key={item.label}
                       onClick={() => scrollToSection(refMap[item.refKey])}
