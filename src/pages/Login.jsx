@@ -10,6 +10,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [feeMessage, setFeeMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -132,19 +133,26 @@ export default function Login() {
                 </div>
 
                 {/* Password */}
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium text-blue-800 mb-1">
                     Password
                   </label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full rounded-xl border border-gray-300 bg-white text-blue-800 placeholder-gray-400 px-3 py-2 outline-none
-                      focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+      focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition pr-10"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
                 </div>
 
                 {/* Remember + Forgot */}

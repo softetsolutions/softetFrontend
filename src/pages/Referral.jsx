@@ -7,6 +7,34 @@ export default function ReferralPage() {
   const [referredUsers, setReferredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [enrolledCount, setEnrolledCount] = useState(0);
+  const [walletAmount, setWalletAmount] = useState(0);
+
+  const fetchEnrolledReferralCount = async () => {
+    try {
+      const res = await fetch(
+        `${API}/api/referral/dashboard/getEnrolledReferralCount`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Failed to load enrolled referral count");
+        return;
+      }
+
+      setEnrolledCount(data.enrolledReferralCount || 0);
+
+      // ₹500 per enrolled person
+      setWalletAmount((data.enrolledReferralCount || 0) * 500);
+    } catch (err) {
+      console.error(err);
+      setError("Server not responding");
+    }
+  };
 
   const fetchReferralData = async () => {
     try {
@@ -72,9 +100,11 @@ export default function ReferralPage() {
     fetchReferralData();
   }, []);
 
-  // fetch referred users **after currentUserId is set**
   useEffect(() => {
-    if (currentUserId) fetchReferredUsers();
+    if (currentUserId) {
+      fetchReferredUsers();
+      fetchEnrolledReferralCount();
+    }
   }, [currentUserId]);
 
   const handleCopyLink = () => {
@@ -115,6 +145,34 @@ export default function ReferralPage() {
               </button>
             </div>
           )}
+        </div>
+        {/* Wallet Section */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">
+            Your Referral Wallet
+          </h2>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-green-50">
+              <p className="text-sm text-gray-600">Enrolled Via Referral</p>
+              <p className="text-3xl font-bold text-green-700">
+                {enrolledCount}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-yellow-50">
+              <p className="text-sm text-gray-600">
+                Wallet Balance (₹500/referral)
+              </p>
+              <p className="text-3xl font-bold text-yellow-700">
+                ₹{walletAmount}
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-2 text-gray-500 text-sm">
+            Count includes only students who paid first installment.
+          </p>
         </div>
 
         {/* Referred Users */}
