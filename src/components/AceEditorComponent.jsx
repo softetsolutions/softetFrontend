@@ -6,8 +6,9 @@ import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-chrome";
 import "ace-builds/src-noconflict/ext-language_tools";
+import PropTypes from "prop-types";
 
-const AceEditorComponent = React.memo(({key, mode, name, value, onChange}) => {
+const AceEditorComponent = React.memo(function AceEditorComponent({key, mode, name, value, onChange}) {
   const editorOptions = {
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
@@ -37,5 +38,15 @@ const AceEditorComponent = React.memo(({key, mode, name, value, onChange}) => {
     </div>
   );
 });
+
+AceEditorComponent.displayName = "AceEditorComponent";
+
+AceEditorComponent.propTypes = {
+  key: PropTypes.string.isRequired,
+  mode: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default AceEditorComponent;

@@ -5,7 +5,23 @@ import Home from "./pages/Home";
 // import Frontet from './pages/Frontet';
 // import JsonDiffet from './pages/JsonDiffet';
 import { Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./reportet/admin/ProtectedRoute";
+import Term from "./pages/Term";
+import Policy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
+import IndustrialTraining from "./pages/IndustrialTraining";
+import ProjectDetails from "./pages/ProjectDetails.jsx";
+import AboutUsPage from "./components/AboutUsPage.jsx";
+import ContectUsPage from "./components/ContectUsPage.jsx";
+
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Referral from "./pages/Referral";
+import Dashboard from "./pages/Dashboard";
+import ProfileModal from "./pages/Profile";
+import Classes from "./pages/Classes";
+import ProtectedRoute from "./Routes/ProtectedRoutes";
+import Payment from "./pages/Payment";
+import ReportetProtectedRoute from "./reportet/admin/ProtectedRoute";
 import MrContextProvider from "./reportet/context/MrContext";
 import { Toaster } from "react-hot-toast";
 
@@ -14,7 +30,7 @@ import { Toaster } from "react-hot-toast";
   /* ReportEt path */
 }
 import HomePage from "./reportet/HomePage";
-import Login from "./reportet/Login";
+import ReportetLogin from "./reportet/Login";
 import UserSignupPage from "./reportet/UserSignup";
 import Sidebar from "./reportet/Sidebar";
 
@@ -25,18 +41,46 @@ const JsonDiffet = lazy(() => import("./pages/JsonDiffet"));
 function App() {
   return (
     <>
-      <MrContextProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/tools/codet" element={<Codet />} />
-          {/* Temprory frontent route */}
-          <Route path="/tools/Frontet" element={<Frontet />} />
-          <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
+    <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/tools/codet" element={<Codet />} />
+    {/* Temprory frontent route */}
+    <Route path="/tools/Frontet" element={<Frontet />} />
+    <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
 
-          {/* -------------------ReportEt Routes-------------------------*/}
+    {/* Industrial Training Routes */}
 
+        <Route path="/:projectSlug" element={<ProjectDetails />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/contact" element={<ContectUsPage />} />
+        <Route path="/terms" element={<Term />} />
+        <Route path="/privacy" element={<Policy />} />
+        <Route path="/refund_policy" element={<RefundPolicy />} />
+        <Route path="/industrial-training" element={<IndustrialTraining />} />
+        <Route path="/industrial-training/login" element={<Login />} />
+        <Route path="/industrial-training/signup" element={<Signup />} />
+        <Route path="/industrial-training/payment" element={<Payment />} />
+        <Route
+          path="/industrial-training/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="profile" element={<ProfileModal />} />
+          <Route path="referral" element={<Referral />} />
+          <Route path="classes" element={<Classes />} />
+
+          {/* default when only /dashboard is opened */}
+          <Route index element={<ProfileModal />} />
+        </Route>
+
+        <Route />
+
+        <MrContextProvider>
           <Route path="/reportet" element={<HomePage />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<ReportetLogin />} />
           <Route path="/signup" element={<UserSignupPage />} />
           {/* <Route path="/admin" element={<Sidebar />} /> */}
 
@@ -44,19 +88,17 @@ function App() {
           <Route
             path="/admin"
             element={
-              <ProtectedRoute routeName="admin" requireRole="admin">
+              <ReportetProtectedRoute routeName="admin" requireRole="admin">
                 <Sidebar />
-              </ProtectedRoute>
+              </ReportetProtectedRoute>
             }
           />
-
-          {/*------------------------------------------------------------------- */}
-        </Routes>
-        <Toaster position="top-right" />
-
-      </MrContextProvider>
-    </>
-  );
+        </MrContextProvider>
+            <Toaster position="top-right" />
+    </Routes>
+    
+   </>
+  )
 }
 
 export default App;

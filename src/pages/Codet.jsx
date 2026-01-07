@@ -6,25 +6,13 @@ import { initialHtml, initialCss, initialJs } from "../constant";
 import IFramePreview from "../components/IFramePreview";
 import AceEditorComponent from "../components/AceEditorComponent";
 
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-html";
-import "ace-builds/src-noconflict/snippets/html";
-import "ace-builds/src-noconflict/mode-css";
-import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-chrome";
-import "ace-builds/src-noconflict/ext-language_tools";
-
-export default function Codet({ title = "Sample Project" }) {
+export default function Codet() {
   const [js, setJs] = useState(initialJs);
   const [output, setOutput] = useState("");
   const [css, setCss] = useState(initialCss);
   const [html, setHtml] = useState(initialHtml);
   const [activeTab, setActiveTab] = useState("html");
   const [isVerticalLayout, setIsVerticalLayout] = useState(false);
-  const [editTitle, setEditTitle] = useState({
-    isInEditingMode: false,
-    value: title,
-  });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -69,19 +57,6 @@ export default function Codet({ title = "Sample Project" }) {
       setCss("");
       setJs("");
     }
-  };
-
-  const editorOptions = {
-    enableBasicAutocompletion: true,
-    enableLiveAutocompletion: true,
-    enableSnippets: true,
-    showLineNumbers: true,
-    tabSize: 2,
-    fontSize: 16,
-    useWorker: false,
-    bracketMatching: true,
-    showPrintMargin: false,
-    wrap: true,
   };
 
   return (
@@ -182,54 +157,28 @@ export default function Codet({ title = "Sample Project" }) {
                 {/* Editors */}
                 <div className="flex-1 overflow-hidden">
                   {activeTab === "html" && (
-                    <div className="h-full">
-                      <AceEditor
-                        key="#softetHtml"
-                        mode="html"
-                        theme="chrome"
-                        value={html}
-                        onChange={setHtml}
-                        name="html-editor"
-                        width="100%"
-                        height="100%"
-                        setOptions={editorOptions}
-                        editorProps={{ $blockScrolling: true }}
-                      />
-                    </div>
+                    <AceEditorComponent
+                      mode="html"
+                      value={html}
+                      onChange={setHtml}
+                      name="html-editor"
+                    />
                   )}
-
                   {activeTab === "css" && (
-                    <div className="h-full">
-                      <AceEditor
-                        key="#softetCss"
-                        mode="css"
-                        theme="chrome"
-                        value={css}
-                        onChange={setCss}
-                        name="css-editor"
-                        width="100%"
-                        height="100%"
-                        setOptions={editorOptions}
-                        editorProps={{ $blockScrolling: true }}
-                      />
-                    </div>
+                    <AceEditorComponent
+                      mode="css"
+                      value={css}
+                      onChange={setCss}
+                      name="css-editor"
+                    />
                   )}
-
                   {activeTab === "js" && (
-                    <div className="h-full">
-                      <AceEditor
-                        key="softetJs"
-                        mode="javascript"
-                        theme="chrome"
-                        value={js}
-                        onChange={setJs}
-                        name="js-editor"
-                        width="100%"
-                        height="100%"
-                        setOptions={editorOptions}
-                        editorProps={{ $blockScrolling: true }}
-                      />
-                    </div>
+                    <AceEditorComponent
+                      mode="javascript"
+                      value={js}
+                      onChange={setJs}
+                      name="js-editor"
+                    />
                   )}
                 </div>
               </div>

@@ -60,7 +60,6 @@ export default function Frontet() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   console.log("Frontet is rendering");

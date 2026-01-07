@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 const IFramePreview = React.memo(({src, title})=>{
     return(
@@ -17,5 +18,11 @@ const IFramePreview = React.memo(({src, title})=>{
                   </div>
     )
 })
+IFramePreview.displayName = "IFramePreview";
+
+IFramePreview.propTypes = {
+  src: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+};
 
 export default IFramePreview;
