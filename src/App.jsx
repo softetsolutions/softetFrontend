@@ -20,6 +20,9 @@ import ProfileModal from "./pages/Profile";
 import Classes from "./pages/Classes";
 import ProtectedRoute from "./Routes/ProtectedRoutes";
 import Payment from "./pages/Payment";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import StudentList from "./pages/StudentList.jsx";
+import PaymentList from "./pages/PaymentList.jsx";
 function App() {
   return (
     <>
@@ -36,17 +39,34 @@ function App() {
         <Route path="/industrial-training/login" element={<Login />} />
         <Route path="/industrial-training/signup" element={<Signup />} />
         <Route path="/industrial-training/payment" element={<Payment />} />
+
         <Route
           path="/industrial-training/dashboard"
           element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
+            <Dashboard />
+            // <ProtectedRoute>
+            // </ProtectedRoute>
           }
         >
           <Route path="profile" element={<ProfileModal />} />
           <Route path="referral" element={<Referral />} />
           <Route path="classes" element={<Classes />} />
+
+          {/* default when only /dashboard is opened */}
+          <Route index element={<ProfileModal />} />
+        </Route>
+
+        <Route
+          path="/industrial-training/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="student-list" element={<StudentList />} />
+          <Route path="payment-list" element={<PaymentList />} />
+          {/* <Route path="#" element={<Classes />} /> */}
 
           {/* default when only /dashboard is opened */}
           <Route index element={<ProfileModal />} />
