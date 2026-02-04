@@ -1,10 +1,13 @@
-// MatTax Images 
+// MatTax Images
 import mattaxDashboard from "../assets/Dashboard.png";
 import invoiceUpload from "../assets/add_transaction.png";
 import mattaxReport from "../assets/report.png";
 import transaction from "../assets/transaction.png";
 import mattaxProfile from "../assets/profile.png";
 import mattaxLoginSignup from "../assets/login_signup.png";
+
+// B4Boosting images
+import B4BoostingMainImg from "../assets/B4Boosting_Main_Image.jpg";
 
 const projectData = [
   {
@@ -168,6 +171,165 @@ const projectData = [
       "End-to-end development including planning, implementation, and testing",
 
     team: "Full-stack development and system architecture by a single developer",
+  },
+
+  {
+    slug: "b4boosting-gaming-services-platform",
+
+    title: "B4Boosting – Gaming Boosting & Digital Services Marketplace",
+
+    tagline:
+      "Fast, secure, and professional boosting services for competitive gamers",
+
+    description:
+      "B4Boosting is an online gaming services platform that allows players to purchase boosting, in-game currency, accounts, items, and coaching services across popular multiplayer games through a streamlined and secure marketplace.",
+
+    detailedDescription:
+      "B4Boosting is a digital marketplace designed for gamers who want to save time, overcome skill barriers, or accelerate in-game progress. The platform connects users with professional boosters and service providers, offering rank boosting, power leveling, in-game currency delivery, account services, and game-related digital products. Built with a user-first approach, B4Boosting focuses on fast delivery, order transparency, and 24/7 customer support while maintaining a clean and intuitive purchasing experience.",
+
+    image: [B4BoostingMainImg],
+
+    projectUrl: "https://b4boosting.com",
+    githubUrl: null,
+
+    overview:
+      "Competitive online games often require significant time investment, advanced skill levels, or repetitive grinding to progress. B4Boosting centralizes professional gaming services into a single platform, enabling players to quickly access boosting, digital goods, and expert assistance without navigating unreliable third-party sources.",
+
+    problem:
+      "Many gamers struggle with slow progression, skill-based rank barriers, and time constraints. Existing solutions are fragmented, untrustworthy, or lack customer support, leading to poor user experiences and high risk of scams.",
+
+    targetUsers:
+      "Casual gamers, competitive players, esports enthusiasts, and busy individuals who want faster in-game progression, higher ranks, rare items, or professional assistance without investing excessive time.",
+
+    features: [
+      {
+        title: "Game Boosting Services",
+        description:
+          "Professional rank boosting, power leveling, and progression services for supported games.",
+        benefit:
+          "Helps players reach desired ranks or milestones quickly and efficiently",
+      },
+      {
+        title: "In-Game Currency & Items",
+        description:
+          "Purchase in-game currency, items, and digital assets with fast delivery.",
+        benefit: "Eliminates repetitive grinding and saves valuable playtime",
+      },
+      {
+        title: "Account & Top-Up Services",
+        description:
+          "Secure account-based services and game top-ups with guided order flow.",
+        benefit: "Provides convenient access to premium game features",
+      },
+      {
+        title: "User Dashboard & Order Tracking",
+        description:
+          "Centralized dashboard to manage orders, track progress, and view order history.",
+        benefit: "Improves transparency and user trust during service delivery",
+      },
+      {
+        title: "24/7 Customer Support",
+        description:
+          "Always-available live support to resolve issues and answer user queries.",
+        benefit:
+          "Ensures smooth service experience and faster issue resolution",
+      },
+      {
+        title: "Secure Payments & Refund Policy",
+        description:
+          "Protected payment gateways with a money-back guarantee policy.",
+        benefit: "Builds confidence and reduces purchase risk for users",
+      },
+    ],
+
+    techStack: [
+      "Next.js",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Tailwind CSS",
+      "JWT Authentication",
+    ],
+
+    detailedTechStack: {
+      frontend: [
+        "Next.js",
+        "Vite",
+        "Tailwind CSS",
+        "Responsive UI Design",
+        "Axios for API communication",
+      ],
+      backend: [
+        "Node.js",
+        "Express.js",
+        "RESTful APIs",
+        "JWT-based Authentication",
+        "Order & Service Management Logic",
+      ],
+      database: [
+        "MongoDB",
+        "Structured Order & User Schema",
+        "Secure Data Handling",
+      ],
+      tools: ["Git", "VS Code", "Postman"],
+      deployment: [
+        "Cloud Hosting",
+        "Production Environment Setup",
+        "Secure Payment Integration",
+      ],
+    },
+
+    challenges: [
+      {
+        problem:
+          "Building trust in a market prone to scams and unreliable service providers",
+        solution:
+          "Introduced order tracking, clear service descriptions, and refund policies",
+        tech: "Order Status System, Secure Payments",
+        impact: "Reduced user hesitation and increased purchase confidence",
+        result: "Higher conversion rate and repeat customers",
+      },
+      {
+        problem: "Managing multiple service types across different games",
+        solution:
+          "Designed a flexible service architecture with modular categories",
+        tech: "Dynamic Service Models, REST APIs",
+        impact: "Hardcoded systems failed to scale with new games",
+        result:
+          "Platform easily expands to support additional games and services",
+      },
+      {
+        problem:
+          "Ensuring smooth communication between users and service delivery",
+        solution:
+          "Integrated real-time support and clear order lifecycle updates",
+        tech: "Live Support Integration, Order Status Updates",
+        impact: "Users lacked clarity during service execution",
+        result: "Improved user satisfaction and reduced disputes",
+      },
+    ],
+
+    metrics: {
+      performance:
+        "Optimized service listing and order flows for fast page loads",
+      security:
+        "Secure authentication, protected payment flows, and user data handling",
+      scalability: "Service-based architecture supports platform growth",
+      accessibility:
+        "Mobile-friendly UI with clear navigation and readable layouts",
+    },
+
+    impact: {
+      efficiency: "Saved users hours or days of in-game grinding",
+      experience: "Provided a single trusted destination for gaming services",
+      adoption:
+        "Designed to attract repeat users through reliability and support",
+    },
+
+    timeline:
+      "Planned, designed, and launched as a production-ready gaming services platform",
+
+    team: "Platform architecture, frontend, and backend developed by a small dedicated team",
   },
 ];
 
