@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createStockist } from "../api/stockist";
 
 function CreateStockist() {
@@ -9,14 +9,14 @@ function CreateStockist() {
     gstNo: "",
   });
   const [loading, setLoading] = useState(false);
-   const [message,setMessage]=useState({text:"",type:""});
+  const [message, setMessage] = useState({ text: "", type: "" });
 
-    useEffect(()=>{
-      if(message.text){
-        const timer=setTimeout(() => setMessage({text:"",type:""}),3000);
-        return ()=>clearTimeout(timer)
-      }
-    },[message])
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,40 +27,47 @@ function CreateStockist() {
 
   const handleSubmit = async () => {
     try {
-      const { name,address,state,gstNo } = formData;
-      if (!name || !address || !state || !gstNo ) {
+      const { name, address, state, gstNo } = formData;
+      if (!name || !address || !state || !gstNo) {
         setMessage({ text: "All fields are required", type: "error" });
-        
+
         return;
       }
       setLoading(true);
       const data = await createStockist(formData);
-      
-      setMessage({text:`Stockist created successfully: ${data.name}`,type:"success"})
+
+      setMessage({
+        text: `Stockist created successfully: ${data.name}`,
+        type: "success",
+      });
       setFormData({ name: "", address: "", state: "", gstNo: "" });
     } catch (err) {
-    
-      setMessage({text:err.message||"Error creating stockist",type:"Error"})
-
+      setMessage({
+        text: err.message || "Error creating stockist",
+        type: "Error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-8">
-       {message.text&&
-      <div className={`mb-4 p-2 rounded text-sm ${
-          message.type === "success"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }`}>
-        {message.text}
-        </div>}
-      <h2 className="text-2xl font-bold text-gray-800">
-        Stockist Master
-      </h2>
-      <p className="text-gray-600 mb-6 pb-2 italic">Keep track of your stockist partners and their business info.</p>
+    <div>
+      {message.text && (
+        <div
+          className={`mb-4 p-2 rounded text-sm ${
+            message.type === "success"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+      <h2 className="text-2xl font-bold text-gray-800">Stockist Master</h2>
+      <p className="text-gray-600 mb-6 pb-2 italic">
+        Keep track of your stockist partners and their business info.
+      </p>
 
       <div className="space-y-4 bg-white p-6 rounded-lg shadow-md">
         {/* Stockist Name */}

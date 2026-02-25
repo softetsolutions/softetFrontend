@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { FaSearch } from 'react-icons/fa';
-import { FaFileImport } from 'react-icons/fa';
-import { getAllDoctors, importDoctorsFromExcel } from '../api/doctor';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { FaSearch } from "react-icons/fa";
+import { FaFileImport } from "react-icons/fa";
+import { getAllDoctors, importDoctorsFromExcel } from "../api/doctor";
+import toast from "react-hot-toast";
 
 const DoctorsList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
@@ -52,11 +52,11 @@ const DoctorsList = () => {
   const filteredDoctors = doctors.filter(
     (doctor) =>
       doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase())
+      doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
-    <div className="bg-gray-100 p-8 min-h-screen">
+    <div className="bg-gray-100 flex flex-col h-full">
       {/* Header Section */}
       <header className="mb-8 flex justify-between items-center">
         <div>
@@ -65,12 +65,10 @@ const DoctorsList = () => {
             Manage your medical staff and their information.
           </p>
         </div>
-
-
       </header>
 
       {/* Doctor List Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md flex-1">
         {/* Import Button */}
         <label className="bg-green-600 w-fit text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700 flex items-center gap-2">
           <FaFileImport />

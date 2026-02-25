@@ -46,10 +46,15 @@ const VisitReport = () => {
     fetchAreas();
   }, [reportFilters.mr]);
 
-const handleReportSearch = async () => {
+  const handleReportSearch = async () => {
     try {
       setReportData([]);
-      if (!reportFilters.mr || !reportFilters.area || !reportFilters.dateFrom || !reportFilters.dateTo) {
+      if (
+        !reportFilters.mr ||
+        !reportFilters.area ||
+        !reportFilters.dateFrom ||
+        !reportFilters.dateTo
+      ) {
         alert("Please select MR, Area, Date From, and Date To");
         return;
       }
@@ -58,9 +63,9 @@ const handleReportSearch = async () => {
         reportFilters.mr,
         reportFilters.area,
         reportFilters.dateFrom,
-        reportFilters.dateTo
+        reportFilters.dateTo,
       );
-      
+
       const formatted = data.map((item, idx) => ({
         id: idx,
         dr: item.doctorId.name || "",
@@ -73,7 +78,7 @@ const handleReportSearch = async () => {
     }
   };
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div>
       <h2 className="text-2xl font-bold text-gray-800">VISIT REPORT</h2>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Filter and review past visit records by MR, area, date, and status.
@@ -149,15 +154,21 @@ const handleReportSearch = async () => {
             <table className="min-w-full text-sm border-collapse border border-gray-300">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="border border-gray-300 px-3 py-2 text-left">DR Name</th>
-                  <th className="border border-gray-300 px-3 py-2 text-left">Remark</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left">
+                    DR Name
+                  </th>
+                  <th className="border border-gray-300 px-3 py-2 text-left">
+                    Remark
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {reportData.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50">
                     <td className="border border-gray-300 px-3 py-2">{r.dr}</td>
-                    <td className="border border-gray-300 px-3 py-2">{r.remark}</td>
+                    <td className="border border-gray-300 px-3 py-2">
+                      {r.remark}
+                    </td>
                   </tr>
                 ))}
               </tbody>

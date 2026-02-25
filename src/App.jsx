@@ -1,9 +1,6 @@
 import { lazy } from "react";
 import "./App.css";
 import Home from "./pages/Home";
-// import Codet from './pages/Codet'
-// import Frontet from './pages/Frontet';
-// import JsonDiffet from './pages/JsonDiffet';
 import { Routes, Route } from "react-router-dom";
 import Term from "./pages/Term";
 import Policy from "./pages/Privacy";
@@ -25,7 +22,6 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import StudentList from "./pages/StudentList.jsx";
 import PaymentList from "./pages/PaymentList.jsx";
 import ReportetProtectedRoute from "./reportet/admin/ProtectedRoute";
-import MrContextProvider from "./reportet/context/MrContext";
 import { Toaster } from "react-hot-toast";
 
 {
@@ -35,6 +31,7 @@ import HomePage from "./reportet/HomePage";
 import ReportetLogin from "./reportet/Login";
 import UserSignupPage from "./reportet/UserSignup";
 import Sidebar from "./reportet/Sidebar";
+import ContextProviderForReportetLayout from "./reportet/ContextProviderForReportetLayout.jsx";
 
 const Codet = lazy(() => import("./pages/Codet"));
 const Frontet = lazy(() => import("./pages/Frontet"));
@@ -97,7 +94,7 @@ function App() {
 
         <Route />
 
-        <MrContextProvider>
+        <Route element={<ContextProviderForReportetLayout />}>
           <Route path="/reportet" element={<HomePage />} />
           <Route path="/login" element={<ReportetLogin />} />
           <Route path="/signup" element={<UserSignupPage />} />
@@ -112,9 +109,9 @@ function App() {
               </ReportetProtectedRoute>
             }
           />
-        </MrContextProvider>
-        <Toaster position="top-right" />
+        </Route>
       </Routes>
+      <Toaster position="top-right" />
     </>
   );
 }

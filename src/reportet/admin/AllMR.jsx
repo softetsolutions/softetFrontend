@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { getAllMrs } from "../api/mr"; // your MR API file
 import MrDialogBox from "../../components/MrDialogBox";
+import TableList from "../genericComps/tableList/TableList";
 
 const AllMR = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,8 +37,10 @@ const AllMR = () => {
       `${mr.firstName} ${mr.lastName}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      mr.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      mr.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  console.log("filteredMRs", filteredMRs);
 
   // To Get MR Information
   const getInfo = (mr) => {
@@ -46,7 +49,7 @@ const AllMR = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-8 min-h-screen">
+    <div className="bg-gray-100 flex flex-col h-full">
       <MrDialogBox
         open={openDialog}
         close={() => setOpenDialog(false)}
@@ -69,7 +72,7 @@ const AllMR = () => {
       </header>
 
       {/* MR List Section */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md flex-1 flex flex-col">
         {/* Search */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-medium text-gray-800">MR List</h2>
@@ -88,7 +91,7 @@ const AllMR = () => {
         </div>
 
         {/* MR Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto flex-1">
           {loading ? (
             <div className="text-center py-6 text-gray-500 text-sm">
               Loading MRs...
@@ -102,6 +105,14 @@ const AllMR = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Email
+                  </th>
+
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Assigned Doctors
+                  </th>
+
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Assigned Areas
                   </th>
 
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -121,6 +132,22 @@ const AllMR = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {mr.email || "Not available"}
+                      </td>
+
+                      <td className="relative px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <TableList
+                          list={
+                            mr.assignedDoctors.map((list) => list?.name) || []
+                          }
+                        />
+                      </td>
+
+                      <td className="relative px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <TableList
+                          list={
+                            mr.assignedAreas.map((list) => list?.name) || []
+                          }
+                        />
                       </td>
 
                       <td>

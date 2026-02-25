@@ -13,15 +13,15 @@ const AddDoctor = () => {
     svr: "",
   });
   const [loading, setLoading] = useState(false);
-  const [count,setCount]=useState(1)
+  const [count, setCount] = useState(1);
 
-   const [message, setMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
-      useEffect(() => {
-      if (message.text) {
-        const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-        return () => clearTimeout(timer); // cleanup if message changes before 5s
-      }
-    }, [message]);
+  const [message, setMessage] = useState({ text: "", type: "" }); // type: 'success' or 'error'
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
+      return () => clearTimeout(timer); // cleanup if message changes before 5s
+    }
+  }, [message]);
 
   // Fetch areas on mount
   useEffect(() => {
@@ -42,20 +42,23 @@ const AddDoctor = () => {
 
   const handleAddDoctor = () => {
     if (!formData.name.trim()) {
-      setMessage({text:"Doctor name is required",type:"error"})
+      setMessage({ text: "Doctor name is required", type: "error" });
       //alert("Doctor name is required");
       return;
     }
-    setCount(prev=>prev+1);
-    setMessage({text:`${count} Doctor added in list`,type:"success"})
+    setCount((prev) => prev + 1);
+    setMessage({ text: `${count} Doctor added in list`, type: "success" });
     setDoctors((prev) => [...prev, { ...formData }]);
     setFormData({ name: "", degree: "", area: "", svr: "" });
   };
 
   const handleSubmit = async () => {
     if (doctors.length === 0) {
-      setMessage({text:"Please add at least one doctor before submitting",type:"error"})
-      
+      setMessage({
+        text: "Please add at least one doctor before submitting",
+        type: "error",
+      });
+
       //alert("Please add at least one doctor before submitting");
       return;
     }
@@ -71,13 +74,16 @@ const AddDoctor = () => {
       };
 
       await addDoctors(payload);
-      setMessage({text:"Doctor saved successfully",type:"success"})
+      setMessage({ text: "Doctor saved successfully", type: "success" });
       setCount(1);
       toast.success("Doctors saved successfully");
       setDoctors([]);
     } catch (error) {
       console.error("Error saving doctors:", error);
-      setMessage({text:error.message||"Failed to save doctors",type:"error"})
+      setMessage({
+        text: error.message || "Failed to save doctors",
+        type: "error",
+      });
       //alert(error.message || "Failed to save doctors");
     } finally {
       setLoading(false);
@@ -85,19 +91,19 @@ const AddDoctor = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div>
       {message.text && (
-      <div
-        className={`mb-4 p-2 rounded text-sm ${
-          message.type === "success"
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-        }`}
-      >
-        {message.text}
-      </div>
-    )}
-    
+        <div
+          className={`mb-4 p-2 rounded text-sm ${
+            message.type === "success"
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
       <h2 className="text-2xl font-bold text-gray-800">Add Doctors</h2>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Add multiple doctors to the list, then submit them all together.
@@ -120,7 +126,9 @@ const AddDoctor = () => {
 
         {/* Area Dropdown */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Select Area</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Select Area
+          </label>
           <select
             value={formData.area}
             onChange={(e) => handleChange("area", e.target.value)}
@@ -178,7 +186,6 @@ const AddDoctor = () => {
           </table>
         </div>
       )}
-
     </div>
   );
 };

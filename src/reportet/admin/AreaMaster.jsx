@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAreas, createArea, importAreasFromExcel } from "../api/area";
 import toast from "react-hot-toast";
-import { FaSearch,FaFileImport } from 'react-icons/fa';
+import { FaSearch, FaFileImport } from "react-icons/fa";
 
 const AreaMaster = () => {
   const [areaName, setAreaName] = useState("");
@@ -80,7 +80,6 @@ const AreaMaster = () => {
 
       // Remove highlight after 2.5s
       setTimeout(() => setHighlightedIds([]), 2500);
-
     } catch (err) {
       toast.error("Failed to import areas");
     } finally {
@@ -90,18 +89,17 @@ const AreaMaster = () => {
   };
 
   const filteredAreas = areas.filter((a) =>
-    a.name.toLowerCase().includes(searchTerm.toLowerCase())
+    a.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div>
       <h2 className="text-2xl font-bold text-gray-800">Area Manager</h2>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Add new areas, import from Excel, view existing ones, and search by name
       </p>
 
       <div className="space-y-4 bg-white p-6 rounded-lg shadow-md">
-
         {/* Import from Excel */}
         <div className="flex items-center gap-3 mb-4">
           <label className="bg-green-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-purple-600 flex items-center gap-2">
@@ -131,8 +129,6 @@ const AreaMaster = () => {
             Add
           </button>
         </div>
-
-
 
         {/* New Areas List */}
         {newAreas.length > 0 && (
@@ -188,10 +184,9 @@ const AreaMaster = () => {
               {filteredAreas.map((area, index) => (
                 <tr
                   key={area._id}
-                  className={`hover:bg-gray-50 transition-colors duration-500 ${highlightedIds.includes(area._id)
-                      ? "bg-yellow-100"
-                      : ""
-                    }`}
+                  className={`hover:bg-gray-50 transition-colors duration-500 ${
+                    highlightedIds.includes(area._id) ? "bg-yellow-100" : ""
+                  }`}
                 >
                   <td className="border border-gray-300 px-4 py-2">
                     {index + 1}
@@ -212,4 +207,3 @@ const AreaMaster = () => {
 };
 
 export default AreaMaster;
-

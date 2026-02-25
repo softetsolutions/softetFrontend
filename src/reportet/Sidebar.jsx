@@ -43,14 +43,14 @@ const Sidebar = () => {
   };
 
   return (
-    <>
+    <div className="h-screen flex flex-col">
       <div className="px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <a href="/reportet" className="px-6 text-blue-600 font-bold text-2xl">
           Report<span className="text-black">ET</span>
         </a>
       </div>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex flex-1  bg-gray-100">
         {/* Sidebar */}
         <div
           className={`${
@@ -175,24 +175,6 @@ const Sidebar = () => {
             ))}
           </ul>
 
-          {/* User Info */}
-          {/* {!collapsed && (
-            <div className="p-4 mt-auto border-t bg-white">
-              <div className="flex items-center space-x-3">
-                <div>
-                  <button className="text-sm font-semibold text-gray-900"
-                  onClick={()=>{
-                    localStorage.removeItem("userToken"); 
-                    navigate("/reportet")
-
-                  }}
-                  >
-                    <LogOut size={18} /> Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          )} */}
           {/* User Info / Logout */}
           <div className="p-4 mt-auto border-t bg-white">
             <div className="flex items-center space-x-3">
@@ -217,7 +199,7 @@ const Sidebar = () => {
           {renderActiveComponent()}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

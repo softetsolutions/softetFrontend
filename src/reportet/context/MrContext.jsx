@@ -2,6 +2,7 @@ import { createContext, useState } from "react";
 
 export const MrContext = createContext();
 
+// eslint-disable-next-line react/prop-types
 function MrContextProvider({ children }) {
   const [editMr, setEditMr] = useState(null);
 
