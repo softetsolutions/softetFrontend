@@ -112,7 +112,6 @@ export default function IndustrialTraining() {
           </h2>
 
           <div className="bg-white rounded-2xl shadow-xl p-12 border">
-            {/* <p className="text-5xl font-extrabold text-blue-600 mb-2">₹4,999</p> */}
             <p className="text-gray-500 mb-8">
               One-time fee • Industry-grade training
             </p>
