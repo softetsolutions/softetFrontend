@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function ReferralPage() {
@@ -9,6 +10,7 @@ export default function ReferralPage() {
   const [error, setError] = useState("");
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [walletAmount, setWalletAmount] = useState(0);
+  const [secondInstallmentAmoount, setSecondInstallmentAmount] = useState(0);
 
   const fetchEnrolledReferralCount = async () => {
     try {
@@ -16,7 +18,7 @@ export default function ReferralPage() {
         `${API}/api/referral/dashboard/getEnrolledReferralCount`,
         {
           credentials: "include",
-        }
+        },
       );
 
       const data = await res.json();
@@ -29,7 +31,18 @@ export default function ReferralPage() {
       setEnrolledCount(data.enrolledReferralCount || 0);
 
       // ₹500 per enrolled person
-      setWalletAmount((data.enrolledReferralCount || 0) * 500);
+      // setWalletAmount((data.enrolledReferralCount || 0) * 500);
+      setWalletAmount(
+        data.enrolledReferralCount > 7
+          ? (data.enrolledReferralCount - 7) * 500
+          : 0,
+      );
+
+      setSecondInstallmentAmount(
+        data.enrolledReferralCount < 7
+          ? 3500 - data.enrolledReferralCount * 500
+          : 0,
+      );
     } catch (err) {
       console.error(err);
       setError("Server not responding");
@@ -56,7 +69,7 @@ export default function ReferralPage() {
 
       setReferralCode(data.referralCode);
       setReferralLink(
-        `${window.location.origin}/industrial-training/signup?referredBy=${data.referralCode}`
+        `${window.location.origin}/industrial-training/signup?referredBy=${data.referralCode}`,
       );
 
       // store current user's id to exclude from referred list
@@ -84,7 +97,7 @@ export default function ReferralPage() {
 
       // Exclude current user if accidentally included
       const filteredUsers = (data.users || []).filter(
-        (u) => u._id !== currentUserId
+        (u) => u._id !== currentUserId,
       );
 
       setReferredUsers(filteredUsers);
@@ -168,6 +181,26 @@ export default function ReferralPage() {
                 ₹{walletAmount}
               </p>
             </div>
+            <div className="p-4 rounded-xl bg-green-50">
+              <p className="text-sm text-gray-600">
+                Second Installment Amount (3500 - referralCount * 500)
+              </p>
+              <p className="text-3xl font-bold text-green-700">
+                ₹{secondInstallmentAmoount}
+              </p>
+            </div>
+
+            {secondInstallmentAmoount > 0 && (
+              <Link
+                to="/industrial-training/payment"
+                className="p-4 rounded-xl bg-yellow-50"
+              >
+                <p className="text-sm text-gray-600">
+                  Pay and send scrrenshot in the group
+                </p>
+                <p className="text-3xl font-bold text-yellow-700">PAY</p>
+              </Link>
+            )}
           </div>
 
           <p className="mt-2 text-gray-500 text-sm">
