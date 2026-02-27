@@ -33,10 +33,10 @@ export default function IndustrialTraining() {
           </p>
 
           <Link
-            to="/industrial-training/payment"
+            to=""
             className="inline-block mt-10 bg-white text-blue-600 px-10 py-3 rounded-xl font-semibold shadow hover:bg-blue-50 transition"
           >
-            Apply Now
+            Next Batch Coming Soon
           </Link>
         </section>
 
@@ -112,16 +112,15 @@ export default function IndustrialTraining() {
           </h2>
 
           <div className="bg-white rounded-2xl shadow-xl p-12 border">
-            <p className="text-5xl font-extrabold text-blue-600 mb-2">₹4,999</p>
             <p className="text-gray-500 mb-8">
               One-time fee • Industry-grade training
             </p>
 
             <Link
-              to="/industrial-training/payment"
+              to=""
               className="inline-block bg-blue-600 text-white px-12 py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
             >
-              Enroll Now
+              Next Batch Coming Soon
             </Link>
           </div>
         </section>
