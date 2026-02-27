@@ -11,6 +11,8 @@ export default function ReferralPage() {
   const [enrolledCount, setEnrolledCount] = useState(0);
   const [walletAmount, setWalletAmount] = useState(0);
   const [secondInstallmentAmoount, setSecondInstallmentAmount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [courseFullyPaid, setCourseFullyPaid] = useState(false);
 
   const fetchEnrolledReferralCount = async () => {
     try {
@@ -74,13 +76,12 @@ export default function ReferralPage() {
 
       // store current user's id to exclude from referred list
       setCurrentUserId(data._id || null);
+      setCourseFullyPaid(data.fullyPaid);
     } catch (err) {
       console.error(err);
       setError("Server not responding");
     }
   };
-
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   const fetchReferredUsers = async () => {
     try {
@@ -181,16 +182,18 @@ export default function ReferralPage() {
                 ₹{walletAmount}
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-green-50">
-              <p className="text-sm text-gray-600">
-                Second Installment Amount (3500 - referralCount * 500)
-              </p>
-              <p className="text-3xl font-bold text-green-700">
-                ₹{secondInstallmentAmoount}
-              </p>
-            </div>
+            {!courseFullyPaid && (
+              <div className="p-4 rounded-xl bg-green-50">
+                <p className="text-sm text-gray-600">
+                  Second Installment Amount (3500 - referralCount * 500)
+                </p>
+                <p className="text-3xl font-bold text-green-700">
+                  ₹{secondInstallmentAmoount}
+                </p>
+              </div>
+            )}
 
-            {secondInstallmentAmoount > 0 && (
+            {secondInstallmentAmoount > 0 && !courseFullyPaid && (
               <Link
                 to="/industrial-training/payment"
                 className="p-4 rounded-xl bg-yellow-50"
@@ -202,6 +205,15 @@ export default function ReferralPage() {
               </Link>
             )}
           </div>
+
+          {courseFullyPaid && (
+            <div className="mt-4 p-4 rounded-xl bg-green-50">
+              <p className="text-sm text-gray-600 text-center">
+                Congratulations! You have successfully submitted the full course
+                fee.
+              </p>
+            </div>
+          )}
 
           <p className="mt-2 text-gray-500 text-sm">
             Count includes only students who paid first installment.
