@@ -13,9 +13,13 @@ export default function ReferralPage() {
   const [secondInstallmentAmoount, setSecondInstallmentAmount] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [courseFullyPaid, setCourseFullyPaid] = useState(false);
+  const [loadingReferralData, setLoadingReferralData] = useState(false);
+  const [loadingEnrolledReferralCount, setLoadingEnrolledReferralCount] =
+    useState(false);
 
   const fetchEnrolledReferralCount = async () => {
     try {
+      setLoadingEnrolledReferralCount(true);
       const res = await fetch(
         `${API}/api/referral/dashboard/getEnrolledReferralCount`,
         {
@@ -48,11 +52,14 @@ export default function ReferralPage() {
     } catch (err) {
       console.error(err);
       setError("Server not responding");
+    } finally {
+      setLoadingEnrolledReferralCount(false);
     }
   };
 
   const fetchReferralData = async () => {
     try {
+      setLoadingReferralData(true);
       const res = await fetch(`${API}/api/auth/user/me`, {
         credentials: "include",
       });
@@ -80,6 +87,8 @@ export default function ReferralPage() {
     } catch (err) {
       console.error(err);
       setError("Server not responding");
+    } finally {
+      setLoadingReferralData(false);
     }
   };
 
@@ -166,52 +175,62 @@ export default function ReferralPage() {
             Your Referral Wallet
           </h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-green-50">
-              <p className="text-sm text-gray-600">Enrolled Via Referral</p>
-              <p className="text-3xl font-bold text-green-700">
-                {enrolledCount}
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-yellow-50">
-              <p className="text-sm text-gray-600">
-                Wallet Balance (₹500/referral)
-              </p>
-              <p className="text-3xl font-bold text-yellow-700">
-                ₹{walletAmount}
-              </p>
-            </div>
-            {!courseFullyPaid && (
+          {!loadingReferralData && !loadingEnrolledReferralCount && (
+            <div className="grid grid-cols-2 gap-4">
               <div className="p-4 rounded-xl bg-green-50">
-                <p className="text-sm text-gray-600">
-                  Second Installment Amount (3500 - referralCount * 500)
-                </p>
+                <p className="text-sm text-gray-600">Enrolled Via Referral</p>
                 <p className="text-3xl font-bold text-green-700">
-                  ₹{secondInstallmentAmoount}
+                  {enrolledCount}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-yellow-50">
+                <p className="text-sm text-gray-600">
+                  Wallet Balance (₹500/referral)
+                </p>
+                <p className="text-3xl font-bold text-yellow-700">
+                  ₹{walletAmount}
+                </p>
+              </div>
+              {!courseFullyPaid && (
+                <div className="p-4 rounded-xl bg-green-50">
+                  <p className="text-sm text-gray-600">
+                    Second Installment Amount (3500 - referralCount * 500)
+                  </p>
+                  <p className="text-3xl font-bold text-green-700">
+                    ₹{secondInstallmentAmoount}
+                  </p>
+                </div>
+              )}
+
+              {secondInstallmentAmoount > 0 && !courseFullyPaid && (
+                <Link
+                  to="/industrial-training/payment"
+                  className="p-4 rounded-xl bg-yellow-50"
+                >
+                  <p className="text-sm text-gray-600">
+                    Pay and send scrrenshot in the group
+                  </p>
+                  <p className="text-3xl font-bold text-yellow-700">PAY</p>
+                </Link>
+              )}
+            </div>
+          )}
+
+          {courseFullyPaid &&
+            !loadingReferralData &&
+            !loadingEnrolledReferralCount && (
+              <div className="mt-4 p-4 rounded-xl bg-green-50">
+                <p className="text-sm text-gray-600 text-center">
+                  Congratulations! You have successfully submitted the full
+                  course fee.
                 </p>
               </div>
             )}
 
-            {secondInstallmentAmoount > 0 && !courseFullyPaid && (
-              <Link
-                to="/industrial-training/payment"
-                className="p-4 rounded-xl bg-yellow-50"
-              >
-                <p className="text-sm text-gray-600">
-                  Pay and send scrrenshot in the group
-                </p>
-                <p className="text-3xl font-bold text-yellow-700">PAY</p>
-              </Link>
-            )}
-          </div>
-
-          {courseFullyPaid && (
-            <div className="mt-4 p-4 rounded-xl bg-green-50">
-              <p className="text-sm text-gray-600 text-center">
-                Congratulations! You have successfully submitted the full course
-                fee.
-              </p>
+          {(loadingReferralData || loadingEnrolledReferralCount) && (
+            <div className="flex content-center">
+              <div className="w-16 h-16 border-8 border-blue-500 border-b-transparent rounded-full animate-spin"></div>
             </div>
           )}
 
