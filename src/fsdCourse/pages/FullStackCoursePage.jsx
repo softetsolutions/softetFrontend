@@ -406,7 +406,8 @@ export default function FullStackCoursePage() {
                 flexWrap: "wrap",
               }}
             >
-              <span
+              <a
+                href="https://www.softetsolutions.com"
                 style={{
                   background: "rgba(255,255,255,0.15)",
                   color: "#fff",
@@ -416,10 +417,24 @@ export default function FullStackCoursePage() {
                   fontSize: 13,
                   fontWeight: 700,
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  cursor: "pointer",
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.28)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)";
+                }}
+                title="Back to Softet Solutions homepage"
               >
-                By Softet Solutions
-              </span>
+                ← By Softet Solutions
+              </a>
               <span
                 style={{
                   background: "rgba(99,102,241,0.8)",
@@ -431,7 +446,7 @@ export default function FullStackCoursePage() {
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
-                ✦ Founding Batch 2025
+                ✦ Founding Batch 2026
               </span>
             </div>
 
