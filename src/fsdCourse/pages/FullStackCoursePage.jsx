@@ -19,7 +19,7 @@ const pad = (n) => String(n).padStart(2, "0");
 
 /* ── Countdown ── */
 function useCountdown() {
-  const [time, setTime] = useState({ h: 23, m: 41, s: 17 });
+  const [time, setTime] = useState({ h: 115, m: 41, s: 17 });
   useEffect(() => {
     const id = setInterval(() => {
       setTime((p) => {
