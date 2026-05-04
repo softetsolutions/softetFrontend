@@ -23,6 +23,12 @@ import Payment from "./pages/Payment";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import StudentList from "./pages/StudentList.jsx";
 import PaymentList from "./pages/PaymentList.jsx";
+import { lazy } from "react";
+
+const FullStackCoursePage = lazy(
+  () => import("./fsdCourse/pages/FullStackCoursePage.jsx"),
+);
+
 function App() {
   return (
     <>
@@ -73,6 +79,12 @@ function App() {
         </Route>
 
         <Route />
+
+        <Route
+          path="full-stack-development-course"
+          element={<FullStackCoursePage />}
+        />
+
         {/* Temprory frontent route */}
         <Route path="/tools/Frontet" element={<Frontet />} />
         <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
