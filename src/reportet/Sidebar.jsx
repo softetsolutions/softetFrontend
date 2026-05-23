@@ -195,7 +195,10 @@ const Sidebar = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div
+          className="flex-1 p-6 flex flex-col"
+          style={{ height: "calc(100vh - 64px)" }}
+        >
           {renderActiveComponent()}
         </div>
       </div>

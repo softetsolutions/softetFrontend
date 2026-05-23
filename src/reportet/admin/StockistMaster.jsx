@@ -12,8 +12,8 @@ const StockistMaster = () => {
     const fetchStockists = async () => {
       try {
         setLoading(true);
-        const data = await getAllStockists();
-        setStockists(Array.isArray(data) ? data : data.stockists || []);
+        const res = await getAllStockists();
+        setStockists(res?.data);
       } catch (error) {
         console.error("Error fetching stockists:", error);
       } finally {

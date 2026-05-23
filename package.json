@@ -17,6 +17,7 @@
     "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.0.3",
     "ace-builds": "^1.38.0",
+    "bson": "^7.2.0",
     "deep-diff": "^1.0.2",
     "framer-motion": "^12.4.0",
     "jsondiffpatch": "^0.7.3",
