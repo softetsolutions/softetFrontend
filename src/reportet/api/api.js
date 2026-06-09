@@ -57,3 +57,14 @@ export const logoutUser = async () => {
   localStorage.removeItem("userToken"); // clear from storage
   return data;
 };
+
+export const onboardEmployee = async (payload) => {
+  const res = await fetch(`${API_BASE_URL}/employee/create`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  if (res.status === 401) await handleUnauthorized();
+  return await res.json();
+};

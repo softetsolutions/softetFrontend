@@ -1,13 +1,13 @@
-import AddDoctor from "./admin/AddDoctor";
+import AddAreaOrDoctor from "./admin/AddDoctorOrArea";
 import StockistMaster from "./admin/StockistMaster";
-import CreateUser from "./admin/CreateUser";
+import CreateEmployee from "./admin/CreateEmployee";
 import DoctorsList from "./admin/DoctorList";
 import VisitReport from "./admin/VisitReport";
 import HierarchyForm from "./admin/HierarchyForm";
 import HeadQuarterListing from "./admin/HeadQuarterListing";
 import CreateStockist from "./admin/CreateStockist";
-import AssignDoctor from "./admin/AssignDoctor";
-import AllMR from "./admin/AllMR";
+import EmployeeList from "./admin/EmployeeList";
+import AreaList from "./admin/AreaList";
 import {
   ClipboardList,
   Package,
@@ -48,45 +48,45 @@ export const sidebarTabs = [
   },
   {
     id: "mr",
-    label: "MR",
+    label: "Employee",
     icon: <Users size={20} />,
     dropdown: [
       {
         id: "create-user",
-        label: "Create MR",
+        label: "Onboard New",
         icon: <UserPlus size={20} />,
-        component: <CreateUser />,
+        component: <CreateEmployee />,
       },
       {
         id: "mr-list",
-        label: "MR List",
+        label: "Employee List",
         icon: <UserPlus size={20} />,
-        component: <AllMR />,
+        component: <EmployeeList />,
       },
     ],
   },
   {
-    id: "doctors",
-    label: "Doctor",
+    id: "area-doctor",
+    label: "Doctor/Area",
     icon: <Users size={20} />,
     dropdown: [
+      {
+        id: "add",
+        label: "Add",
+        icon: <UserPlus size={18} />,
+        component: <AddAreaOrDoctor />,
+      },
+      {
+        id: "area-list",
+        label: "Area List",
+        icon: <UserCheck size={18} />,
+        component: <AreaList />,
+      },
       {
         id: "doctors-list",
         label: "Doctors List",
         icon: <List size={18} />,
         component: <DoctorsList />,
-      },
-      {
-        id: "add-doctor",
-        label: "Add Doctor",
-        icon: <UserPlus size={18} />,
-        component: <AddDoctor />,
-      },
-      {
-        id: "assign-doctor",
-        label: "Assign Doctor",
-        icon: <UserCheck size={18} />,
-        component: <AssignDoctor />,
       },
     ],
   },

@@ -14,10 +14,12 @@ export const addDoctors = async (doctorData) => {
 };
 
 // 2. Get all doctors
-export const getAllDoctors = async () => {
+export const getAllDoctors = async (paginationData) => {
   const res = await fetch(`${API_BASE_URL}/doctor/getAll`, {
-    method: "GET",
+    method: "POST",
     credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(paginationData),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to fetch doctors");
@@ -69,7 +71,7 @@ export const getDoctorsWithRemarks = async (
   mrId,
   areaId,
   startDate,
-  endDate
+  endDate,
 ) => {
   try {
     if (!mrId || !areaId || !startDate || !endDate) {
@@ -88,7 +90,7 @@ export const getDoctorsWithRemarks = async (
       {
         method: "GET",
         credentials: "include",
-      }
+      },
     );
 
     const data = await res.json();

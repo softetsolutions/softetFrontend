@@ -29,21 +29,15 @@ export const assignAreaToMR = async (mrId, areaId) => {
   }
 };
 
-export const getAreas = async () => {
-  try {
-    const res = await fetch(`${API_BASE_URL}/area`, {
-      method: "GET",
-      credentials: "include",
-    });
+export const getAreas = async (paginationData) => {
+  const res = await fetch(`${API_BASE_URL}/area`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(paginationData),
+  });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to fetch areas");
-
-    return data.data || data;
-  } catch (err) {
-    console.error("Get Areas Error:", err);
-    throw err;
-  }
+  return await res.json();
 };
 
 export const getAreaById = async (id) => {
@@ -59,6 +53,23 @@ export const getAreaById = async (id) => {
     return data;
   } catch (err) {
     console.error("Get Area By ID Error:", err);
+    throw err;
+  }
+};
+
+export const getAreasByHeadQuarterId = async (id) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/area/headquarter/${id}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to fetch area");
+
+    return data;
+  } catch (err) {
+    console.error("Get Area By Headquarter ID Error:", err);
     throw err;
   }
 };

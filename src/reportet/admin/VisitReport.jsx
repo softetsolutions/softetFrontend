@@ -36,7 +36,8 @@ const VisitReport = () => {
           const areaRes = await getAreaByMrId(reportFilters.mr);
           setAreas(areaRes || []);
         } else {
-          const allAreas = await getAreas();
+          // const allAreas = await getAreas();
+          const allAreas = undefined;
           setAreas(allAreas || []);
         }
       } catch (err) {

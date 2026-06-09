@@ -29,3 +29,15 @@ export const getAllHeadquartersData = async (paginationData) => {
   if (!res.ok) throw new Error("Failed to fetch headQuarters");
   return await res.json();
 };
+
+export const getAllHeadQuartersNames = async () => {
+  const res = await fetch(
+    `${API_BASE_URL}/headQuarter/getAllHeadQuarterNames`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+  if (!res.ok) throw new Error("Failed to fetch headquarter names");
+  return await res.json();
+};

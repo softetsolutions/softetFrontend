@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { useState, useEffect, useCallback } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaFileImport } from "react-icons/fa";
+
+import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { getAllDoctors, importDoctorsFromExcel } from "../api/doctor";
-import toast from "react-hot-toast";
 
 const DoctorsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,43 +12,54 @@ const DoctorsList = () => {
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
 
+  const [totalDocuments, setTotalDocuments] = useState(0);
+  const [paginationData, setPaginationData] = useState({
+    currentPage: 1,
+    perPageDocument: 10,
+  });
+
   // Fetch doctors from API
-  const fetchDoctors = async () => {
+  const fetchDoctors = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getAllDoctors();
+      const data = await getAllDoctors({
+        pageNo: paginationData.currentPage,
+        limit: paginationData.perPageDocument,
+      });
+
       setDoctors(Array.isArray(data) ? data : data.doctors || []);
+      setTotalDocuments(data.doctorsCount);
     } catch (error) {
       console.error("Error fetching doctors:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [paginationData]);
 
   useEffect(() => {
     fetchDoctors();
-  }, []);
+  }, [fetchDoctors]);
 
   // Handle file import
-  const handleImport = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // const handleImport = async (e) => {
+  //   const file = e.target.files[0];
+  //   if (!file) return;
 
-    setImporting(true);
-    try {
-      const newDoctors = await importDoctorsFromExcel(file);
-      toast.success(newDoctors.message);
+  //   setImporting(true);
+  //   try {
+  //     const newDoctors = await importDoctorsFromExcel(file);
+  //     toast.success(newDoctors.message);
 
-      // refresh doctor list
-      await fetchDoctors();
-    } catch (err) {
-      toast.error("Failed to import doctors");
-      console.error(err);
-    } finally {
-      setImporting(false);
-      e.target.value = ""; // reset file input
-    }
-  };
+  //     // refresh doctor list
+  //     await fetchDoctors();
+  //   } catch (err) {
+  //     toast.error("Failed to import doctors");
+  //     console.error(err);
+  //   } finally {
+  //     setImporting(false);
+  //     e.target.value = ""; // reset file input
+  //   }
+  // };
 
   // Filter doctors based on search term
   const filteredDoctors = doctors.filter(
@@ -70,7 +83,7 @@ const DoctorsList = () => {
       {/* Doctor List Section */}
       <div className="bg-white p-6 rounded-lg shadow-md flex-1">
         {/* Import Button */}
-        <label className="bg-green-600 w-fit text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700 flex items-center gap-2">
+        {/* <label className="bg-green-600 w-fit text-white px-4 py-2 rounded cursor-pointer hover:bg-green-700 flex items-center gap-2">
           <FaFileImport />
           {importing ? "Importing..." : "Import Excel"}
           <input
@@ -79,8 +92,8 @@ const DoctorsList = () => {
             onChange={handleImport}
             className="hidden"
           />
-        </label>
-        <div className="flex justify-between items-center mb-6">
+        </label> */}
+        {/* <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-medium text-gray-800">Doctors List</h2>
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -96,55 +109,67 @@ const DoctorsList = () => {
               />
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Doctor Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto h-full flex flex-col ">
           {loading ? (
             <div className="text-center py-6 text-gray-500 text-sm">
               Loading doctors...
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Specialty
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredDoctors.length > 0 ? (
-                  filteredDoctors.map((doctor) => (
-                    <tr
-                      key={doctor._id}
-                      className={`hover:bg-gray-50 transition-colors}`}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {doctor.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {doctor.specialty}
-                      </td>
+            <>
+              <div className="flex-1">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Specialty
+                      </th>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="px-6 py-4 text-center text-sm text-gray-500"
-                    >
-                      No doctors found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredDoctors.length > 0 ? (
+                      filteredDoctors.map((doctor) => (
+                        <tr
+                          key={doctor._id}
+                          className={`hover:bg-gray-50 transition-colors}`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {doctor.name}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {doctor.specialty}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="7"
+                          className="px-6 py-4 text-center text-sm text-gray-500"
+                        >
+                          No doctors found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <PaginationComp
+                totalDocuments={totalDocuments}
+                perPageDocument={paginationData.perPageDocument}
+                currentPage={paginationData.currentPage}
+                paginationHandler={setPaginationData}
+                actualResultPerPage={doctors.length}
+                listName="Doctors"
+              />
+            </>
           )}
         </div>
       </div>
