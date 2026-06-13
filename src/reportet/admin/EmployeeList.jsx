@@ -163,7 +163,18 @@ const EmployeeList = () => {
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button>
+                        <button
+                          onClick={() => {
+                            window.dispatchEvent(
+                              new CustomEvent("switch-tab", {
+                                detail: {
+                                  tabId: "profile",
+                                  employeeId: employee.employeeId,
+                                },
+                              }),
+                            );
+                          }}
+                        >
                           <Pencil />
                         </button>
                       </td>

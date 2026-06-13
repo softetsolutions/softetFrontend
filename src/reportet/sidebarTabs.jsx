@@ -7,7 +7,9 @@ import HierarchyForm from "./admin/HierarchyForm";
 import HeadQuarterListing from "./admin/HeadQuarterListing";
 import CreateStockist from "./admin/CreateStockist";
 import EmployeeList from "./admin/EmployeeList";
+import EmployeeDetail from "./admin/EmployeeProfile";
 import AreaList from "./admin/AreaList";
+import AdminLeaves from "./admin/AdminLeaves";
 import {
   ClipboardList,
   Package,
@@ -63,6 +65,12 @@ export const sidebarTabs = [
         icon: <UserPlus size={20} />,
         component: <EmployeeList />,
       },
+      {
+        id: "profile",
+        label: "Profile",
+        icon: <UserPlus size={20} />,
+        component: <EmployeeDetail key="employee-detail" />,
+      },
     ],
   },
   {
@@ -106,6 +114,19 @@ export const sidebarTabs = [
         label: "Headquarter List",
         icon: <UserCheck size={18} />,
         component: <HeadQuarterListing />,
+      },
+    ],
+  },
+  {
+    id: "leave-management",
+    label: "Leave Management",
+    icon: <MapPin size={18} />,
+    dropdown: [
+      {
+        id: "leaves",
+        label: "Leaves",
+        icon: <Map size={18} />,
+        component: <AdminLeaves />,
       },
     ],
   },
