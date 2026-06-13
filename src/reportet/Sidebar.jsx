@@ -3,11 +3,13 @@ import { sidebarTabs } from "./sidebarTabs";
 import { ChevronRight, ChevronLeft, ChevronDown, LogOut } from "lucide-react";
 import VisitReport from "./admin/VisitReport";
 import { useNavigate } from "react-router-dom";
+import EmployeeDetail from "./admin/EmployeeProfile";
 
 const Sidebar = () => {
   const [activeTabId, setActiveTabId] = useState("visit-report");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -15,14 +17,28 @@ const Sidebar = () => {
     setOpenDropdown(openDropdown === id ? null : id);
   };
 
+  // useEffect(() => {
+  //   const handler = (e) => setActiveTabId(e.detail);
+  //   window.addEventListener("switch-tab", handler);
+  //   return () => window.removeEventListener("switch-tab", handler);
+  // }, []);
+
   useEffect(() => {
-    const handler = (e) => setActiveTabId(e.detail);
+    const handler = (e) => {
+      if (e.detail.tabId) {
+        setActiveTabId(e.detail.tabId);
+        if (e.detail.employeeId) setSelectedEmployeeId(e.detail.employeeId);
+      } else {
+        setActiveTabId(e.detail);
+      }
+    };
     window.addEventListener("switch-tab", handler);
     return () => window.removeEventListener("switch-tab", handler);
   }, []);
-
   const renderActiveComponent = () => {
-    // Flatten all tabs and sub-tabs to find the active component
+    if (activeTabId === "profile") {
+      return <EmployeeDetail preloadedEmployeeId={selectedEmployeeId} />;
+    }
     let allTabs = [];
     sidebarTabs.forEach((tab) => {
       if (tab.dropdown) {
