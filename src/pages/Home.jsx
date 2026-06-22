@@ -84,7 +84,7 @@ function Home() {
         </div>
       </div>
       <Link
-        to={"/industrial-training"}
+        to={"/full-stack-development-course"}
         className="
     fixed bottom-20 right-8 z-50
     bg-blue-600 text-white
@@ -99,10 +99,12 @@ function Home() {
   "
       >
         <span className="text-sm font-medium opacity-90">
-          Industrial Training
+          Full Stack Placement guarantee Course
         </span>
-        <span className="text-base font-bold">MERN Stack • Live</span>
-        <span className="text-xs opacity-80">Become Job-Ready → ₹4,999</span>
+        <span className="text-base font-bold">
+          Full Stack Development • Live
+        </span>
+        <span className="text-xs opacity-80">Become Job-Ready</span>
       </Link>
     </>
   );

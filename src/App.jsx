@@ -21,6 +21,12 @@ import Payment from "./pages/Payment";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import StudentList from "./pages/StudentList.jsx";
 import PaymentList from "./pages/PaymentList.jsx";
+import { lazy } from "react";
+
+const FullStackCoursePage = lazy(
+  () => import("./fsdCourse/pages/FullStackCoursePage.jsx"),
+);
+
 import ReportetProtectedRoute from "./reportet/admin/ProtectedRoute";
 import { Toaster } from "react-hot-toast";
 
@@ -93,6 +99,11 @@ function App() {
         </Route>
 
         <Route />
+
+        <Route
+          path="full-stack-development-course"
+          element={<FullStackCoursePage />}
+        />
 
         <Route element={<ContextProviderForReportetLayout />}>
           <Route path="/reportet" element={<HomePage />} />
