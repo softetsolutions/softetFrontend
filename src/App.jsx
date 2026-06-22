@@ -1,8 +1,6 @@
+import { lazy } from "react";
 import "./App.css";
 import Home from "./pages/Home";
-import Codet from "./pages/Codet";
-import Frontet from "./pages/Frontet";
-import JsonDiffet from "./pages/JsonDiffet";
 import { Routes, Route } from "react-router-dom";
 import Term from "./pages/Term";
 import Policy from "./pages/Privacy";
@@ -29,12 +27,34 @@ const FullStackCoursePage = lazy(
   () => import("./fsdCourse/pages/FullStackCoursePage.jsx"),
 );
 
+import ReportetProtectedRoute from "./reportet/admin/ProtectedRoute";
+import { Toaster } from "react-hot-toast";
+
+{
+  /* ReportEt path */
+}
+import HomePage from "./reportet/HomePage";
+import ReportetLogin from "./reportet/Login";
+import UserSignupPage from "./reportet/UserSignup";
+import Sidebar from "./reportet/Sidebar";
+import ContextProviderForReportetLayout from "./reportet/ContextProviderForReportetLayout.jsx";
+
+const Codet = lazy(() => import("./pages/Codet"));
+const Frontet = lazy(() => import("./pages/Frontet"));
+const JsonDiffet = lazy(() => import("./pages/JsonDiffet"));
+
 function App() {
   return (
     <>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/tools/codet" element={<Codet />} />
+        {/* Temprory frontent route */}
+        <Route path="/tools/Frontet" element={<Frontet />} />
+        <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
+
+        {/* Industrial Training Routes */}
+
         <Route path="/:projectSlug" element={<ProjectDetails />} />
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/contact" element={<ContectUsPage />} />
@@ -85,10 +105,24 @@ function App() {
           element={<FullStackCoursePage />}
         />
 
-        {/* Temprory frontent route */}
-        <Route path="/tools/Frontet" element={<Frontet />} />
-        <Route path="/tools/jsonDiff" element={<JsonDiffet />} />
+        <Route element={<ContextProviderForReportetLayout />}>
+          <Route path="/reportet" element={<HomePage />} />
+          <Route path="/login" element={<ReportetLogin />} />
+          <Route path="/signup" element={<UserSignupPage />} />
+          {/* <Route path="/admin" element={<Sidebar />} /> */}
+
+          {/* Protected admin route */}
+          <Route
+            path="/admin"
+            element={
+              <ReportetProtectedRoute routeName="admin" requireRole="admin">
+                <Sidebar />
+              </ReportetProtectedRoute>
+            }
+          />
+        </Route>
       </Routes>
+      <Toaster position="top-right" />
     </>
   );
 }

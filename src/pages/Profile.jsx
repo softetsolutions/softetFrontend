@@ -8,7 +8,6 @@ const ProfileModal = () => {
     phone: "+91 98765 43210",
     course: "Industrial Training",
   };
-  // console.log("Profile user:", storedUser);
 
   const [user, setUser] = useState(storedUser);
   // const [editing, setEditing] = useState(false);
@@ -29,7 +28,7 @@ const ProfileModal = () => {
         {
           method: "GET",
           credentials: "include",
-        }
+        },
       );
 
       if (!res.ok) throw new Error("Failed to download");

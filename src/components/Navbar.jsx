@@ -183,6 +183,12 @@ export function Navbar({
             <>
               {showoptions && (
                 <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
+                  <Link
+                    className="bg-blue-400 px-4 py-2 text-white font-semibold rounded-lg"
+                    to="/reportet"
+                  >
+                    ReportEt
+                  </Link>
                   {navItems.map((item) => (
                     <button
                       key={item.label}

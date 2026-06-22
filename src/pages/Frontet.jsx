@@ -62,8 +62,6 @@ export default function Frontet() {
     };
   }, []);
 
-  console.log("Frontet is rendering");
-
   const handleClearAll = () => {
     if (confirm("Are you sure you want to clear all code?")) {
       setHtml(`<html>
@@ -216,7 +214,7 @@ export default function Frontet() {
                       )}
 
                       {activeTab === "js" && (
-                       <AceEditorComponent
+                        <AceEditorComponent
                           key="softetJs"
                           mode="javascript"
                           theme="chrome"
@@ -253,11 +251,7 @@ export default function Frontet() {
               >
                 {/* Expected Preview */}
                 <Panel defaultSize={50} minSize={30}>
-                  
-                  <IFramePreview 
-                    src={output}
-                    title="Expected Output"
-                  />
+                  <IFramePreview src={output} title="Expected Output" />
                 </Panel>
 
                 {/* Resize Handle */}
@@ -279,10 +273,7 @@ export default function Frontet() {
 
                 {/* Preview */}
                 <Panel defaultSize={50} minSize={30}>
-                  <IFramePreview
-                    src={output}
-                    title="Preview"
-                  />
+                  <IFramePreview src={output} title="Preview" />
                 </Panel>
               </PanelGroup>
             </Panel>
