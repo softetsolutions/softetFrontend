@@ -13,6 +13,17 @@ export const getEmployeeList = async (payload) => {
   return await res.json();
 };
 
+export const getEmployeeListOptions = async (abortcontroller) => {
+  const res = await fetch(`${API_BASE_URL}/employee/getAllEmployeeOptions`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    signal: abortcontroller?.signal,
+  });
+  if (res.status === 401) await handleUnauthorized();
+  if (!res.ok) throw new Error("Failed to fetch employee");
+  return await res.json();
+};
 
 export const getEmployeeById = async (employeeId) => {
   const res = await fetch(`${API_BASE_URL}/employee/${employeeId}`, {

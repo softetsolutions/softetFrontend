@@ -98,7 +98,6 @@ const HeadQuarterListing = () => {
           headQuartersDetails?.data[0]?.totalCount[0]?.totalHeadquarters,
         );
         setLoader(false);
-        console.log("newHeadQuarterDetailsState", newHeadQuarterDetailsState);
       } catch (error) {
         setLoader(false);
         console.error("Error in fetching the headQuarterlist", error);

@@ -30,7 +30,6 @@ const EmployeeList = () => {
         pageNo: paginationData.currentPage,
         limit: paginationData.perPageDocument,
       });
-      console.log("Employee list is", data);
       setEmployees(data.employees || []);
       setTotalEmployees(data?.employeeCount || 0);
     } catch (error) {
@@ -53,8 +52,6 @@ const EmployeeList = () => {
         .includes(searchTerm.toLowerCase()) ||
       employee.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
-  console.log("filteredEmployees", filteredEmployees);
 
   return (
     <div className="bg-gray-100 flex flex-col h-full">

@@ -18,7 +18,6 @@ export default function Signup() {
 
   const [searchParams] = useSearchParams();
   const refferedBy = searchParams.get("referredBy") || null;
-  // console.log("Referred By:", refferedBy);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -49,7 +48,7 @@ export default function Signup() {
 
         setTimeout(
           () => (window.location.href = "/industrial-training/login"),
-          1500
+          1500,
         );
       }
     } catch (err) {

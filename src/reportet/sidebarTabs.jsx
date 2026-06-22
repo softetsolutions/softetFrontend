@@ -10,6 +10,7 @@ import EmployeeList from "./admin/EmployeeList";
 import EmployeeDetail from "./admin/EmployeeProfile";
 import AreaList from "./admin/AreaList";
 import AdminLeaves from "./admin/AdminLeaves";
+import SalesReport from "./admin/SalesReport";
 import {
   ClipboardList,
   Package,
@@ -20,14 +21,30 @@ import {
   Map,
   UserCheck,
   Store,
+  BadgeDollarSign,
+  Parasol,
 } from "lucide-react";
 
 export const sidebarTabs = [
   {
-    id: "visit-report",
-    label: "Visit Report",
+    id: "reports",
+    label: "Reports",
     icon: <ClipboardList size={18} />,
-    component: <VisitReport />,
+
+    dropdown: [
+      {
+        id: "visit-report",
+        label: "Visit Report",
+        icon: <ClipboardList size={18} />,
+        component: <VisitReport />,
+      },
+      {
+        id: "sales-report",
+        label: "Sales Report",
+        icon: <BadgeDollarSign size={18} />,
+        component: <SalesReport />,
+      },
+    ],
   },
   {
     id: "stockist-master",
@@ -36,7 +53,7 @@ export const sidebarTabs = [
     dropdown: [
       {
         id: "stockist-master",
-        label: "Stockist Master",
+        label: "Stockist List",
         icon: <Store size={18} />,
         component: <StockistMaster />,
       },
@@ -120,7 +137,7 @@ export const sidebarTabs = [
   {
     id: "leave-management",
     label: "Leave Management",
-    icon: <MapPin size={18} />,
+    icon: <Parasol size={18} />,
     dropdown: [
       {
         id: "leaves",

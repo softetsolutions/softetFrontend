@@ -45,8 +45,6 @@ export default function Codet() {
     };
   }, []);
 
-  console.log("Codet is rendering");
-
   const handleClearAll = () => {
     if (confirm("Are you sure you want to clear all code?")) {
       setHtml(`<html>
@@ -91,7 +89,6 @@ export default function Codet() {
               value={editTitle.value}
               onChange={(e) => {
                 if (e.key === "Enter") {
-                  console.log("Hi The enter is pressed", e.key);
                   setEditTitle((prevState) => ({
                     ...prevState,
                     isInEditingMode: false,

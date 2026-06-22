@@ -38,7 +38,7 @@ export default function Login() {
       }
       if (!data.user.firstInstallmentPaid) {
         setFeeMessage(
-          "⚠️ Your first installment is pending. Please pay your fee to get dashboard access."
+          "⚠️ Your first installment is pending. Please pay your fee to get dashboard access.",
         );
         setLoading(false);
         navigate("/industrial-training/payment");
@@ -53,14 +53,13 @@ export default function Login() {
 
         course: data.user.course || "Not Selected",
       };
-      // console.log("Logged in user:", user);
-      // console.log(user._id);
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(user));
       navigate("/industrial-training");
     } catch (err) {
       setError("Server not responding");
+      console.error("Error in handling login", err);
     } finally {
       setLoading(false);
     }

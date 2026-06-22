@@ -22,11 +22,13 @@ export const createStockist = async (stockistData) => {
 };
 
 // GET ALL Stockists
-export const getAllStockists = async () => {
+export const getAllStockists = async (abortController, body) => {
   try {
-    const res = await fetch(`${API_BASE_URL}/stockists`, {
-      method: "GET",
+    const res = await fetch(`${API_BASE_URL}/stockists/paginatedStockistList`, {
+      method: "POST",
       credentials: "include",
+      body: JSON.stringify(body),
+      signal: abortController?.signal,
     });
 
     const data = await res.json();

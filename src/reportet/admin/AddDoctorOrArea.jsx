@@ -41,8 +41,6 @@ const AddDoctorOrArea = () => {
   const [duplicateFields, setDuplicateFields] = useState({});
   const [emptyFields, setEmptyFields] = useState({});
 
-  console.log("selectedHeadQuarter is", selectedHeadQuarter);
-
   const fetchHeadQuartersNames = async () => {
     try {
       setLoader(true);
@@ -107,7 +105,6 @@ const AddDoctorOrArea = () => {
       const selectedHeadQuarterId = event.target.value;
       if (mode === "doctor") {
         const res = await getAreasByHeadQuarterId(selectedHeadQuarterId);
-        console.log("Selected headquarter area is", res);
         const areaOptions = res.data.map((doctor) => ({
           name: doctor?.name,
           value: doctor?._id,

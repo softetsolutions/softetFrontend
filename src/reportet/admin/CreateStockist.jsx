@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react";
 import { createStockist } from "../api/stockist";
+import { getAllHeadQuartersNames } from "../api/headQuarter";
+import toast from "react-hot-toast";
 
 function CreateStockist() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
     state: "",
-    gstNo: "",
+    headQuarter: "",
   });
+  const [headQuarterOptions, setHeadQuarterOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
-
-  useEffect(() => {
-    if (message.text) {
-      const timer = setTimeout(() => setMessage({ text: "", type: "" }), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,52 +22,50 @@ function CreateStockist() {
 
   const handleSubmit = async () => {
     try {
-      const { name, address, state, gstNo } = formData;
-      if (!name || !address || !state || !gstNo) {
-        setMessage({ text: "All fields are required", type: "error" });
-
+      const { name, address, state, headQuarter } = formData;
+      if (!name || !address || !state || !headQuarter) {
+        toast.error("All fields are mandatory. Pls fill required fields");
         return;
       }
       setLoading(true);
       const data = await createStockist(formData);
-
-      setMessage({
-        text: `Stockist created successfully: ${data.name}`,
-        type: "success",
-      });
-      setFormData({ name: "", address: "", state: "", gstNo: "" });
+      if (data?.success) {
+        toast.success("Stockist added successfully");
+        setFormData({ name: "", address: "", state: "", headQuarter: "" });
+      }
     } catch (err) {
-      setMessage({
-        text: err.message || "Error creating stockist",
-        type: "Error",
-      });
+      console.error("Unable to create stockist got some problem", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchHeadQuarterNames = async () => {
+    try {
+      const headQuartersOptions = await getAllHeadQuartersNames();
+      setHeadQuarterOptions(headQuartersOptions?.headQuarterNames);
+    } catch (error) {
+      console.error("Unable to fetch the headquarters.", error);
+      toast.error("Unable to fetch the headquarters.Pls refresh the page");
+    }
+  };
+
+  useEffect(() => {
+    fetchHeadQuarterNames();
+  }, []);
+
   return (
     <div>
-      {message.text && (
-        <div
-          className={`mb-4 p-2 rounded text-sm ${
-            message.type === "success"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
-      <h2 className="text-2xl font-bold text-gray-800">Stockist Master</h2>
-      <p className="text-gray-600 mb-6 pb-2 italic">
-        Keep track of your stockist partners and their business info.
-      </p>
+      <h2 className="text-2xl font-bold text-gray-800">Create Stockist</h2>
+      <p className="text-gray-600 mb-6 pb-2 italic">Add stockist.</p>
 
       <div className="space-y-4 bg-white p-6 rounded-lg shadow-md">
         {/* Stockist Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700"
+          >
             Stockist Name
           </label>
           <input
@@ -87,7 +80,10 @@ function CreateStockist() {
 
         {/* Stockist Address */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="address"
+            className="block text-sm font-medium text-gray-700"
+          >
             Stockist Address
           </label>
           <input
@@ -102,7 +98,10 @@ function CreateStockist() {
 
         {/* Stockist State */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="state"
+            className="block text-sm font-medium text-gray-700"
+          >
             Stockist State
           </label>
           <input
@@ -115,19 +114,23 @@ function CreateStockist() {
           />
         </div>
 
-        {/* Stockist GST No */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Stockist GST No.
+          <label htmlFor="headQuarter" className="block text-sm font-medium">
+            Choose HeadQuarter <span className=" text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            name="gstNo"
-            value={formData.gstNo}
+          <select
+            name="headQuarter"
+            className="w-full p-2 border rounded mt-1"
             onChange={handleChange}
-            placeholder="Enter GST number"
-            className="w-full mt-1 px-3 py-2 border rounded-md shadow-sm"
-          />
+            value={formData?.headQuarter}
+          >
+            <option value="">Choose Headquarter</option>
+            {headQuarterOptions?.map((headQuarter) => (
+              <option key={headQuarter?._id} value={headQuarter?._id}>
+                {headQuarter?.headQuarterName}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="flex justify-end space-x-4 mt-6">
@@ -136,10 +139,7 @@ function CreateStockist() {
             disabled={loading}
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? "Saving..." : "Save / Update"}
-          </button>
-          <button className="bg-gray-200 text-gray-800 px-5 py-2 rounded hover:bg-gray-300">
-            Search
+            {loading ? "Saving..." : "Save "}
           </button>
         </div>
       </div>

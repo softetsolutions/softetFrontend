@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import { organizationDailyVisitList } from "../api/api";
+import { organizationSalesList } from "../api/sale";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
 
-const VisitReport = () => {
+const SaleReport = () => {
   const [employees, setEmployees] = useState([]);
-  const [reportData, setReportData] = useState([]);
+  const [saleData, setSaleData] = useState([]);
   const [reportFilters, setReportFilters] = useState({
     employee: "",
     dateFrom: "",
@@ -22,7 +22,7 @@ const VisitReport = () => {
     perPageDocument: 10,
   });
 
-  const getDailyVisitList = useCallback(
+  const getSalesList = useCallback(
     async (abortController, payloadParams) => {
       try {
         const payload = {
@@ -35,12 +35,12 @@ const VisitReport = () => {
           limit: paginationData?.perPageDocument,
           ...payloadParams,
         };
-        const visitReport = await organizationDailyVisitList(
+        const saleReport = await organizationSalesList(
           abortController,
           payload,
         );
-        setReportData(visitReport?.data);
-        setTotalDocuments(visitReport?.dailyVistListCount);
+        setSaleData(saleReport?.data);
+        setTotalDocuments(saleReport?.saleCount);
       } catch (error) {
         if (error.name === "AbortError") {
           console.error("Request was cancelled");
@@ -79,10 +79,10 @@ const VisitReport = () => {
   useEffect(() => {
     const abortController = new AbortController();
     const abortControllerTwo = new AbortController();
-    getDailyVisitList(abortController);
+    getSalesList(abortController);
     getEmployeeOption(abortControllerTwo);
     return () => abortController.abort();
-  }, [getDailyVisitList]);
+  }, [getSalesList]);
 
   return (
     <div className="h-full flex flex-col">
@@ -161,7 +161,7 @@ const VisitReport = () => {
 
       <div className="space-y-4 bg-white  rounded-lg shadow-md mt-3 flex-1">
         <div className="mt-3 p-2 overflow-x-auto h-full">
-          {reportData?.length > 0 ? (
+          {saleData?.length > 0 ? (
             <>
               <div className="h-9/10 overflow-auto">
                 <table className="min-w-full text-sm ">
@@ -176,58 +176,47 @@ const VisitReport = () => {
                       </th>
 
                       <th className=" border-gray-300 px-3 py-2 text-left">
-                        Areas Visited
+                        Stockist Name
                       </th>
 
                       <th className=" border-gray-300 px-3 py-2 text-left">
-                        Doctors Visited
+                        Sale Month
                       </th>
 
                       <th className=" border-gray-300 px-3 py-2 text-left">
-                        Visit Date
+                        Sale Amount
                       </th>
 
                       <th className=" border-gray-300 px-3 py-2 text-left">
-                        With
-                      </th>
-
-                      <th className=" border-gray-300 px-3 py-2 text-left">
-                        Remark
+                        Created At
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {reportData.map((report) => (
+                    {saleData.map((report) => (
                       <tr key={report._id} className="hover:bg-gray-50">
                         <td className=" border-gray-300 px-3 py-2">
-                          {report?.employeeId?.firstName +
+                          {report?.saleBy?.firstName +
                             " " +
-                            report?.employeeId?.lastName +
+                            report?.saleBy?.lastName +
                             ""}
                         </td>
                         <td className=" border-gray-300 px-3 py-2">
-                          {roleMaper[report?.employeeId?.role]}
+                          {roleMaper[report?.saleBy?.role]}
                         </td>
                         <td className=" border-gray-300 px-3 py-2">
-                          {report?.areaId?.map((area) => (
-                            <div key={area?._id}>{area?.name}</div>
-                          ))}
+                          {report?.stockist?.name}
                         </td>
                         <td className=" border-gray-300 px-3 py-2">
-                          {report?.doctorId?.map((doctor) => (
-                            <div key={doctor?._id}>{doctor?.name}</div>
-                          ))}
+                          {report?.month?.toUpperCase()}
+                        </td>
+
+                        <td className=" border-gray-300 px-3 py-2">
+                          {report?.saleAmount}
                         </td>
 
                         <td className=" border-gray-300 px-3 py-2">
                           {formatDate(report?.createdAt)}
-                        </td>
-
-                        <td className=" border-gray-300 px-3 py-2">
-                          {report?.assistedBy || "-"}
-                        </td>
-                        <td className=" border-gray-300 px-3 py-2">
-                          {report.remark}
                         </td>
                       </tr>
                     ))}
@@ -239,7 +228,7 @@ const VisitReport = () => {
                 perPageDocument={paginationData.perPageDocument}
                 currentPage={paginationData.currentPage}
                 paginationHandler={setPaginationData}
-                actualResultPerPage={reportData?.length}
+                actualResultPerPage={saleData?.length}
                 listName="Reports"
               />
             </>
@@ -252,4 +241,4 @@ const VisitReport = () => {
   );
 };
 
-export default VisitReport;
+export default SaleReport;

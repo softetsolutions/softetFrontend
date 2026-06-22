@@ -23,8 +23,6 @@ const Navbar = () => {
   // Handle login/dashboard click
   const onLoginClick = () => {
     navigate(isLoggedIn ? "/admin" : "/login");
-    console.log("user loggedIn");
-    
   };
 
   // Detect login state on mount
@@ -53,12 +51,17 @@ const Navbar = () => {
     <>
       <nav
         className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          scrolled ? "bg-gray-300 shadow-md text-black" : "bg-transparent text-white"
+          scrolled
+            ? "bg-gray-300 shadow-md text-black"
+            : "bg-transparent text-white"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 text-blue-600 font-bold text-2xl">
+          <a
+            href="/"
+            className="flex items-center gap-2 text-blue-600 font-bold text-2xl"
+          >
             Report<span className="text-black">ET</span>
           </a>
 
@@ -101,7 +104,10 @@ const Navbar = () => {
       >
         <div className="flex flex-col h-full p-6">
           <div className="flex justify-between items-center mb-8">
-            <a href="/" className="flex items-center gap-2 text-blue-600 font-bold text-2xl">
+            <a
+              href="/"
+              className="flex items-center gap-2 text-blue-600 font-bold text-2xl"
+            >
               <Receipt className="w-6 h-6 text-orange-500" />
               Report<span className="text-black">ET</span>
             </a>

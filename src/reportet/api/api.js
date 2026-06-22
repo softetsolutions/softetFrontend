@@ -68,3 +68,18 @@ export const onboardEmployee = async (payload) => {
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
 };
+
+export const organizationDailyVisitList = async (abortcontroller, payload) => {
+  const res = await fetch(
+    `${API_BASE_URL}/daily-visit/getOrganizationVisitList`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+      signal: abortcontroller?.signal,
+    },
+  );
+  if (res.status === 401) await handleUnauthorized();
+  return await res.json();
+};
