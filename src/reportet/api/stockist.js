@@ -27,6 +27,9 @@ export const getAllStockists = async (abortController, body) => {
     const res = await fetch(`${API_BASE_URL}/stockists/paginatedStockistList`, {
       method: "POST",
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json", 
+      },
       body: JSON.stringify(body),
       signal: abortController?.signal,
     });

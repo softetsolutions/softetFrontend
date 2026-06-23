@@ -16,7 +16,7 @@ const DoctorsList = () => {
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
-    perPageDocument: 10,
+    perPageDocument: 5,
   });
 
   // Fetch doctors from API

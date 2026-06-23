@@ -14,12 +14,25 @@ const StockistMaster = () => {
     perPageDocument: 5,
   });
 
+  useEffect(() => {
+    if (
+      totalStockist > 0 &&
+      paginationData.currentPage >
+        Math.ceil(totalStockist / paginationData.perPageDocument)
+    ) {
+      setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+    }
+  }, [totalStockist]);
+
   // Fetch stockists from API
   useEffect(() => {
     const fetchStockists = async (abortController) => {
       try {
         setLoading(true);
-        const res = await getAllStockists(abortController);
+        const res = await getAllStockists(abortController, {
+          pageNo: paginationData.currentPage,
+          limit: paginationData.perPageDocument,
+        });
         setStockists(res?.data);
         setTotalStockist(res?.stockistCount);
       } catch (error) {
@@ -31,7 +44,7 @@ const StockistMaster = () => {
 
     const abortController = new AbortController();
     fetchStockists(abortController);
-  }, []);
+  }, [paginationData]);
 
   // Filter stockists based on search term
   // const filteredStockists = stockists.filter(
