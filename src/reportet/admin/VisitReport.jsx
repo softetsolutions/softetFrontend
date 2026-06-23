@@ -5,10 +5,12 @@ import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
+import Spinner from "../genericComps/Spinner";
 
 const VisitReport = () => {
   const [employees, setEmployees] = useState([]);
   const [reportData, setReportData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [reportFilters, setReportFilters] = useState({
     employee: "",
     dateFrom: "",
@@ -25,6 +27,7 @@ const VisitReport = () => {
   const getDailyVisitList = useCallback(
     async (abortController, payloadParams) => {
       try {
+        setLoading(true);
         const payload = {
           ...(reportFilters?.employee && {
             employeeId: reportFilters?.employee,
@@ -49,6 +52,8 @@ const VisitReport = () => {
 
         console.error("Problem in fetching daily visit list org wise", error);
         toast.error("Unable to get the daily visit list, Pls try again later");
+      } finally {
+        setLoading(false);
       }
     },
     [
@@ -150,9 +155,17 @@ const VisitReport = () => {
           <div className="flex-1 flex flex-col justify-end">
             <button
               onClick={handleSearch}
+              disabled={loading}
               className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer"
             >
-              Apply
+              {loading && (
+                <Spinner
+                  size={16}
+                  borderWidth={2}
+                  className="border-white border-t-transparent"
+                />
+              )}
+              {loading ? "Applying" : "Apply"}
             </button>
           </div>
         </div>
@@ -161,7 +174,12 @@ const VisitReport = () => {
 
       <div className="space-y-4 bg-white  rounded-lg shadow-md mt-3 flex-1">
         <div className="mt-3 p-2 overflow-x-auto h-full">
-          {reportData?.length > 0 ? (
+          {loading ? (
+            <div className="h-full flex flex-col items-center justify-center gap-3 py-10">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-gray-500 text-sm">Loading Visit report...</p>
+            </div>
+          ) : reportData?.length > 0 ? (
             <>
               <div className="h-9/10 overflow-auto">
                 <table className="min-w-full text-sm ">

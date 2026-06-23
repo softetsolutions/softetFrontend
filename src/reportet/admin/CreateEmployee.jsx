@@ -7,11 +7,13 @@ import { getAllHeadQuartersNames } from "../api/headQuarter.js";
 import { onboardEmployee } from "../api/api.js";
 import { Input } from "../genericComps/InputComps.jsx";
 import { EyeOff, Eye } from "lucide-react";
+import Spinner from "../genericComps/Spinner.jsx";
 
 const CreateEmployee = () => {
   const [selectedHeadQuarters, setSelectedHeadQuarters] = useState([]);
   const [headQuartersNames, setHeadQuartersNames] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState({ text: "", type: "" });
 
@@ -57,6 +59,7 @@ const CreateEmployee = () => {
 
   const handleSave = async () => {
     try {
+      setLoading(true);
       const {
         firstName,
         lastName,
@@ -111,6 +114,8 @@ const CreateEmployee = () => {
     } catch (err) {
       toast.error(err.message);
       console.error("Error in onboarding new Employee", err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -267,9 +272,17 @@ const CreateEmployee = () => {
 
         <button
           onClick={handleSave}
+          disabled={loading}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
         >
-          Save
+          {loading && (
+            <Spinner
+              size={16}
+              borderWidth={2}
+              className="border-white border-t-transparent"
+            />
+          )}
+          {loading ? "Saving" : "Save"}
         </button>
       </div>
     </div>

@@ -5,10 +5,14 @@ import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
+import Spinner from "../genericComps/Spinner";
 
 const SaleReport = () => {
   const [employees, setEmployees] = useState([]);
   const [saleData, setSaleData] = useState([]);
+  const [load, setLoad] = useState(false);
+  const [tableLoading, setTableLoading] = useState(false);
+
   const [reportFilters, setReportFilters] = useState({
     employee: "",
     dateFrom: "",
@@ -25,6 +29,7 @@ const SaleReport = () => {
   const getSalesList = useCallback(
     async (abortController, payloadParams) => {
       try {
+        setTableLoading(true);
         const payload = {
           ...(reportFilters?.employee && {
             employeeId: reportFilters?.employee,
@@ -49,6 +54,8 @@ const SaleReport = () => {
 
         console.error("Problem in fetching daily visit list org wise", error);
         toast.error("Unable to get the daily visit list, Pls try again later");
+      } finally {
+        setTableLoading(false);
       }
     },
     [
@@ -60,6 +67,7 @@ const SaleReport = () => {
 
   const getEmployeeOption = async (abortController) => {
     try {
+      setLoad(true);
       const employees = await getEmployeeListOptions(abortController);
       const employeeOptions = employees?.data?.map((employee) => ({
         employeeName: employee?.firstName + " " + employee?.lastName,
@@ -150,9 +158,18 @@ const SaleReport = () => {
           <div className="flex-1 flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer"
+              disabled={tableLoading}
+              className="bg-blue-900 text-white rounded w-full py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
             >
-              Apply
+              {tableLoading && (
+                <Spinner
+                  size={16}
+                  borderWidth={2}
+                  className="border-white border-t-transparent"
+                />
+              )}
+
+              {tableLoading ? "Applying..." : "Apply"}
             </button>
           </div>
         </div>
@@ -161,7 +178,12 @@ const SaleReport = () => {
 
       <div className="space-y-4 bg-white  rounded-lg shadow-md mt-3 flex-1">
         <div className="mt-3 p-2 overflow-x-auto h-full">
-          {saleData?.length > 0 ? (
+          {tableLoading ? (
+            <div className="h-full flex flex-col items-center justify-center gap-3 py-10">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-gray-500 text-sm">Loading sales report...</p>
+            </div>
+          ) : saleData?.length > 0 ? (
             <>
               <div className="h-9/10 overflow-auto">
                 <table className="min-w-full text-sm ">

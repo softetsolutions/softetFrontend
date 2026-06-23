@@ -276,7 +276,7 @@ const HierarchyForm = () => {
             onClick={() => submitHierarchyHandler(headquarters)}
             className={`flex items-center gap-1 text-white px-4 py-2 rounded cursor-pointer ${loader ? "bg-blue-400" : "bg-blue-600"}`}
           >
-            <div>Save</div>
+            <div>{loader ? "Saving..." : "Save"}</div>
             {loader && (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             )}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createStockist } from "../api/stockist";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import toast from "react-hot-toast";
+import Spinner from "../genericComps/Spinner";
 
 function CreateStockist() {
   const [formData, setFormData] = useState({
@@ -139,6 +140,13 @@ function CreateStockist() {
             disabled={loading}
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
           >
+            {loading && (
+              <Spinner
+                size={16}
+                borderWidth={2}
+                className="border-white border-t-transparent"
+              />
+            )}
             {loading ? "Saving..." : "Save "}
           </button>
         </div>

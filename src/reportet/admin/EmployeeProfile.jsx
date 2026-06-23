@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
+import Spinner from "../genericComps/Spinner";
 import {
   PhoneCall,
   Mail,
@@ -33,6 +34,7 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const [saving, setSaving] = useState(false);
   const [allHeadQuarters, setAllHeadQuarters] = useState([]);
   const [hqsLoading, setHqsLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   const [form, setForm] = useState({
     firstName: "",
@@ -110,6 +112,8 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const fetchEmployee = async () => {
     try {
       setLoading(true);
+
+      setSearching(true);
       const data = await getEmployeeById(employeeId);
       setEmployee(data.employee);
       setForm({
@@ -126,6 +130,7 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
       toast.error("Failed to fetch employee details");
     } finally {
       setLoading(false);
+      setSearching(false);
     }
   };
 
@@ -246,9 +251,17 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
           </div>
           <button
             onClick={() => setEmployeeId(searchInput.trim())}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+            disabled={searching}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors disabled:opacity-70 flex items-center gap-2"
           >
-            Search
+            {searching && (
+              <Spinner
+                size={16}
+                borderWidth={2}
+                className="border-white border-t-transparent"
+              />
+            )}
+            {searching ? "Searching..." : "Search"}
           </button>
         </div>
         <p className="text-gray-500 text-sm italic text-center mt-10">
@@ -261,7 +274,8 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
     return (
       <div className="bg-gray-100 flex flex-col h-full">
         <div className="text-center py-6 text-gray-500 text-sm">
-          Loading employee details...
+          <Spinner size={48} borderWidth={4} />
+          <p className="text-sm text-gray-500">Loading employee details...</p>
         </div>
       </div>
     );
@@ -320,9 +334,17 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
           </div>
           <button
             onClick={() => setEmployeeId(searchInput.trim())}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+            disabled={searching}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-70"
           >
-            Search
+            {searching && (
+              <Spinner
+                size={16}
+                borderWidth={2}
+                className="border-white border-t-transparent"
+              />
+            )}
+            {searching ? "Searching..." : "Search"}
           </button>
         </div>
         <div className="flex items-center gap-1">
@@ -350,7 +372,15 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
                 disabled={saving}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                <Check size={16} /> {saving ? "Saving..." : "Save Changes"}
+                {saving && (
+                  <Spinner
+                    size={16}
+                    borderWidth={2}
+                    className="border-white border-t-transparent"
+                  />
+                )}
+                <Check size={16} />
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </>
           ) : (

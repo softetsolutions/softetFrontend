@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import { useState, useEffect, useCallback } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaFileImport } from "react-icons/fa";
+import Spinner from "../genericComps/Spinner";
 
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { getAllDoctors, importDoctorsFromExcel } from "../api/doctor";
@@ -114,8 +115,9 @@ const DoctorsList = () => {
         {/* Doctor Table */}
         <div className="overflow-x-auto h-full flex flex-col ">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">
-              Loading doctors...
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-sm text-gray-500">Loading Doctors...</p>
             </div>
           ) : (
             <>

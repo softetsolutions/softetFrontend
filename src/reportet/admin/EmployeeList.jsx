@@ -8,6 +8,7 @@ import { getEmployeeList } from "../api/employee";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
 import { PhoneCall, Pencil } from "lucide-react";
+import Spinner from "../genericComps/Spinner";
 
 const EmployeeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,8 +101,9 @@ const EmployeeList = () => {
         {/* MR Table */}
         <div className="overflow-x-auto flex-1">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">
-              Loading employees...
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-sm text-gray-500">Loading Employees...</p>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">

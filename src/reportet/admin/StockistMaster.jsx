@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { getAllStockists } from "../api/stockist"; // Adjust path if needed
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
+import Spinner from "../genericComps/Spinner";
 
 const StockistMaster = () => {
   // const [searchTerm, setSearchTerm] = useState("");
@@ -80,8 +81,9 @@ const StockistMaster = () => {
         {/* Stockist Table */}
         <div className="overflow-x-auto flex-1">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">
-              Loading stockists...
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-sm text-gray-500">Loading stockists...</p>
             </div>
           ) : (
             <>
