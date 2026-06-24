@@ -6,6 +6,7 @@ import { Input, Select } from "../genericComps/InputComps";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import { getAreasByHeadQuarterId, createArea } from "../api/area";
 import { addDoctors } from "../api/doctor";
+import Spinner from "../genericComps/Spinner";
 
 const addOptions = [
   {
@@ -40,10 +41,14 @@ const AddDoctorOrArea = () => {
   const [selectedArea, setSelectedArea] = useState("");
   const [duplicateFields, setDuplicateFields] = useState({});
   const [emptyFields, setEmptyFields] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [hqLoading, setHqLoading] = useState(false);
+  const [areaLoading, setAreaLoading] = useState(false);
 
   const fetchHeadQuartersNames = async () => {
     try {
       setLoader(true);
+      setHqLoading(true);
       const { headQuarterNames } = await getAllHeadQuartersNames();
       const headQuartersOptions = headQuarterNames.map((headQuarter) => ({
         name: headQuarter?.headQuarterName,
@@ -102,6 +107,7 @@ const AddDoctorOrArea = () => {
 
   const handleHeadQuarterSelection = async (event) => {
     try {
+      setAreaLoading(true);
       const selectedHeadQuarterId = event.target.value;
       if (mode === "doctor") {
         const res = await getAreasByHeadQuarterId(selectedHeadQuarterId);
@@ -116,6 +122,8 @@ const AddDoctorOrArea = () => {
     } catch (error) {
       console.error("Unable to fetch area", error);
       toast.error("Unable to select headquarter");
+    } finally {
+      setAreaLoading(false);
     }
   };
 
@@ -138,6 +146,8 @@ const AddDoctorOrArea = () => {
 
   const handleSubmit = async () => {
     try {
+      setSaving(true);
+
       let payload = {};
       const emptyFields = {};
       const repeatingField = {};
@@ -235,6 +245,8 @@ const AddDoctorOrArea = () => {
     } catch (error) {
       console.error("Error in adding areas", error);
       toast.error("Cant add areas. Pls try again later");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -268,7 +280,10 @@ const AddDoctorOrArea = () => {
             onChange={handleHeadQuarterSelection}
             required={true}
             options={headQuartersOptions}
-            selectName={"Choose Headquarter"}
+            disabled={hqLoading}
+            selectName={
+              hqLoading ? "Loading Headquarters..." : "Choose Headquarter"
+            }
           />
         )}
 
@@ -277,11 +292,12 @@ const AddDoctorOrArea = () => {
           {mode === "doctor" && selectedHeadQuarter && (
             <div>
               <Select
-                selectName={"Choose Area"}
+                selectName={areaLoading ? "Loading Areas..." : "Choose Area"}
                 labelName={"Area"}
                 value={selectedArea}
                 options={areaOptions}
                 required={true}
+                disabled={areaLoading}
                 onChange={(event) => setSelectedArea(event.target.value)}
               />
             </div>
@@ -397,12 +413,23 @@ const AddDoctorOrArea = () => {
           )}
 
           <button
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-60 flex items-center gap-2"
             onClick={handleSubmit}
-            // disabled={loading}
+            disabled={saving}
           >
-            {/* {loading ? "Submitting..." : "Submit All"} */}
-            Submit
+            {saving && (
+              <Spinner
+                size={16}
+                borderWidth={2}
+                className="border-white border-t-transparent"
+              />
+            )}
+
+            {saving
+              ? mode === "doctor"
+                ? "Saving Doctors..."
+                : "Saving Areas..."
+              : "Submit"}
           </button>
         </>
       </div>

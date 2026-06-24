@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { getAreas } from "../api/area";
+import Spinner from "../genericComps/Spinner";
 
 const AreaList = () => {
   const [loading, setLoading] = useState(false);
@@ -8,7 +9,7 @@ const AreaList = () => {
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
-    perPageDocument: 8,
+    perPageDocument: 5,
   });
 
   const fetchAreas = useCallback(async () => {
@@ -46,8 +47,9 @@ const AreaList = () => {
       <div className="bg-white p-6 rounded-lg shadow-md flex-1">
         <div className="overflow-x-auto h-full flex flex-col ">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">
-              Loading areas...
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-sm text-gray-500">Loading Areas...</p>
             </div>
           ) : (
             <>

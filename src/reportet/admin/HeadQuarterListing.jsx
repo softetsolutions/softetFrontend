@@ -131,9 +131,10 @@ const HeadQuarterListing = () => {
       {loader && (
         <div
           style={{ height: "calc(100% - 106px)", overflow: "auto" }}
-          className="flex justify-center items-center"
+          className="flex flex-col justify-center items-center gap-3"
         >
           <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-500 text-sm">Loading HeadQuarters...</p>
         </div>
       )}
 

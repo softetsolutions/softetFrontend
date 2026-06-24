@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { getAllLeavesForAdmin, actionOnLeaveByAdmin } from "../api/leave";
 import { formatDate } from "../utils/helperFunctions";
+import Spinner from "../genericComps/Spinner";
 
 const STATUS_TABS = ["all", "areaManager", "pending", "approved", "rejected"];
 
@@ -217,8 +218,9 @@ const AdminLeaves = () => {
       {/* Content */}
       <div className="bg-white rounded-lg shadow-md flex-1 overflow-hidden">
         {loading ? (
-          <div className="py-16 text-center text-sm text-gray-400">
-            Loading leave requests...
+          <div className="py-16 flex flex-col items-center justify-center gap-3">
+            <Spinner size={40} borderWidth={4} />
+            <p className="text-sm text-gray-400">Loading leave requests...</p>
           </div>
         ) : leaves.length === 0 ? (
           <div className="py-16 flex flex-col items-center gap-3 text-gray-400">

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { getAllStockists } from "../api/stockist"; // Adjust path if needed
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
+import Spinner from "../genericComps/Spinner";
 
 const StockistMaster = () => {
   // const [searchTerm, setSearchTerm] = useState("");
@@ -13,12 +14,25 @@ const StockistMaster = () => {
     perPageDocument: 5,
   });
 
+  useEffect(() => {
+    if (
+      totalStockist > 0 &&
+      paginationData.currentPage >
+        Math.ceil(totalStockist / paginationData.perPageDocument)
+    ) {
+      setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+    }
+  }, [totalStockist]);
+
   // Fetch stockists from API
   useEffect(() => {
     const fetchStockists = async (abortController) => {
       try {
         setLoading(true);
-        const res = await getAllStockists(abortController);
+        const res = await getAllStockists(abortController, {
+          pageNo: paginationData.currentPage,
+          limit: paginationData.perPageDocument,
+        });
         setStockists(res?.data);
         setTotalStockist(res?.stockistCount);
       } catch (error) {
@@ -30,7 +44,7 @@ const StockistMaster = () => {
 
     const abortController = new AbortController();
     fetchStockists(abortController);
-  }, []);
+  }, [paginationData]);
 
   // Filter stockists based on search term
   // const filteredStockists = stockists.filter(
@@ -80,8 +94,9 @@ const StockistMaster = () => {
         {/* Stockist Table */}
         <div className="overflow-x-auto flex-1">
           {loading ? (
-            <div className="text-center py-6 text-gray-500 text-sm">
-              Loading stockists...
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <Spinner size={40} borderWidth={4} />
+              <p className="text-sm text-gray-500">Loading stockists...</p>
             </div>
           ) : (
             <>
