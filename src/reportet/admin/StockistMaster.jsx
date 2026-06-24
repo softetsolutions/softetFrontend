@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-import { getAllStockists } from "../api/stockist"; // Adjust path if needed
+import { Pencil, X, Check, Loader2 } from "lucide-react";
+import { getAllStockists, updateStockist } from "../api/stockist"; // Adjust path if needed
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import Spinner from "../genericComps/Spinner";
 
@@ -9,6 +10,16 @@ const StockistMaster = () => {
   const [stockists, setStockists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalStockist, setTotalStockist] = useState(0);
+  const [editingStockist, setEditingStockist] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editLoader, setEditLoader] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [filters, setFilters] = useState({
+    name: "",
+    state: "",
+    address: "",
+    headQuarter: "",
+  });
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     perPageDocument: 5,
@@ -32,6 +43,10 @@ const StockistMaster = () => {
         const res = await getAllStockists(abortController, {
           pageNo: paginationData.currentPage,
           limit: paginationData.perPageDocument,
+          name: filters.name,
+          state: filters.state,
+          address: filters.address,
+          headQuarter: filters.headQuarter,
         });
         setStockists(res?.data);
         setTotalStockist(res?.stockistCount);
@@ -44,7 +59,13 @@ const StockistMaster = () => {
 
     const abortController = new AbortController();
     fetchStockists(abortController);
-  }, [paginationData]);
+  }, [paginationData, filters]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  };
 
   // Filter stockists based on search term
   // const filteredStockists = stockists.filter(
@@ -56,6 +77,39 @@ const StockistMaster = () => {
   //     stockist.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     stockist.gstNumber?.toLowerCase().includes(searchTerm.toLowerCase()),
   // );
+  const openEdit = (stockist) => {
+    setEditingStockist(stockist);
+    setEditName(stockist.name);
+    setEditError("");
+  };
+
+  const closeEdit = () => {
+    setEditingStockist(null);
+    setEditName("");
+    setEditError("");
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editName.trim()) {
+      setEditError("Stockist name is required.");
+      return;
+    }
+    try {
+      setEditLoader(true);
+      setEditError("");
+      await updateStockist(editingStockist._id, { name: editName.trim() });
+      setStockists((prev) =>
+        prev.map((s) =>
+          s._id === editingStockist._id ? { ...s, name: editName.trim() } : s,
+        ),
+      );
+      closeEdit();
+    } catch (error) {
+      setEditError("Failed to update. Please try again.");
+    } finally {
+      setEditLoader(false);
+    }
+  };
 
   return (
     <div className="bg-gray-100 flex flex-col max-h-full">
@@ -91,6 +145,89 @@ const StockistMaster = () => {
           </div> */}
         </div>
 
+        <div className="flex flex-wrap gap-3 mb-4 items-center">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input
+              name="name"
+              value={filters.name}
+              onChange={handleFilterChange}
+              placeholder="Search by name..."
+              className="pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition w-56"
+            />
+          </div>
+
+          <select
+            name="state"
+            value={filters.state}
+            onChange={handleFilterChange}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition text-gray-600 w-44"
+          >
+            <option value="">All States</option>
+            {[...new Set(stockists.map((s) => s.state).filter(Boolean))].map(
+              (state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ),
+            )}
+          </select>
+
+          <select
+            name="address"
+            value={filters.address}
+            onChange={handleFilterChange}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition text-gray-600 w-44"
+          >
+            <option value="">All Addresses</option>
+            {[...new Set(stockists.map((s) => s.address).filter(Boolean))].map(
+              (address) => (
+                <option key={address} value={address}>
+                  {address}
+                </option>
+              ),
+            )}
+          </select>
+
+          <select
+            name="headQuarter"
+            value={filters.headQuarter}
+            onChange={handleFilterChange}
+            className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition text-gray-600 w-44"
+          >
+            <option value="">All Headquarters</option>
+            {[
+              ...new Map(
+                stockists
+                  .filter((s) => s.headQuarter?._id)
+                  .map((s) => [s.headQuarter._id, s.headQuarter]),
+              ).values(),
+            ].map((hq) => (
+              <option key={hq._id} value={hq._id}>
+                {hq.headQuarterName}
+              </option>
+            ))}
+          </select>
+
+          {(filters.name ||
+            filters.state ||
+            filters.address ||
+            filters.headQuarter) && (
+            <button
+              onClick={() =>
+                setFilters({
+                  name: "",
+                  state: "",
+                  address: "",
+                  headQuarter: "",
+                })
+              }
+              className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"
+            >
+              Clear
+            </button>
+          )}
+        </div>
         {/* Stockist Table */}
         <div className="overflow-x-auto flex-1">
           {loading ? (
@@ -116,6 +253,9 @@ const StockistMaster = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Headquarter Name
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -133,6 +273,15 @@ const StockistMaster = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {stockist?.headQuarter?.headQuarterName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => openEdit(stockist)}
+                              title="Edit stockist"
+                              className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -161,6 +310,81 @@ const StockistMaster = () => {
           )}
         </div>
       </div>
+      {editingStockist && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={closeEdit}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+                  <Pencil className="w-4 h-4 text-blue-600" />
+                </div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Edit Stockist
+                </h2>
+              </div>
+              <button
+                onClick={closeEdit}
+                className="p-1.5 rounded-md text-gray-400 hover:bg-gray-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Field */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                  Stockist Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                />
+              </div>
+              {editError && (
+                <p className="text-xs text-red-500 font-medium">{editError}</p>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                onClick={closeEdit}
+                disabled={editLoader}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={editLoader}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-60"
+              >
+                {editLoader ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Save changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

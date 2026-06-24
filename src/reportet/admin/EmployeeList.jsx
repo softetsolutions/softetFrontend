@@ -15,6 +15,11 @@ const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [filters, setFilters] = useState({
+    name: "",
+    fromDate: "",
+    toDate: "",
+  });
 
   const [selectedMR, setSelectedMR] = useState(null);
 
@@ -30,6 +35,9 @@ const EmployeeList = () => {
       const data = await getEmployeeList({
         pageNo: paginationData.currentPage,
         limit: paginationData.perPageDocument,
+        name: filters.name,
+        fromDate: filters.fromDate,
+        toDate: filters.toDate,
       });
       setEmployees(data.employees || []);
       setTotalEmployees(data?.employeeCount || 0);
@@ -43,7 +51,7 @@ const EmployeeList = () => {
 
   useEffect(() => {
     fetchEmployees(paginationData);
-  }, [paginationData]);
+  }, [paginationData, filters]);
 
   // Filter MRs based on search term
   const filteredEmployees = employees.filter(
@@ -54,6 +62,11 @@ const EmployeeList = () => {
       employee.email?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  };
   return (
     <div className="bg-gray-100 flex flex-col h-full">
       <MrDialogBox
@@ -79,25 +92,59 @@ const EmployeeList = () => {
         </div>
       </header>
 
-      {/* MR List Section */}
       <div className="bg-white p-6 rounded-lg shadow-md flex-1 flex flex-col">
-        {/* Search */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
           <h2 className="text-xl font-medium text-gray-800">Employee List</h2>
-          {/* <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaSearch className="h-4 w-4 text-gray-400" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search MRs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm w-64"
-            />
-          </div> */}
-        </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <input
+                name="name"
+                value={filters.name}
+                onChange={handleFilterChange}
+                placeholder="Search by name..."
+                className="pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition w-48"
+              />
+            </div>
 
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs text-gray-500 whitespace-nowrap">
+                From
+              </label>
+              <input
+                type="date"
+                name="fromDate"
+                value={filters.fromDate}
+                onChange={handleFilterChange}
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+              />
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs text-gray-500 whitespace-nowrap">
+                To
+              </label>
+              <input
+                type="date"
+                name="toDate"
+                value={filters.toDate}
+                onChange={handleFilterChange}
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+              />
+            </div>
+
+            {(filters.name || filters.fromDate || filters.toDate) && (
+              <button
+                onClick={() =>
+                  setFilters({ name: "", fromDate: "", toDate: "" })
+                }
+                className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
         {/* MR Table */}
         <div className="overflow-x-auto flex-1">
           {loading ? (

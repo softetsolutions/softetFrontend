@@ -114,3 +114,14 @@ export const getAreaByMrId = async (mrId) => {
     throw err;
   }
 };
+export const editArea = async (areaId, data) => {
+  const res = await fetch(`${API_BASE_URL}/area/${areaId}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data), 
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to update area");
+  return result;
+};

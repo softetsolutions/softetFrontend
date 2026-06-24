@@ -103,3 +103,16 @@ export const getDoctorsWithRemarks = async (
     throw err;
   }
 };
+
+
+export const editDoctor = async (doctorId, data) => {
+  const res = await fetch(`${API_BASE_URL}/doctor/${doctorId}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data), 
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to update doctor");
+  return result;
+};

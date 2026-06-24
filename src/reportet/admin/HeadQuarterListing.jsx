@@ -7,8 +7,17 @@ import {
   ChevronUp,
   Search,
   SlidersHorizontal,
+  Pencil,
+  X,
+  Check,
+  Loader2,
+  Trash2,
 } from "lucide-react";
-import { getAllHeadquartersData } from "../api/headQuarter";
+import {
+  getAllHeadquartersData,
+  editHeadQuarter,
+  deleteHeadQuarter,
+} from "../api/headQuarter";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 
 // let headQuarterListingStructure = [
@@ -36,11 +45,21 @@ const HeadQuarterListing = () => {
   const [expandedHq, setExpandedHq] = useState(null);
   const [expandedArea, setExpandedArea] = useState(null);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [filters, setFilters] = useState({ headQuarterName: "", location: "" });
+
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     perPageDocument: 5,
   });
   const [loader, setLoader] = useState(false);
+  const [editingHq, setEditingHq] = useState(null);
+  const [editForm, setEditForm] = useState({
+    headQuarterName: "",
+    location: "",
+  });
+  const [editLoader, setEditLoader] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [deleteLoader, setDeleteLoader] = useState(null);
 
   // Helper to calculate totals from nested state
   const getTotals = (hq) => {
@@ -59,6 +78,8 @@ const HeadQuarterListing = () => {
         const headQuartersDetails = await getAllHeadquartersData({
           pageNo: paginationData.currentPage,
           perPageDocument: paginationData.perPageDocument,
+          headQuarterName: filters.headQuarterName,
+          location: filters.location,
         });
         const newHeadQuarterDetailsState =
           headQuartersDetails?.data[0]?.headQuarterDetail?.map(
@@ -103,7 +124,70 @@ const HeadQuarterListing = () => {
         console.error("Error in fetching the headQuarterlist", error);
       }
     })();
-  }, [paginationData]);
+  }, [paginationData, filters]);
+
+  const openEdit = (e, hq) => {
+    e.stopPropagation();
+    setEditingHq(hq);
+    setEditForm({ headQuarterName: hq.name, location: hq.location });
+    setEditError("");
+  };
+
+  const closeEdit = () => {
+    setEditingHq(null);
+    setEditForm({ headQuarterName: "", location: "" });
+    setEditError("");
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editForm.headQuarterName.trim()) {
+      setEditError("Headquarter name is required.");
+      return;
+    }
+    try {
+      setEditLoader(true);
+      setEditError("");
+      await editHeadQuarter(editingHq.id, {
+        headQuarterName: editForm.headQuarterName.trim(),
+        location: editForm.location.trim(),
+      });
+      setHeadquarters((prev) =>
+        prev.map((hq) =>
+          hq.id === editingHq.id
+            ? {
+                ...hq,
+                name: editForm.headQuarterName.trim(),
+                location: editForm.location.trim(),
+              }
+            : hq,
+        ),
+      );
+      closeEdit();
+    } catch (error) {
+      setEditError("Failed to update. Please try again.");
+    } finally {
+      setEditLoader(false);
+    }
+  };
+  const handleDelete = async (e, hqId) => {
+    e.stopPropagation();
+
+    try {
+      setDeleteLoader(hqId);
+      await deleteHeadQuarter(hqId);
+      setHeadquarters((prev) => prev.filter((hq) => hq.id !== hqId));
+      setTotalDocuments((prev) => prev - 1);
+    } catch (error) {
+      console.error("Delete headquarter error:", error);
+    } finally {
+      setDeleteLoader(null);
+    }
+  };
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  };
 
   return (
     <div className="flex flex-col gap-2 h-full  w-full max-w-5xl mx-auto space-y-4 bg-[#f7f9fb] font-inter antialiased text-slate-900">
@@ -112,20 +196,40 @@ const HeadQuarterListing = () => {
         <h1 className="text-2xl pl-2 font-bold text-slate-900">
           Network Directory
         </h1>
-        {/* <div className="flex items-center gap-3">
+
+        <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
-              type="text"
-              placeholder="Search network..."
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-64 shadow-sm"
+              name="headQuarterName"
+              value={filters.headQuarterName}
+              onChange={handleFilterChange}
+              placeholder="Search by name..."
+              className="pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-52 shadow-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-            <SlidersHorizontal className="w-4 h-4" />
-            Filters
-          </button>
-        </div> */}
+
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              name="location"
+              value={filters.location}
+              onChange={handleFilterChange}
+              placeholder="Filter by location..."
+              className="pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-52 shadow-sm"
+            />
+          </div>
+
+          {(filters.headQuarterName || filters.location) && (
+            <button
+              onClick={() => setFilters({ headQuarterName: "", location: "" })}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-md transition"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loader && (
@@ -156,6 +260,26 @@ const HeadQuarterListing = () => {
                   }
                 >
                   <div className="flex items-center gap-4">
+                    <button
+                      onClick={(e) => openEdit(e, hq)}
+                      title="Edit headquarter"
+                      className="p-2 rounded-md text-slate-400 hover:text-[#0F52BA] hover:bg-blue-50 transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={(e) => handleDelete(e, hq.id)}
+                      title="Delete headquarter"
+                      disabled={deleteLoader === hq.id}
+                      className="p-2 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      {deleteLoader === hq.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
+                    </button>
                     <div className="w-10 h-10 bg-blue-50 rounded flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-[#0F52BA]" />
                     </div>
@@ -296,6 +420,102 @@ const HeadQuarterListing = () => {
               </div>
             );
           })}
+        </div>
+      )}
+      {editingHq && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={closeEdit}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+                  <Pencil className="w-4 h-4 text-[#0F52BA]" />
+                </div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Edit Headquarter
+                </h2>
+              </div>
+              <button
+                onClick={closeEdit}
+                className="p-1.5 rounded-md text-slate-400 hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Headquarter Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.headQuarterName}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({
+                      ...prev,
+                      headQuarterName: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Location
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                    }
+                    className="w-full pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  />
+                </div>
+              </div>
+              {editError && (
+                <p className="text-xs text-red-500 font-medium">{editError}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                onClick={closeEdit}
+                disabled={editLoader}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={editLoader}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#0F52BA] hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-60"
+              >
+                {editLoader ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Save changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
