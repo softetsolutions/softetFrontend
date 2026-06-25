@@ -238,7 +238,7 @@ const VisitReport = () => {
                         </td>
 
                         <td className=" border-gray-300 px-3 py-2">
-                          {formatDate(report?.createdAt)}
+                          {formatDate(report?.visitDate)}
                         </td>
 
                         <td className=" border-gray-300 px-3 py-2">
