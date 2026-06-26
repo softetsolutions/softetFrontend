@@ -60,13 +60,10 @@ export const editHeadQuarter = async (headquarterId, data) => {
 
 
 export const deleteHeadQuarter = async (headquarterId) => {
-  const res = await fetch(
-    `${API_BASE_URL}/headQuarter/${headquarterId}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-    },
-  );
-  if (!res.ok) throw new Error("Failed to delete the headquarter");
+  const res = await fetch(`${API_BASE_URL}/headQuarter/${headquarterId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  
   return await res.json();
 };

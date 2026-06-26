@@ -1,14 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
-import { getAreas, editArea } from "../api/area";
+import { getAreas, editArea, deleteArea } from "../api/area";
 import Spinner from "../genericComps/Spinner";
 import { FaSearch } from "react-icons/fa";
-import { Pencil, X, Check, Loader2 } from "lucide-react";
+import { Pencil, X, Check, Loader2, Trash2, AlertTriangle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const AreaList = () => {
   const [loading, setLoading] = useState(false);
   const [areas, setAreas] = useState([]);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [deleteLoader, setDeleteLoader] = useState(null);
+  const [confirmDeleteArea, setConfirmDeleteArea] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [toast, setToast] = useState(null);
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     perPageDocument: 5,
@@ -81,7 +86,33 @@ const AreaList = () => {
       setEditLoader(false);
     }
   };
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
+  const handleDelete = async () => {
+    const areaId = confirmDeleteArea._id;
+    try {
+      setDeleteLoader(areaId);
+      setConfirmDeleteArea(null);
+
+      const res = await deleteArea(areaId);
+
+      if (res?.success === false) {
+        showToast(res.message, "error");
+        return;
+      }
+
+      setAreas((prev) => prev.filter((a) => a._id !== areaId));
+      setTotalDocuments((prev) => prev - 1);
+      showToast("Area deleted successfully.", "success");
+    } catch (error) {
+      showToast(error.message || "Could not delete area. Try again.", "error");
+    } finally {
+      setDeleteLoader(null);
+    }
+  };
   return (
     <div className="bg-gray-100 flex flex-col h-full overflow-hidden">
       <header className="mb-8 flex justify-between items-center">
@@ -163,13 +194,27 @@ const AreaList = () => {
                             {area.headQuarterId.headQuarterName}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                              onClick={(e) => openEdit(e, area)}
-                              title="Edit area"
-                              className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => openEdit(e, area)}
+                                title="Edit area"
+                                className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteArea(area)}
+                                title="Delete area"
+                                disabled={deleteLoader === area._id}
+                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                              >
+                                {deleteLoader === area._id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -268,6 +313,77 @@ const AreaList = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {confirmDeleteArea && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={() => setConfirmDeleteArea(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Delete Area
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-gray-900">
+                {confirmDeleteArea.name}
+              </span>
+              ?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteArea(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium
+      ${
+        toast.type === "success"
+          ? "bg-green-50 border border-green-200 text-green-700"
+          : "bg-red-50 border border-red-200 text-red-700"
+      }`}
+        >
+          {toast.type === "success" ? (
+            <Check className="w-4 h-4 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+          )}
+          {toast.message}
+          <button
+            onClick={() => setToast(null)}
+            className="ml-2 opacity-50 hover:opacity-100"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
     </div>

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
-import { organizationSalesList } from "../api/sale";
+import { organizationSalesList, updateSale, deleteSale } from "../api/sale";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Pencil, Trash2 } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
 
 const ALL_MONTHS = [
@@ -30,6 +30,9 @@ const SaleReport = () => {
   const [saleData, setSaleData] = useState([]);
   const [load, setLoad] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
+  const [editModal, setEditModal] = useState(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const [reportFilters, setReportFilters] = useState({
     employee: "",
@@ -183,6 +186,41 @@ const SaleReport = () => {
     return `${reportFilters.years.length} Years Selected`;
   };
 
+  const handleEdit = async () => {
+    try {
+      if (!editAmount || Number(editAmount) <= 0) {
+        toast.error("Please enter a valid amount");
+        return;
+      }
+      const res = await updateSale(editModal._id, {
+        saleAmount: Number(editAmount),
+      });
+      if (res.success) {
+        toast.success("Sale updated");
+        setEditModal(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.error || "Update failed");
+      }
+    } catch (e) {
+      toast.error("Update failed");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await deleteSale(deleteConfirmId);
+      if (res.success) {
+        toast.success("Sale deleted");
+        setDeleteConfirmId(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.message || "Delete failed");
+      }
+    } catch (e) {
+      toast.error("Delete failed");
+    }
+  };
   return (
     <div className="h-full flex flex-col">
       <h2 className="text-2xl font-bold text-gray-800">SALES REPORT</h2>
@@ -391,6 +429,9 @@ const SaleReport = () => {
                       <th className=" border-gray-300 px-3 py-2 text-left">
                         Created At
                       </th>
+                      <th className="border-gray-300 px-3 py-2 text-left">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -419,6 +460,25 @@ const SaleReport = () => {
                         <td className=" border-gray-300 px-3 py-2">
                           {formatDate(report?.createdAt)}
                         </td>
+                        <td className="border-gray-300 px-3 py-2">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditModal(report);
+                                setEditAmount(report.saleAmount);
+                              }}
+                              className="p-1 rounded hover:bg-blue-50 text-blue-600"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmId(report._id)}
+                              className="p-1 rounded hover:bg-red-50 text-red-500"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -438,6 +498,69 @@ const SaleReport = () => {
               <p className="text-gray-500 text-lg font-medium">
                 No Sales Found
               </p>
+            </div>
+          )}
+          {/* Edit Modal */}
+          {editModal && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-4">
+                  Edit Sale Amount
+                </h3>
+                <p className="text-sm text-gray-500 mb-1">
+                  {editModal.saleBy?.firstName} —{" "}
+                  {editModal.month?.toUpperCase()}
+                </p>
+                <input
+                  type="number"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  className="border rounded w-full px-3 py-2 text-sm mb-4"
+                  placeholder="Enter new amount"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setEditModal(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEdit}
+                    className="px-4 py-2 text-sm rounded bg-blue-900 text-white"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete Confirm Modal */}
+          {deleteConfirmId && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Confirm Delete
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  This sale record will be permanently deleted.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setDeleteConfirmId(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 text-sm rounded bg-red-600 text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

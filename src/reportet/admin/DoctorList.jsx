@@ -5,11 +5,13 @@ import { FaFileImport } from "react-icons/fa";
 import Spinner from "../genericComps/Spinner";
 
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
-import { Pencil, X, Check, Loader2 } from "lucide-react";
+import { Pencil, X, Check, Loader2, Trash2, AlertTriangle } from "lucide-react";
 import {
   getAllDoctors,
   importDoctorsFromExcel,
   editDoctor,
+  deleteDoctor,
+  getAllAreasForDropdown,
 } from "../api/doctor";
 
 const DoctorsList = () => {
@@ -21,7 +23,16 @@ const DoctorsList = () => {
   const [editForm, setEditForm] = useState({ name: "", specialty: "" });
   const [editLoader, setEditLoader] = useState(false);
   const [editError, setEditError] = useState("");
-  const [filters, setFilters] = useState({ name: "", specialty: "" });
+  const [deleteLoader, setDeleteLoader] = useState(null);
+  const [confirmDeleteDoctor, setConfirmDeleteDoctor] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [filters, setFilters] = useState({
+    name: "",
+    specialty: "",
+    areaId: "",
+  });
+  const [areaOptions, setAreaOptions] = useState([]);
+  const [areaOptionsLoader, setAreaOptionsLoader] = useState(false);
 
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [paginationData, setPaginationData] = useState({
@@ -80,17 +91,40 @@ const DoctorsList = () => {
   //     doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
   //     doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()),
   // );
-  const openEdit = (e, doctor) => {
+  const openEdit = async (e, doctor) => {
     e.stopPropagation();
+    console.log("doctor.areaId:", doctor.areaId);
     setEditingDoctor(doctor);
-    setEditForm({ name: doctor.name, specialty: doctor.specialty || "" });
+    setEditForm({
+      name: doctor.name,
+      specialty: doctor.specialty || "",
+      areaId: doctor.areaId || "",
+    });
     setEditError("");
+
+    try {
+      setAreaOptionsLoader(true);
+      const areas = await getAllAreasForDropdown();
+      setAreaOptions(areas);
+      const currentArea = areas.find(
+        (a) => a._id?.toString() === doctor.areaId?.toString(),
+      );
+      setEditForm((prev) => ({
+        ...prev,
+        areaId: currentArea ? currentArea._id : "",
+      }));
+    } catch {
+      setAreaOptions([]);
+    } finally {
+      setAreaOptionsLoader(false);
+    }
   };
 
   const closeEdit = () => {
     setEditingDoctor(null);
-    setEditForm({ name: "", specialty: "" });
+    setEditForm({ name: "", specialty: "", areaId: "" });
     setEditError("");
+    setAreaOptions([]);
   };
 
   const handleEditSubmit = async () => {
@@ -104,6 +138,7 @@ const DoctorsList = () => {
       await editDoctor(editingDoctor._id, {
         name: editForm.name.trim(),
         specialty: editForm.specialty.trim(),
+        ...(editForm.areaId && { areaId: editForm.areaId }),
       });
       setDoctors((prev) =>
         prev.map((d) =>
@@ -127,6 +162,30 @@ const DoctorsList = () => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
     setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  };
+
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleDelete = async () => {
+    const doctorId = confirmDeleteDoctor._id;
+    try {
+      setDeleteLoader(doctorId);
+      setConfirmDeleteDoctor(null);
+      await deleteDoctor(doctorId);
+      setDoctors((prev) => prev.filter((d) => d._id !== doctorId));
+      setTotalDocuments((prev) => prev - 1);
+      showToast("Doctor deleted successfully.", "success");
+    } catch (error) {
+      showToast(
+        error.message || "Could not delete doctor. Try again.",
+        "error",
+      );
+    } finally {
+      setDeleteLoader(null);
+    }
   };
   return (
     <div className="bg-gray-100 flex flex-col h-full overflow-hidden">
@@ -213,13 +272,27 @@ const DoctorsList = () => {
                             {doctor.specialty}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                              onClick={(e) => openEdit(e, doctor)}
-                              title="Edit doctor"
-                              className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={(e) => openEdit(e, doctor)}
+                                title="Edit doctor"
+                                className="p-1.5 rounded-md text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteDoctor(doctor)}
+                                title="Delete doctor"
+                                disabled={deleteLoader === doctor._id}
+                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50"
+                              >
+                                {deleteLoader === doctor._id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))
@@ -304,6 +377,38 @@ const DoctorsList = () => {
                   }
                   className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
                 />
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Area
+                  </label>
+                  {areaOptionsLoader ? (
+                    <div className="flex items-center gap-2 text-xs text-gray-400 py-2">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Loading areas...
+                    </div>
+                  ) : (
+                    <select
+                      value={editForm.areaId}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          areaId: e.target.value,
+                        }))
+                      }
+                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                    >
+                      <option value="">— Select area —</option>
+                      {areaOptions.map((area) => (
+                        <option key={area._id} value={area._id}>
+                          {area.name}
+                          {area.headQuarterId?.headQuarterName
+                            ? ` (${area.headQuarterId.headQuarterName})`
+                            : ""}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
               </div>
               {editError && (
                 <p className="text-xs text-red-500 font-medium">{editError}</p>
@@ -338,6 +443,77 @@ const DoctorsList = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {confirmDeleteDoctor && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={() => setConfirmDeleteDoctor(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Delete Doctor
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-gray-900">
+                {confirmDeleteDoctor.name}
+              </span>
+              ?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteDoctor(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium
+      ${
+        toast.type === "success"
+          ? "bg-green-50 border border-green-200 text-green-700"
+          : "bg-red-50 border border-red-200 text-red-700"
+      }`}
+        >
+          {toast.type === "success" ? (
+            <Check className="w-4 h-4 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+          )}
+          {toast.message}
+          <button
+            onClick={() => setToast(null)}
+            className="ml-2 opacity-50 hover:opacity-100"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
     </div>

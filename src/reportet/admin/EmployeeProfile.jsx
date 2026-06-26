@@ -592,6 +592,14 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
                 {employee.employeeId}
               </p>
             </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Username
+              </label>
+              <p className="mt-1 text-sm text-gray-800">
+                {employee.userName || "Not available"}
+              </p>
+            </div>
 
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">

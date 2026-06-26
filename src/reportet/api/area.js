@@ -125,3 +125,12 @@ export const editArea = async (areaId, data) => {
   if (!res.ok) throw new Error(result.message || "Failed to update area");
   return result;
 };
+export const deleteArea = async (areaId) => {
+  const res = await fetch(`${API_BASE_URL}/area/${areaId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to delete area");
+  return result;
+};

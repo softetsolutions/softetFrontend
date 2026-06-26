@@ -59,3 +59,44 @@ export const getAllEmployeeNames = async () => {
   if (!res.ok) throw new Error("Failed to fetch employees list");
   return await res.json();
 };
+
+export const forgotPassword = async (payload) => {
+  const res = await fetch(`${API_BASE_URL}/employee/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401) {
+    await handleUnauthorized();
+  }
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Failed to send reset link");
+  }
+
+  return data;
+};
+
+export const resetPassword = async (token, payload) => {
+  const res = await fetch(`${API_BASE_URL}/employee/reset-password/${token}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json();
+  if (res.status === 400) {
+    const err = new Error(data.message || "Invalid or expired link");
+    err.expired = true;
+    throw err;
+  }
+  if (!res.ok) throw new Error(data.message || "Failed to reset password");
+  return data;
+};
