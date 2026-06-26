@@ -225,11 +225,10 @@ const DoctorsList = () => {
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="7"
-                          className="px-6 py-4 text-center text-sm text-gray-500"
-                        >
-                          No doctors found.
+                        <td colSpan="5">
+                          <div className="flex items-center justify-center h-64 text-sm text-gray-500">
+                            No Doctor found.
+                          </div>
                         </td>
                       </tr>
                     )}

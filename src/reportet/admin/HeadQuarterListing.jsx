@@ -245,6 +245,12 @@ const HeadQuarterListing = () => {
       {/* Main Listing Section */}
       {!loader && (
         <div style={{ height: "calc(100% - 106px)", overflow: "auto" }}>
+          {headquarters.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-2">
+              <Building2 className="w-10 h-10" />
+              <p className="text-sm font-medium">No Headquarters found.</p>
+            </div>
+          )}
           {headquarters.map((hq) => {
             const { areaCount, doctorCount } = getTotals(hq);
             return (

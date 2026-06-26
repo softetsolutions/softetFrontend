@@ -347,12 +347,6 @@ const HierarchyForm = () => {
                   <h4 className="text-xs font-bold text-blue-600 uppercase tracking-widest">
                     Regional Areas
                   </h4>
-                  <button
-                    onClick={() => addArea(hq.id)}
-                    className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:underline"
-                  >
-                    <Plus className="w-3 h-3" /> Add Area
-                  </button>
                 </div>
 
                 <div className="space-y-4 ml-4 border-l-2 border-slate-100 pl-6">
@@ -446,6 +440,12 @@ const HierarchyForm = () => {
                       </div>
                     </div>
                   ))}
+                  <button
+                    onClick={() => addArea(hq.id)}
+                    className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:underline ml-auto"
+                  >
+                    <Plus className="w-3 h-3" /> Add Area
+                  </button>
                 </div>
               </div>
             </div>

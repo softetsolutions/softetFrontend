@@ -175,11 +175,10 @@ const AreaList = () => {
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="7"
-                          className="px-6 py-4 text-center text-sm text-gray-500"
-                        >
-                          No areas found.
+                        <td colSpan="5">
+                          <div className="flex items-center justify-center h-64 text-sm text-gray-500">
+                            No Area found.
+                          </div>
                         </td>
                       </tr>
                     )}

@@ -11,6 +11,7 @@ const VisitReport = () => {
   const [employees, setEmployees] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
   const [reportFilters, setReportFilters] = useState({
     employee: "",
     dateFrom: "",
@@ -54,6 +55,7 @@ const VisitReport = () => {
         toast.error("Unable to get the daily visit list, Pls try again later");
       } finally {
         setLoading(false);
+        setBtnLoading(false);
       }
     },
     [
@@ -78,6 +80,7 @@ const VisitReport = () => {
   };
 
   const handleSearch = async () => {
+    setBtnLoading(true);
     setFilterApplied((prev) => !prev);
   };
 
@@ -155,17 +158,17 @@ const VisitReport = () => {
           <div className="flex-1 flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              disabled={loading}
-              className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer"
+              disabled={btnLoading}
+              className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer disabled:opacity-60 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              {loading && (
+              {btnLoading && (
                 <Spinner
                   size={16}
                   borderWidth={2}
                   className="border-white border-t-transparent"
                 />
               )}
-              {loading ? "Applying" : "Apply"}
+              {btnLoading ? "Applying" : "Apply"}
             </button>
           </div>
         </div>
@@ -262,7 +265,11 @@ const VisitReport = () => {
               />
             </>
           ) : (
-            <p className="text-gray-500 text-xs">No Visit found</p>
+            <div className="h-full flex items-center justify-center">
+              <p className="text-gray-500 text-lg font-medium">
+                No Visit Found
+              </p>
+            </div>
           )}
         </div>
       </div>
