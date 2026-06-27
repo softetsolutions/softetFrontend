@@ -11,6 +11,7 @@ import EmployeeDetail from "./admin/EmployeeProfile";
 import AreaList from "./admin/AreaList";
 import AdminLeaves from "./admin/AdminLeaves";
 import SalesReport from "./admin/SalesReport";
+import DoctorVisitReport from "./admin/DoctorVisit";
 import {
   ClipboardList,
   Package,
@@ -43,6 +44,12 @@ export const sidebarTabs = [
         label: "Sales Report",
         icon: <BadgeDollarSign size={18} />,
         component: <SalesReport />,
+      },
+      {
+        id: "doctor-visit-report",
+        label: "Doctor Visit Report",
+        icon: <BadgeDollarSign size={18} />,
+        component: <DoctorVisitReport />,
       },
     ],
   },
