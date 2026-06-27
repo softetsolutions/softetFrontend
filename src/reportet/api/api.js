@@ -83,3 +83,23 @@ export const organizationDailyVisitList = async (abortcontroller, payload) => {
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
 };
+
+export const updateDailyVisit = async (id, payload) => {
+  const res = await fetch(`${API_BASE_URL}/daily-visit/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  if (res.status === 401) await handleUnauthorized();
+  return await res.json();
+};
+
+export const deleteDailyVisit = async (id) => {
+  const res = await fetch(`${API_BASE_URL}/daily-visit/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (res.status === 401) await handleUnauthorized();
+  return await res.json();
+};

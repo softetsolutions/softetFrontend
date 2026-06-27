@@ -1,16 +1,25 @@
 import { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
-import { organizationDailyVisitList } from "../api/api";
+import {
+  organizationDailyVisitList,
+  updateDailyVisit,
+  deleteDailyVisit,
+} from "../api/api";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
 import Spinner from "../genericComps/Spinner";
+import { Pencil, Trash2 } from "lucide-react";
 
 const VisitReport = () => {
   const [employees, setEmployees] = useState([]);
   const [reportData, setReportData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
+  const [editModal, setEditModal] = useState(null);
+  const [editRemark, setEditRemark] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [reportFilters, setReportFilters] = useState({
     employee: "",
     dateFrom: "",
@@ -54,6 +63,7 @@ const VisitReport = () => {
         toast.error("Unable to get the daily visit list, Pls try again later");
       } finally {
         setLoading(false);
+        setBtnLoading(false);
       }
     },
     [
@@ -78,6 +88,7 @@ const VisitReport = () => {
   };
 
   const handleSearch = async () => {
+    setBtnLoading(true);
     setFilterApplied((prev) => !prev);
   };
 
@@ -89,6 +100,39 @@ const VisitReport = () => {
     return () => abortController.abort();
   }, [getDailyVisitList]);
 
+  const handleEdit = async () => {
+    if (!editRemark.trim()) {
+      toast.error("Remark cannot be empty");
+      return;
+    }
+    try {
+      const res = await updateDailyVisit(editModal._id, { remark: editRemark });
+      if (res.success) {
+        toast.success("Visit updated");
+        setEditModal(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.message || "Update failed");
+      }
+    } catch (e) {
+      toast.error("Update failed");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await deleteDailyVisit(deleteConfirmId);
+      if (res.success) {
+        toast.success("Visit deleted");
+        setDeleteConfirmId(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.message || "Delete failed");
+      }
+    } catch (e) {
+      toast.error("Delete failed");
+    }
+  };
   return (
     <div className="h-full flex flex-col">
       <h2 className="text-2xl font-bold text-gray-800">VISIT REPORT</h2>
@@ -155,17 +199,17 @@ const VisitReport = () => {
           <div className="flex-1 flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              disabled={loading}
-              className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer"
+              disabled={btnLoading}
+              className="bg-blue-900 text-white rounded w-full py-2.5 cursor-pointer disabled:opacity-60 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              {loading && (
+              {btnLoading && (
                 <Spinner
                   size={16}
                   borderWidth={2}
                   className="border-white border-t-transparent"
                 />
               )}
-              {loading ? "Applying" : "Apply"}
+              {btnLoading ? "Applying" : "Apply"}
             </button>
           </div>
         </div>
@@ -212,6 +256,9 @@ const VisitReport = () => {
                       <th className=" border-gray-300 px-3 py-2 text-left">
                         Remark
                       </th>
+                      <th className="border-gray-300 px-3 py-2 text-left">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -247,6 +294,25 @@ const VisitReport = () => {
                         <td className=" border-gray-300 px-3 py-2">
                           {report.remark}
                         </td>
+                        <td className="border-gray-300 px-3 py-2">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditModal(report);
+                                setEditRemark(report.remark);
+                              }}
+                              className="p-1 rounded hover:bg-blue-50 text-blue-600"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmId(report._id)}
+                              className="p-1 rounded hover:bg-red-50 text-red-500"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -262,7 +328,73 @@ const VisitReport = () => {
               />
             </>
           ) : (
-            <p className="text-gray-500 text-xs">No Visit found</p>
+            <div className="h-full flex items-center justify-center">
+              <p className="text-gray-500 text-lg font-medium">
+                No Visit Found
+              </p>
+            </div>
+          )}
+
+          {editModal && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-4">
+                  Edit Remark
+                </h3>
+                <p className="text-sm text-gray-500 mb-1">
+                  {editModal.employeeId?.firstName} —{" "}
+                  {formatDate(editModal.visitDate)}
+                </p>
+                <textarea
+                  value={editRemark}
+                  onChange={(e) => setEditRemark(e.target.value)}
+                  className="border rounded w-full px-3 py-2 text-sm mb-4 resize-none"
+                  rows={3}
+                  placeholder="Enter remark"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setEditModal(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEdit}
+                    className="px-4 py-2 text-sm rounded bg-blue-900 text-white"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deleteConfirmId && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Confirm Delete
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  This visit record will be permanently deleted.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setDeleteConfirmId(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 text-sm rounded bg-red-600 text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -21,6 +21,8 @@ import Payment from "./pages/Payment";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import StudentList from "./pages/StudentList.jsx";
 import PaymentList from "./pages/PaymentList.jsx";
+import ForgotPassword from "./reportet/ForgotPassword.jsx";
+import ResetPassword from "./reportet/ResetPassword.jsx";
 
 const FullStackCoursePage = lazy(
   () => import("./fsdCourse/pages/FullStackCoursePage.jsx"),
@@ -108,6 +110,14 @@ function App() {
           <Route path="/reportet" element={<HomePage />} />
           <Route path="/login" element={<ReportetLogin />} />
           <Route path="/signup" element={<UserSignupPage />} />
+          <Route
+            path="reportet/employee/forgot-password"
+            element={<ForgotPassword />}
+          />
+          <Route
+            path="reportet/employee/reset-password/:token"
+            element={<ResetPassword />}
+          />
           {/* <Route path="/admin" element={<Sidebar />} /> */}
 
           {/* Protected admin route */}

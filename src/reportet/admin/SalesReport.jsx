@@ -1,22 +1,43 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
-import { organizationSalesList } from "../api/sale";
+import { organizationSalesList, updateSale, deleteSale } from "../api/sale";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
+import { ChevronDown, Pencil, Trash2 } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
+
+const ALL_MONTHS = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+const currentYear = new Date().getFullYear();
+const ALL_YEARS = [currentYear];
 
 const SaleReport = () => {
   const [employees, setEmployees] = useState([]);
   const [saleData, setSaleData] = useState([]);
   const [load, setLoad] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
+  const [editModal, setEditModal] = useState(null);
+  const [editAmount, setEditAmount] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   const [reportFilters, setReportFilters] = useState({
     employee: "",
-    dateFrom: "",
-    dateTo: "",
+    months: [...ALL_MONTHS],
+    years: [currentYear],
   });
   const [filterApplied, setFilterApplied] = useState(false);
 
@@ -25,6 +46,10 @@ const SaleReport = () => {
     currentPage: 1,
     perPageDocument: 10,
   });
+  const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
+  const monthDropdownRef = useRef(null);
+  const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
+  const yearDropdownRef = useRef(null);
 
   const getSalesList = useCallback(
     async (abortController, payloadParams) => {
@@ -34,8 +59,8 @@ const SaleReport = () => {
           ...(reportFilters?.employee && {
             employeeId: reportFilters?.employee,
           }),
-          ...(reportFilters?.dateFrom && { dateFrom: reportFilters?.dateFrom }),
-          ...(reportFilters?.dateTo && { dateTo: reportFilters?.dateTo }),
+          months: reportFilters.months,
+          years: reportFilters.years,
           pageNo: paginationData?.currentPage,
           limit: paginationData?.perPageDocument,
           ...payloadParams,
@@ -56,6 +81,7 @@ const SaleReport = () => {
         toast.error("Unable to get the daily visit list, Pls try again later");
       } finally {
         setTableLoading(false);
+        setLoad(false);
       }
     },
     [
@@ -67,7 +93,6 @@ const SaleReport = () => {
 
   const getEmployeeOption = async (abortController) => {
     try {
-      setLoad(true);
       const employees = await getEmployeeListOptions(abortController);
       const employeeOptions = employees?.data?.map((employee) => ({
         employeeName: employee?.firstName + " " + employee?.lastName,
@@ -81,6 +106,7 @@ const SaleReport = () => {
   };
 
   const handleSearch = async () => {
+    setLoad(true);
     setFilterApplied((prev) => !prev);
   };
 
@@ -92,11 +118,114 @@ const SaleReport = () => {
     return () => abortController.abort();
   }, [getSalesList]);
 
+  const toggleMonth = (month) => {
+    setReportFilters((prev) => ({
+      ...prev,
+      months: prev.months.includes(month)
+        ? prev.months.filter((m) => m !== month)
+        : [...prev.months, month],
+    }));
+  };
+
+  const toggleAllMonths = () => {
+    setReportFilters((prev) => ({
+      ...prev,
+      months: prev.months.length === ALL_MONTHS.length ? [] : [...ALL_MONTHS],
+    }));
+  };
+
+  const monthLabel = () => {
+    if (reportFilters.months.length === 0) return "No months selected";
+    if (reportFilters.months.length === ALL_MONTHS.length) return "All Months";
+    if (reportFilters.months.length <= 2)
+      return reportFilters.months
+        .map((m) => m[0].toUpperCase() + m.slice(1))
+        .join(", ");
+    return `${reportFilters.months.length} Months Selected`;
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        monthDropdownRef.current &&
+        !monthDropdownRef.current.contains(e.target)
+      ) {
+        setMonthDropdownOpen(false);
+      }
+
+      if (
+        yearDropdownRef.current &&
+        !yearDropdownRef.current.contains(e.target)
+      ) {
+        setYearDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  const toggleYear = (year) => {
+    setReportFilters((prev) => ({
+      ...prev,
+      years: prev.years.includes(year)
+        ? prev.years.filter((y) => y !== year)
+        : [...prev.years, year],
+    }));
+  };
+
+  const toggleAllYears = () => {
+    setReportFilters((prev) => ({
+      ...prev,
+      years: prev.years.length === ALL_YEARS.length ? [] : [...ALL_YEARS],
+    }));
+  };
+
+  const yearLabel = () => {
+    if (reportFilters.years.length === 0) return "No years selected";
+    if (reportFilters.years.length === ALL_YEARS.length) return "All Years";
+    if (reportFilters.years.length <= 2) return reportFilters.years.join(", ");
+    return `${reportFilters.years.length} Years Selected`;
+  };
+
+  const handleEdit = async () => {
+    try {
+      if (!editAmount || Number(editAmount) <= 0) {
+        toast.error("Please enter a valid amount");
+        return;
+      }
+      const res = await updateSale(editModal._id, {
+        saleAmount: Number(editAmount),
+      });
+      if (res.success) {
+        toast.success("Sale updated");
+        setEditModal(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.error || "Update failed");
+      }
+    } catch (e) {
+      toast.error("Update failed");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await deleteSale(deleteConfirmId);
+      if (res.success) {
+        toast.success("Sale deleted");
+        setDeleteConfirmId(null);
+        setFilterApplied((prev) => !prev);
+      } else {
+        toast.error(res.message || "Delete failed");
+      }
+    } catch (e) {
+      toast.error("Delete failed");
+    }
+  };
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-2xl font-bold text-gray-800">VISIT REPORT</h2>
+      <h2 className="text-2xl font-bold text-gray-800">SALES REPORT</h2>
       <p className="text-gray-600 mb-6 pb-2 italic">
-        Filter and review past visit records by MR, area, date, and status.
+        Filter and review past sales records by MR, area, date, and status.
       </p>
 
       <div className="space-y-4 bg-white p-6 rounded-lg shadow-md">
@@ -122,46 +251,134 @@ const SaleReport = () => {
               ))}
             </select>
           </div>
-          {/* Date Between */}
 
-          <div className="flex-1 flex gap-2">
-            <div>
-              <label htmlFor="from">From</label>
-              <input
-                name="from"
-                type="date"
-                value={reportFilters.dateFrom}
-                onChange={(e) =>
-                  setReportFilters({
-                    ...reportFilters,
-                    dateFrom: e.target.value,
-                  })
-                }
-                className="border w-full p-2 rounded"
-              />
-            </div>
+          <div className="flex-1" ref={monthDropdownRef}>
+            <label className="block text-sm mb-1">Select Months</label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMonthDropdownOpen((prev) => !prev)}
+                className="w-full border p-2 rounded flex items-center justify-between text-sm bg-white"
+              >
+                <span
+                  className={
+                    reportFilters.months.length === 0 ? "text-gray-400" : ""
+                  }
+                >
+                  {monthLabel()}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
 
-            <div>
-              <label htmlFor="to">To</label>
-              <input
-                name="to"
-                type="date"
-                value={reportFilters.dateTo}
-                onChange={(e) =>
-                  setReportFilters({ ...reportFilters, dateTo: e.target.value })
-                }
-                className="border w-full p-2 rounded"
-              />
+              {monthDropdownOpen && (
+                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                  <div
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer mb-1 border-b pb-2"
+                    onClick={toggleAllMonths}
+                  >
+                    <input
+                      type="checkbox"
+                      readOnly
+                      checked={
+                        reportFilters.months.length === ALL_MONTHS.length
+                      }
+                      className="accent-blue-600"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">
+                      {reportFilters.months.length === ALL_MONTHS.length
+                        ? "Deselect All"
+                        : "Select All"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-0.5">
+                    {ALL_MONTHS.map((month) => (
+                      <div
+                        key={month}
+                        onClick={() => toggleMonth(month)}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-blue-50 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          readOnly
+                          checked={reportFilters.months.includes(month)}
+                          className="accent-blue-600"
+                        />
+                        <span className="text-sm capitalize">{month}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+          <div className="flex-1" ref={yearDropdownRef}>
+            <label className="block text-sm mb-1">Select Years</label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setYearDropdownOpen((prev) => !prev)}
+                className="w-full border p-2 rounded flex items-center justify-between text-sm bg-white"
+              >
+                <span
+                  className={
+                    reportFilters.years.length === 0 ? "text-gray-400" : ""
+                  }
+                >
+                  {yearLabel()}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
 
+              {yearDropdownOpen && (
+                <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                  <div
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-gray-50 cursor-pointer mb-1 border-b pb-2"
+                    onClick={toggleAllYears}
+                  >
+                    <input
+                      type="checkbox"
+                      readOnly
+                      checked={reportFilters.years.length === ALL_YEARS.length}
+                      className="accent-blue-600"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">
+                      {reportFilters.years.length === ALL_YEARS.length
+                        ? "Deselect All"
+                        : "Select All"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-0.5">
+                    {ALL_YEARS.map((year) => (
+                      <div
+                        key={year}
+                        onClick={() => toggleYear(year)}
+                        className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-blue-50 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          readOnly
+                          checked={reportFilters.years.includes(year)}
+                          className="accent-blue-600"
+                        />
+                        <span
+                          className={`text-sm ${year === currentYear ? "font-bold text-blue-600" : ""}`}
+                        >
+                          {year}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           <div className="flex-1 flex flex-col justify-end">
             <button
               onClick={handleSearch}
-              disabled={tableLoading}
-              className="bg-blue-900 text-white rounded w-full py-2.5 flex items-center justify-center gap-2 disabled:opacity-60"
+              disabled={load}
+              className="bg-blue-900 text-white rounded w-full py-2.5 flex items-center justify-center gap-2 disabled:opacity-60 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
-              {tableLoading && (
+              {load && (
                 <Spinner
                   size={16}
                   borderWidth={2}
@@ -169,7 +386,7 @@ const SaleReport = () => {
                 />
               )}
 
-              {tableLoading ? "Applying..." : "Apply"}
+              {load ? "Applying..." : "Apply"}
             </button>
           </div>
         </div>
@@ -212,6 +429,9 @@ const SaleReport = () => {
                       <th className=" border-gray-300 px-3 py-2 text-left">
                         Created At
                       </th>
+                      <th className="border-gray-300 px-3 py-2 text-left">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -240,6 +460,25 @@ const SaleReport = () => {
                         <td className=" border-gray-300 px-3 py-2">
                           {formatDate(report?.createdAt)}
                         </td>
+                        <td className="border-gray-300 px-3 py-2">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditModal(report);
+                                setEditAmount(report.saleAmount);
+                              }}
+                              className="p-1 rounded hover:bg-blue-50 text-blue-600"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmId(report._id)}
+                              className="p-1 rounded hover:bg-red-50 text-red-500"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -255,7 +494,74 @@ const SaleReport = () => {
               />
             </>
           ) : (
-            <p className="text-gray-500 text-xs">No Visit found</p>
+            <div className="h-full flex items-center justify-center">
+              <p className="text-gray-500 text-lg font-medium">
+                No Sales Found
+              </p>
+            </div>
+          )}
+          {/* Edit Modal */}
+          {editModal && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-4">
+                  Edit Sale Amount
+                </h3>
+                <p className="text-sm text-gray-500 mb-1">
+                  {editModal.saleBy?.firstName} —{" "}
+                  {editModal.month?.toUpperCase()}
+                </p>
+                <input
+                  type="number"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  className="border rounded w-full px-3 py-2 text-sm mb-4"
+                  placeholder="Enter new amount"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setEditModal(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEdit}
+                    className="px-4 py-2 text-sm rounded bg-blue-900 text-white"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Delete Confirm Modal */}
+          {deleteConfirmId && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-80 shadow-xl">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Confirm Delete
+                </h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  This sale record will be permanently deleted.
+                </p>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setDeleteConfirmId(null)}
+                    className="px-4 py-2 text-sm rounded border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 text-sm rounded bg-red-600 text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

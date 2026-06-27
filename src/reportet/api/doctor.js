@@ -103,3 +103,37 @@ export const getDoctorsWithRemarks = async (
     throw err;
   }
 };
+
+
+export const editDoctor = async (doctorId, data) => {
+  const res = await fetch(`${API_BASE_URL}/doctor/${doctorId}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data), 
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to update doctor");
+  return result;
+};
+
+export const deleteDoctor = async (doctorId) => {
+  const res = await fetch(`${API_BASE_URL}/doctor/${doctorId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.message || "Failed to delete doctor");
+  return result;
+};
+
+export const getAllAreasForDropdown = async () => {
+  const res = await fetch(`${API_BASE_URL}/area`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pageNo: 1, limit: 1000 }),
+  });
+  const result = await res.json();
+  return result.areas || [];
+};

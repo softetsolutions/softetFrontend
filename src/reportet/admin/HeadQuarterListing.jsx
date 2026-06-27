@@ -7,9 +7,21 @@ import {
   ChevronUp,
   Search,
   SlidersHorizontal,
+  Pencil,
+  X,
+  Check,
+  Loader2,
+  Trash2,
+  MoreVertical,
+  AlertTriangle,
 } from "lucide-react";
-import { getAllHeadquartersData } from "../api/headQuarter";
+import {
+  getAllHeadquartersData,
+  editHeadQuarter,
+  deleteHeadQuarter,
+} from "../api/headQuarter";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
+import toast from "react-hot-toast";
 
 // let headQuarterListingStructure = [
 //     {
@@ -36,11 +48,24 @@ const HeadQuarterListing = () => {
   const [expandedHq, setExpandedHq] = useState(null);
   const [expandedArea, setExpandedArea] = useState(null);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [filters, setFilters] = useState({ headQuarterName: "", location: "" });
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [confirmDeleteHq, setConfirmDeleteHq] = useState(null);
+  const [toast, setToast] = useState(null);
+
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     perPageDocument: 5,
   });
   const [loader, setLoader] = useState(false);
+  const [editingHq, setEditingHq] = useState(null);
+  const [editForm, setEditForm] = useState({
+    headQuarterName: "",
+    location: "",
+  });
+  const [editLoader, setEditLoader] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [deleteLoader, setDeleteLoader] = useState(null);
 
   // Helper to calculate totals from nested state
   const getTotals = (hq) => {
@@ -59,6 +84,8 @@ const HeadQuarterListing = () => {
         const headQuartersDetails = await getAllHeadquartersData({
           pageNo: paginationData.currentPage,
           perPageDocument: paginationData.perPageDocument,
+          headQuarterName: filters.headQuarterName,
+          location: filters.location,
         });
         const newHeadQuarterDetailsState =
           headQuartersDetails?.data[0]?.headQuarterDetail?.map(
@@ -103,7 +130,87 @@ const HeadQuarterListing = () => {
         console.error("Error in fetching the headQuarterlist", error);
       }
     })();
-  }, [paginationData]);
+  }, [paginationData, filters]);
+
+  const openEdit = (e, hq) => {
+    e.stopPropagation();
+    setEditingHq(hq);
+    setEditForm({ headQuarterName: hq.name, location: hq.location });
+    setEditError("");
+  };
+
+  const closeEdit = () => {
+    setEditingHq(null);
+    setEditForm({ headQuarterName: "", location: "" });
+    setEditError("");
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editForm.headQuarterName.trim()) {
+      setEditError("Headquarter name is required.");
+      return;
+    }
+    try {
+      setEditLoader(true);
+      setEditError("");
+      await editHeadQuarter(editingHq.id, {
+        headQuarterName: editForm.headQuarterName.trim(),
+        location: editForm.location.trim(),
+      });
+      setHeadquarters((prev) =>
+        prev.map((hq) =>
+          hq.id === editingHq.id
+            ? {
+                ...hq,
+                name: editForm.headQuarterName.trim(),
+                location: editForm.location.trim(),
+              }
+            : hq,
+        ),
+      );
+      closeEdit();
+    } catch (error) {
+      setEditError("Failed to update. Please try again.");
+    } finally {
+      setEditLoader(false);
+    }
+  };
+  const showToast = (message, type = "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleDelete = async () => {
+    const hqId = confirmDeleteHq.id;
+    try {
+      setDeleteLoader(hqId);
+      setConfirmDeleteHq(null);
+      const response = await deleteHeadQuarter(hqId);
+
+      if (response?.success === false) {
+        showToast(response.message, "error");
+        return;
+      }
+
+      setHeadquarters((prev) => prev.filter((hq) => hq.id !== hqId));
+      setTotalDocuments((prev) => prev - 1);
+      showToast("Headquarter deleted successfully.", "success");
+    } catch (error) {
+      showToast("Could not delete headquarter. Try again.", "error");
+    } finally {
+      setDeleteLoader(null);
+    }
+  };
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+  };
+  useEffect(() => {
+    const close = () => setOpenMenuId(null);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
 
   return (
     <div className="flex flex-col gap-2 h-full  w-full max-w-5xl mx-auto space-y-4 bg-[#f7f9fb] font-inter antialiased text-slate-900">
@@ -112,20 +219,40 @@ const HeadQuarterListing = () => {
         <h1 className="text-2xl pl-2 font-bold text-slate-900">
           Network Directory
         </h1>
-        {/* <div className="flex items-center gap-3">
+
+        <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
-              type="text"
-              placeholder="Search network..."
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-64 shadow-sm"
+              name="headQuarterName"
+              value={filters.headQuarterName}
+              onChange={handleFilterChange}
+              placeholder="Search by name..."
+              className="pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-52 shadow-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-            <SlidersHorizontal className="w-4 h-4" />
-            Filters
-          </button>
-        </div> */}
+
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              name="location"
+              value={filters.location}
+              onChange={handleFilterChange}
+              placeholder="Filter by location..."
+              className="pl-10 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-100 outline-none w-52 shadow-sm"
+            />
+          </div>
+
+          {(filters.headQuarterName || filters.location) && (
+            <button
+              onClick={() => setFilters({ headQuarterName: "", location: "" })}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-md transition"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loader && (
@@ -141,12 +268,18 @@ const HeadQuarterListing = () => {
       {/* Main Listing Section */}
       {!loader && (
         <div style={{ height: "calc(100% - 106px)", overflow: "auto" }}>
+          {headquarters.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-64 text-slate-400 gap-2">
+              <Building2 className="w-10 h-10" />
+              <p className="text-sm font-medium">No Headquarters found.</p>
+            </div>
+          )}
           {headquarters.map((hq) => {
             const { areaCount, doctorCount } = getTotals(hq);
             return (
               <div
                 key={hq.id}
-                className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden"
+                className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-visible"
               >
                 {/* Headquarter Row */}
                 <div
@@ -156,6 +289,48 @@ const HeadQuarterListing = () => {
                   }
                 >
                   <div className="flex items-center gap-4">
+                    <div
+                      className="relative"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() =>
+                          setOpenMenuId(openMenuId === hq.id ? null : hq.id)
+                        }
+                        className="p-2 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      >
+                        {deleteLoader === hq.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <MoreVertical className="w-4 h-4" />
+                        )}
+                      </button>
+
+                      {openMenuId === hq.id && (
+                        <div className="absolute left-0 top-10 z-20 w-36 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+                          <button
+                            onClick={() => {
+                              openEdit({ stopPropagation: () => {} }, hq);
+                              setOpenMenuId(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                          >
+                            <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setConfirmDeleteHq(hq);
+                              setOpenMenuId(null);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                     <div className="w-10 h-10 bg-blue-50 rounded flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-[#0F52BA]" />
                     </div>
@@ -296,6 +471,175 @@ const HeadQuarterListing = () => {
               </div>
             );
           })}
+        </div>
+      )}
+      {editingHq && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={closeEdit}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-50 rounded flex items-center justify-center">
+                  <Pencil className="w-4 h-4 text-[#0F52BA]" />
+                </div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Edit Headquarter
+                </h2>
+              </div>
+              <button
+                onClick={closeEdit}
+                className="p-1.5 rounded-md text-slate-400 hover:bg-slate-100 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Headquarter Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.headQuarterName}
+                  onChange={(e) =>
+                    setEditForm((prev) => ({
+                      ...prev,
+                      headQuarterName: e.target.value,
+                    }))
+                  }
+                  className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  Location
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={editForm.location}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                    }
+                    className="w-full pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  />
+                </div>
+              </div>
+              {editError && (
+                <p className="text-xs text-red-500 font-medium">{editError}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                onClick={closeEdit}
+                disabled={editLoader}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={editLoader}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#0F52BA] hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-60"
+              >
+                {editLoader ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Save changes
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete confirmation modal */}
+      {confirmDeleteHq && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={() => setConfirmDeleteHq(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Delete Headquarter
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-600 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-slate-900">
+                {confirmDeleteHq.name}
+              </span>
+              ?
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDeleteHq(null)}
+                className="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all
+      ${
+        toast.type === "success"
+          ? "bg-green-50 border border-green-200 text-green-700"
+          : "bg-red-50 border border-red-200 text-red-700"
+      }`}
+        >
+          {toast.type === "success" ? (
+            <Check className="w-4 h-4 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+          )}
+          {toast.message}
+          <button
+            onClick={() => setToast(null)}
+            className="ml-2 text-current opacity-50 hover:opacity-100"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 

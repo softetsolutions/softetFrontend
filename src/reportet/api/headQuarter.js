@@ -41,3 +41,29 @@ export const getAllHeadQuartersNames = async () => {
   if (!res.ok) throw new Error("Failed to fetch headquarter names");
   return await res.json();
 };
+
+export const editHeadQuarter = async (headquarterId, data) => {
+  const res = await fetch(
+    `${API_BASE_URL}/headQuarter/${headquarterId}`,
+    {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),   
+    },
+  );
+  if (!res.ok) throw new Error("Failed to update the headquarter");
+  return await res.json();
+};
+
+
+export const deleteHeadQuarter = async (headquarterId) => {
+  const res = await fetch(`${API_BASE_URL}/headQuarter/${headquarterId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  
+  return await res.json();
+};
