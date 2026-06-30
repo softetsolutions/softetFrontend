@@ -110,6 +110,7 @@ export const getDoctorVisitReport = async (params) => {
   if (params.year) query.append("year", params.year);
   if (params.doctorId) query.append("doctorId", params.doctorId);
   if (params.minVisits) query.append("minVisits", params.minVisits);
+  if (params.headQuarterId) query.append("headQuarterId", params.headQuarterId);
   if (params.pageNo) query.append("pageNo", params.pageNo);
   if (params.limit) query.append("limit", params.limit);
 

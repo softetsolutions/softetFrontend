@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import { AlertTriangle, X, Check } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
 import { getDoctorVisitReport } from "../api/api";
+import { getAllHeadQuartersNames } from "../api/headQuarter";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 
 const MONTHS = [
@@ -28,6 +29,8 @@ const DoctorVisitReport = () => {
   const [report, setReport] = useState([]);
   const [toast, setToast] = useState(null);
   const [totalDocuments, setTotalDocuments] = useState(0);
+  const [headQuarters, setHeadQuarters] = useState([]);
+  const [maxVisits, setMaxVisits] = useState(0);
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
     perPageDocument: 10,
@@ -37,6 +40,7 @@ const DoctorVisitReport = () => {
     year: currentYear,
     doctorName: "",
     minVisits: "",
+    headQuarterId: "",
   });
 
   const showToast = (message, type = "error") => {
@@ -51,6 +55,7 @@ const DoctorVisitReport = () => {
         month: filters.month || undefined,
         year: filters.year,
         minVisits: filters.minVisits || undefined,
+        headQuarterId: filters.headQuarterId || undefined,
         pageNo: paginationData.currentPage,
         limit: paginationData.perPageDocument,
       });
@@ -62,6 +67,7 @@ const DoctorVisitReport = () => {
 
       setReport(data.data || []);
       setTotalDocuments(data.pagination?.total || 0);
+      if (data.maxTotalVisits !== undefined) setMaxVisits(data.maxTotalVisits);
     } catch (error) {
       showToast("Failed to fetch doctor visit report");
     } finally {
@@ -73,8 +79,21 @@ const DoctorVisitReport = () => {
     filters.minVisits,
     paginationData.currentPage,
     paginationData.perPageDocument,
+    filters.headQuarterId,
   ]);
 
+  useEffect(() => {
+    const fetchHeadQuarters = async () => {
+      try {
+        const data = await getAllHeadQuartersNames();
+        console.log(data);
+        if (data.status) setHeadQuarters(data.headQuarterNames);
+      } catch (error) {
+        console.error("Failed to fetch headquarters", error);
+      }
+    };
+    fetchHeadQuarters();
+  }, []);
   useEffect(() => {
     fetchReport();
   }, [fetchReport]);
@@ -92,6 +111,7 @@ const DoctorVisitReport = () => {
       year: currentYear,
       doctorName: "",
       minVisits: "",
+      headQuarterId: "",
     });
     setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
   };
@@ -162,18 +182,37 @@ const DoctorVisitReport = () => {
                 </option>
               ))}
             </select>
-            <input
+            <select
               name="minVisits"
-              type="number"
-              min="0"
               value={filters.minVisits}
               onChange={handleFilterChange}
-              placeholder="Min visits"
-              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition w-28"
-            />
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition w-36"
+            >
+              <option value="">All Visits</option>
+              <option value="0">Missed call (0)</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3 and more</option>
+            </select>
+            <select
+              name="headQuarterId"
+              value={filters.headQuarterId}
+              onChange={handleFilterChange}
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+            >
+              <option value="">All Headquarters</option>
+              {headQuarters.map((hq) => (
+                <option key={hq._id} value={hq._id}>
+                  {hq.headQuarterName}
+                </option>
+              ))}
+            </select>
 
             {/* Clear — show when doctorName typed or month cleared */}
-            {(filters.doctorName || !filters.month || filters.minVisits) && (
+            {(filters.doctorName ||
+              !filters.month ||
+              filters.minVisits ||
+              filters.headQuarterId) && (
               <button
                 onClick={clearFilters}
                 className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"
@@ -207,6 +246,9 @@ const DoctorVisitReport = () => {
                         Total Visits
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Headquarter
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Visit Dates
                       </th>
                     </tr>
@@ -227,9 +269,16 @@ const DoctorVisitReport = () => {
                             {row.specialty || "—"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
-                              {row.totalVisits}
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${row.totalVisits === 0 ? "bg-red-50 text-red-600" : "bg-blue-50 text-blue-700"}`}
+                            >
+                              {row.totalVisits === 0
+                                ? "Missed call"
+                                : row.totalVisits}
                             </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {row.headQuarterName || "—"}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-500">
                             {row.visitDates || "—"}
