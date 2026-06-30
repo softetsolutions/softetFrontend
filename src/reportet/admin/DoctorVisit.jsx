@@ -54,6 +54,7 @@ const DoctorVisitReport = () => {
       const data = await getDoctorVisitReport({
         month: filters.month || undefined,
         year: filters.year,
+        doctorName: filters.doctorName || undefined,
         minVisits: filters.minVisits || undefined,
         headQuarterId: filters.headQuarterId || undefined,
         pageNo: paginationData.currentPage,
@@ -77,6 +78,7 @@ const DoctorVisitReport = () => {
     filters.month,
     filters.year,
     filters.minVisits,
+    filters.doctorName,
     paginationData.currentPage,
     paginationData.perPageDocument,
     filters.headQuarterId,
@@ -117,11 +119,11 @@ const DoctorVisitReport = () => {
   };
 
   // local doctor name filter — no API call
-  const filteredReport = filters.doctorName
-    ? report.filter((r) =>
-        r.doctorName?.toLowerCase().includes(filters.doctorName.toLowerCase()),
-      )
-    : report;
+  // const filteredReport = filters.doctorName
+  //   ? report.filter((r) =>
+  //       r.doctorName?.toLowerCase().includes(filters.doctorName.toLowerCase()),
+  //     )
+  //   : report;
 
   return (
     <div className="bg-gray-100 flex flex-col h-full overflow-hidden">
@@ -254,8 +256,8 @@ const DoctorVisitReport = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredReport.length > 0 ? (
-                      filteredReport.map((row) => (
+                    {report.length > 0 ? (
+                      report.map((row) => (
                         <tr
                           key={row.doctorId}
                           className="hover:bg-gray-50 transition-colors"
@@ -304,7 +306,7 @@ const DoctorVisitReport = () => {
                 perPageDocument={paginationData.perPageDocument}
                 currentPage={paginationData.currentPage}
                 paginationHandler={setPaginationData}
-                actualResultPerPage={filteredReport.length}
+                actualResultPerPage={report.length}
                 listName="Doctors"
               />
             </>
