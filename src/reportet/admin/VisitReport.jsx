@@ -278,10 +278,26 @@ const VisitReport = () => {
                             <div key={area?._id}>{area?.name}</div>
                           ))}
                         </td>
-                        <td className=" border-gray-300 px-3 py-2">
+                        {/* <td className=" border-gray-300 px-3 py-2">
                           {report?.doctorId?.map((doctor) => (
                             <div key={doctor?._id}>{doctor?.name}</div>
                           ))}
+                        </td> */}
+                        <td className=" border-gray-300 px-3 py-2">
+                          {report?.doctorId?.length > 0 ? (
+                            <div className="relative group inline-block">
+                              <span className="cursor-pointer underline decoration-dotted text-blue-700 font-medium text-base">
+                                {report.doctorId.length}
+                              </span>
+                              <div className="absolute z-10 hidden group-hover:block bg-white text-gray-800 text-xs rounded px-2 py-1 left-0 top-6 w-max max-w-48 shadow-lg border border-gray-200">
+                                {report.doctorId.map((doctor) => (
+                                  <div key={doctor?._id}>{doctor?.name}</div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            "-"
+                          )}
                         </td>
 
                         <td className=" border-gray-300 px-3 py-2">

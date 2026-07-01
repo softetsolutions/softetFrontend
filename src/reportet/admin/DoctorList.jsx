@@ -13,6 +13,8 @@ import {
   deleteDoctor,
   getAllAreasForDropdown,
 } from "../api/doctor";
+import { getAllHeadQuartersNames } from "../api/headQuarter";
+import { getAreasByHeadQuarterId } from "../api/area";
 
 const DoctorsList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,10 +28,13 @@ const DoctorsList = () => {
   const [deleteLoader, setDeleteLoader] = useState(null);
   const [confirmDeleteDoctor, setConfirmDeleteDoctor] = useState(null);
   const [toast, setToast] = useState(null);
+  const [headQuarters, setHeadQuarters] = useState([]);
+  const [areasByHQ, setAreasByHQ] = useState([]);
   const [filters, setFilters] = useState({
     name: "",
     specialty: "",
     areaId: "",
+    headQuarterId: "",
   });
   const [areaOptions, setAreaOptions] = useState([]);
   const [areaOptionsLoader, setAreaOptionsLoader] = useState(false);
@@ -49,6 +54,8 @@ const DoctorsList = () => {
         limit: paginationData.perPageDocument,
         name: filters.name,
         specialty: filters.specialty,
+        areaId: filters.areaId || undefined,
+        headQuarterId: filters.headQuarterId || undefined,
       });
 
       setDoctors(Array.isArray(data) ? data : data.doctors || []);
@@ -187,6 +194,26 @@ const DoctorsList = () => {
       setDeleteLoader(null);
     }
   };
+
+  useEffect(() => {
+    const fetchHQs = async () => {
+      const data = await getAllHeadQuartersNames();
+      if (data.status) setHeadQuarters(data.headQuarterNames);
+    };
+    fetchHQs();
+  }, []);
+
+  useEffect(() => {
+    if (!filters.headQuarterId) {
+      setAreasByHQ([]);
+      return;
+    }
+    const fetchAreas = async () => {
+      const data = await getAreasByHeadQuarterId(filters.headQuarterId);
+      setAreasByHQ(data.data || []);
+    };
+    fetchAreas();
+  }, [filters.headQuarterId]);
   return (
     <div className="bg-gray-100 flex flex-col h-full overflow-hidden">
       {/* Header Section */}
@@ -221,9 +248,50 @@ const DoctorsList = () => {
               placeholder="Filter by specialty..."
               className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition w-48"
             />
-            {(filters.name || filters.specialty) && (
+            <select
+              name="headQuarterId"
+              value={filters.headQuarterId}
+              onChange={(e) => {
+                handleFilterChange(e);
+                setFilters((prev) => ({ ...prev, areaId: "" })); // reset area on HQ change
+              }}
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+            >
+              <option value="">All Headquarters</option>
+              {headQuarters.map((hq) => (
+                <option key={hq._id} value={hq._id}>
+                  {hq.headQuarterName}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="areaId"
+              value={filters.areaId}
+              onChange={handleFilterChange}
+              disabled={!filters.headQuarterId}
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition disabled:opacity-50"
+            >
+              <option value="">All Areas</option>
+              {areasByHQ.map((area) => (
+                <option key={area._id} value={area._id}>
+                  {area.name}
+                </option>
+              ))}
+            </select>
+            {(filters.name ||
+              filters.specialty ||
+              filters.headQuarterId ||
+              filters.areaId) && (
               <button
-                onClick={() => setFilters({ name: "", specialty: "" })}
+                onClick={() =>
+                  setFilters({
+                    name: "",
+                    specialty: "",
+                    areaId: "",
+                    headQuarterId: "",
+                  })
+                }
                 className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"
               >
                 Clear
@@ -252,6 +320,12 @@ const DoctorsList = () => {
                         Specialty
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Area
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Headquarter
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -270,6 +344,13 @@ const DoctorsList = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {doctor.specialty}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {doctor.areaId?.name || "—"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {doctor.areaId?.headQuarterId?.headQuarterName ||
+                              "—"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-1">

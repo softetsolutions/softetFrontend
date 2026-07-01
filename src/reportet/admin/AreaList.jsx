@@ -13,6 +13,7 @@ const AreaList = () => {
   const [deleteLoader, setDeleteLoader] = useState(null);
   const [confirmDeleteArea, setConfirmDeleteArea] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [forceDeleteArea, setForceDeleteArea] = useState(null);
   const [toast, setToast] = useState(null);
   const [paginationData, setPaginationData] = useState({
     currentPage: 1,
@@ -91,13 +92,32 @@ const AreaList = () => {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const handleDelete = async () => {
-    const areaId = confirmDeleteArea._id;
+  const handleDelete = async (force = false) => {
+    const area = force ? forceDeleteArea?.area : confirmDeleteArea;
+    console.log("handleDelete called", {
+      force,
+      area,
+      forceDeleteArea,
+      confirmDeleteArea,
+    });
+    if (!area) return;
+    const areaId = area._id;
+
     try {
       setDeleteLoader(areaId);
-      setConfirmDeleteArea(null);
+      if (force) {
+        setForceDeleteArea(null);
+      } else {
+        setConfirmDeleteArea(null);
+      }
 
-      const res = await deleteArea(areaId);
+      const res = await deleteArea(areaId, force);
+      console.log("delete response", res);
+
+      if (res?.hasLinkedDoctors) {
+        setForceDeleteArea({ area, doctorCount: res.doctorCount });
+        return;
+      }
 
       if (res?.success === false) {
         showToast(res.message, "error");
@@ -352,7 +372,7 @@ const AreaList = () => {
                 Cancel
               </button>
               <button
-                onClick={handleDelete}
+                onClick={() => handleDelete(false)}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -384,6 +404,57 @@ const AreaList = () => {
           >
             <X className="w-3.5 h-3.5" />
           </button>
+        </div>
+      )}
+      {forceDeleteArea && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+          onClick={() => setForceDeleteArea(null)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 bg-red-50 rounded-full flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Force Delete Area
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              <span className="font-semibold text-gray-900">
+                {forceDeleteArea.area.name}
+              </span>{" "}
+              has{" "}
+              <span className="font-semibold text-red-600">
+                {forceDeleteArea.doctorCount} doctor(s)
+              </span>{" "}
+              associated with it. Deleting this area will also permanently
+              delete all associated doctors.
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={() => setForceDeleteArea(null)}
+                className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(true)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete All
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
