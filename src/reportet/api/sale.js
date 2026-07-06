@@ -32,3 +32,49 @@ export const deleteSale = async (id) => {
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
 };
+
+
+
+export const createSaleByAdmin = async (saleData) => {
+  try {
+  
+    const res = await fetch(`${API_BASE_URL}/sales/createSaleByAdmin`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(saleData),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to create sale");
+
+    return data;
+  } catch (err) {
+    console.error("Create Sale By Admin Error:", err);
+    throw err;
+  }
+};
+
+export const alreadySubmitedSaleByAdmin = async ({ stockist }) => {
+  try {
+    const params = new URLSearchParams({ stockist });
+    const res = await fetch(
+      `${API_BASE_URL}/sales/alreadySubmitedSalesByAdmin?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.error || "Failed to check sale submission status");
+
+    return data;
+  } catch (err) {
+    console.error("Already Submited Sale By Admin Error:", err);
+    throw err;
+  }
+};
