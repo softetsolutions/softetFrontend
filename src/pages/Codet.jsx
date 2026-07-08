@@ -83,7 +83,7 @@ export default function Codet() {
           </div>
         </div>
 
-        <div className="flex items-center">
+        {/* <div className="flex items-center">
           {editTitle.isInEditingMode ? (
             <input
               value={editTitle.value}
@@ -113,7 +113,7 @@ export default function Codet() {
               {title}
             </div>
           )}
-        </div>
+        </div> */}
 
         <div className="flex gap-1.5 items-center mr-3">
           <button
@@ -155,6 +155,7 @@ export default function Codet() {
                 <div className="flex-1 overflow-hidden">
                   {activeTab === "html" && (
                     <AceEditorComponent
+                      acKey={"html1"}
                       mode="html"
                       value={html}
                       onChange={setHtml}
@@ -163,6 +164,7 @@ export default function Codet() {
                   )}
                   {activeTab === "css" && (
                     <AceEditorComponent
+                      acKey={"css1"}
                       mode="css"
                       value={css}
                       onChange={setCss}
@@ -171,6 +173,7 @@ export default function Codet() {
                   )}
                   {activeTab === "js" && (
                     <AceEditorComponent
+                      acKey={"javascript1"}
                       mode="javascript"
                       value={js}
                       onChange={setJs}
