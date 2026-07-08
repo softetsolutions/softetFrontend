@@ -1,317 +1,305 @@
-import { ChevronRight, Download, Check, Home, Bell, Search, Menu, Stethoscope, Users, Pill } from 'lucide-react';
+import {
+  Users,
+  ClipboardCheck,
+  Clock,
+  BarChart3,
+  Wallet,
+  MapPin,
+  Check,
+  ArrowRight,
+} from "lucide-react";
 
-const HeroSection = () => {
+const features = [
+  {
+    icon: Users,
+    gradient: "from-indigo-500 to-indigo-700",
+    title: "Role-Based Access",
+    desc: "Separate, purpose-built views for Admin, Area Manager, and MR — each seeing exactly the data relevant to their role.",
+  },
+  {
+    icon: ClipboardCheck,
+    gradient: "from-blue-500 to-blue-700",
+    title: "Daily & Monthly Reporting",
+    desc: "MRs submit daily visit reports and monthly sales reports directly from the app — no paperwork, no spreadsheets.",
+  },
+  {
+    icon: Clock,
+    gradient: "from-violet-500 to-purple-700",
+    title: "Missed Doctor Tracking",
+    desc: "MRs and Area Managers instantly see which doctors were missed, so no visit plan falls through the cracks.",
+  },
+  {
+    icon: BarChart3,
+    gradient: "from-sky-500 to-blue-600",
+    title: "Headquarter-Wise Sales Insights",
+    desc: "Admins view sales performance and visit compliance broken down by headquarter, MR, and doctor.",
+  },
+  {
+    icon: Wallet,
+    gradient: "from-purple-600 to-indigo-800",
+    title: "Built-In HRMS",
+    desc: "Leave tracking and payroll generation live inside ReportET, so there's no need for a separate HR tool.",
+  },
+  {
+    icon: MapPin,
+    gradient: "from-cyan-500 to-sky-700",
+    title: "Live Employee Tracking",
+    desc: "Real-time location tracking for field employees is on its way, adding another layer of visibility for admins.",
+    soon: true,
+  },
+];
 
-  const testimonials = [
-    {
-      id: 1,
-      quote: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus",
-      image: "https://placehold.co/128x128/9CA3AF/FFFFFF?text=AM", // Placeholder image for Adward Maya
-      name: "Adward Maya",
-      title: "WEB DEVELOPER"
-    },
-    {
-      id: 2,
-      quote: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus",
-      image: "https://placehold.co/128x128/9CA3AF/FFFFFF?text=JR", // Placeholder image for Jesmin Rosy
-      name: "Jesmin Rosy",
-      title: "WEB DESIGNER"
-    }
-  ];
+const adminPoints = [
+  "Daily reporting, MR-wise and doctor-wise",
+  "Headquarter-wise sales and missed-visit view",
+  "Monthly report roll-ups across the team",
+  "Leave approvals and payroll generation",
+];
+
+const mobilePoints = [
+  "Submit daily and monthly reports on the go",
+  "See missed doctors at a glance",
+  "Apply for leave and check payroll status",
+  "Same account, for both MR and Area Manager",
+];
+
+const audienceTags = [
+  "Medical Representatives",
+  "Area Managers",
+  "Admin Teams",
+  "Multi-Headquarter Operations",
+  "Doctor Visit Compliance",
+  "Leave & Payroll",
+];
+
+export default function Hero() {
   return (
-    <section>
-      <section
-        className="relative bg-cover bg-center min-h-screen text-white flex flex-col justify-center items-center text-center px-4"
-        style={{ backgroundImage: "url('https://images.pexels.com/photos/8855516/pexels-photo-8855516.jpeg')" }} // Replace with your background image path
-      >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-white/20"></div>
+    <main className="bg-slate-50 text-slate-900 font-sans">
+      {/* HERO */}
+      <section className="text-center px-6 pt-24 pb-20 max-w-4xl mx-auto">
+        <p className="text-blue-600 font-bold tracking-widest text-xs uppercase mb-4">
+          Field Force Reporting Platform
+        </p>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-6">
+          Every Visit, Every Report,{" "}
+          <span className="bg-gradient-to-br from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+            One Platform.
+          </span>
+        </h1>
+        <div className="w-16 h-1 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 mx-auto mb-6" />
+        <p className="text-slate-500 text-base md:text-lg mb-8 max-w-xl mx-auto">
+          ReportET helps medical distribution businesses track daily reporting,
+          monthly sales, and doctor visits across every headquarter — with a
+          built-in HRMS for leave and payroll, so your field team runs on a
+          single system, not five.
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <a
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-gradient-to-br from-indigo-600 to-blue-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-transform"
+          >
+            Request a Demo <ArrowRight size={18} />
+          </a>
+          {/* <button className="bg-white border border-slate-200 font-bold px-7 py-3.5 rounded-xl hover:border-blue-400 hover:text-blue-600 transition-colors">
+            See Plans
+          </button> */}
+        </div>
 
-        {/* Content */}
-        <div className="relative z-10 max-w-2xl space-y-6 ">
-          <h1 className="text-4xl md:text-5xl font-bold text-black">
-            We help you to boost your business
-          </h1>
-          <p className="text-lg md:text-xl text-blue-600">
-            Connect with your clients in a different way
-          </p>
+        <div className="flex flex-wrap justify-center gap-8 mt-14 text-sm font-semibold text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> Built for
+            Admin, Area Manager & MR roles
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500" /> Daily &
+            monthly reporting
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500" />{" "}
+            Headquarter-wise sales visibility
+          </div>
         </div>
       </section>
 
-            <div className="bg-white min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-inter flex flex-col lg:flex-row items-center justify-center lg:space-x-12">
-        {/* Left side: Mobile App Mockup */}
-        <div className="flex-shrink-0 mb-12 lg:mb-0">
-          <div className="bg-gray-100 rounded-[3rem] p-4 shadow-2xl relative w-80 h-[600px] border-[10px] border-gray-900">
-            {/* Top Notch/Speaker */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-gray-900 rounded-b-2xl z-10"></div>
-
-            {/* Main App Content */}
-            <div className="bg-white rounded-[2rem] h-full flex flex-col overflow-hidden">
-              {/* Header */}
-              <div className="flex justify-between items-center p-4">
-                <button className="text-gray-400 p-2 rounded-lg bg-gray-100">
-                  <ChevronRight size={20} className="transform rotate-180" />
-                </button>
-                <span className="text-gray-800 font-semibold">Medical Analysis</span>
-                <button className="text-gray-400 p-2 rounded-lg bg-gray-100">
-                  <Menu size={20} />
-                </button>
-              </div>
-
-              {/* Stats Section */}
-              <div className="p-4 space-y-4">
-                <div className="bg-blue-50 p-6 rounded-2xl flex items-center space-x-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
-                    <Stethoscope size={24} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm text-gray-500 font-medium">Active Doctors</h4>
-                    <p className="text-2xl text-gray-900 font-bold">275</p>
-                    <p className="text-xs text-gray-400">This Monthly</p>
-                  </div>
-                </div>
-                <div className="bg-purple-50 p-6 rounded-2xl flex items-center space-x-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-500">
-                    <Users size={24} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm text-gray-500 font-medium">Active Patienats</h4>
-                    <p className="text-2xl text-gray-900 font-bold">1685</p>
-                    <p className="text-xs text-gray-400">This Monthly</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Nav Bar */}
-              <div className="mt-auto p-4 flex justify-around items-center bg-white border-t border-gray-200 rounded-b-[2rem]">
-                <button className="text-gray-400 hover:text-blue-500 transition-colors duration-200">
-                  <Home size={24} />
-                </button>
-                <button className="text-gray-400 hover:text-blue-500 transition-colors duration-200">
-                  <Bell size={24} />
-                </button>
-                <button className="text-blue-500">
-                  <Pill size={24} />
-                </button>
-                <button className="text-gray-400 hover:text-blue-500 transition-colors duration-200">
-                  <Search size={24} />
-                </button>
-                <button className="text-gray-400 hover:text-blue-500 transition-colors duration-200">
-                  <Menu size={24} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right side: Text Content */}
-        <div className="max-w-xl text-center lg:text-left">
-          <h3 className="text-blue-600 uppercase tracking-widest text-sm font-semibold mb-2">
-            ABOUT OUR APP
-          </h3>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-8">
-            Assuring you of <span className="text-blue-600">the best medical services.</span>
-          </h2>
-          <p className="text-gray-600 leading-relaxed mb-8">
-            We help you to create innovations and we transform ideas into reality. The innovation is often identified with new technology. Most of the innovative projects however is not based on revolutionary technological solutions. The innovation is often about changing the meaning of what a product or a service is and what it offers its users.
+      {/* FEATURES */}
+      <section className="px-6 pb-24 max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-blue-600 font-bold tracking-widest text-xs uppercase mb-3">
+            Features Overview
           </p>
-
-          {/* Features List */}
-          <div className="space-y-4 mb-10">
-            <div className="flex items-center space-x-2">
-              <Check size={20} className="text-blue-500" />
-              <span className="text-gray-700">Ultimate interface</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check size={20} className="text-blue-500" />
-              <span className="text-gray-700">24/7 Support</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="bg-white py-16 px-4 text-center">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-semibold text-red-500 mb-10">
-            Get amazing product with an excellent service
-          </h1>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
-            {/* Business Analytics */}
-            <div className="flex flex-col items-center px-4">
-              <div className="text-red-500 mb-3 text-4xl">📊</div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Business Analytics</h3>
-              <p className="text-gray-600">
-                Reporting Log helps to discover, interpret, and communicate with meaningful patterns in data.
-                We aim to obtain insightful and actionable information that help practitioners accomplish tasks.
-              </p>
-            </div>
-
-            {/* Customized Solutions */}
-            <div className="flex flex-col items-center px-4">
-              <div className="text-red-500 mb-3 text-4xl">🏷️</div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Customized solutions</h3>
-              <p className="text-gray-600">
-                Reporting Log is fully customizable as per your requirement that gives you more power and
-                manageable way to control everything.
-              </p>
-              <button className="mt-6 px-6 py-2 border-2 border-red-500 text-red-500 rounded-full font-semibold hover:bg-red-500 hover:text-white transition">
-                GET STARTED
-              </button>
-            </div>
-
-
-
-            {/* Expense Control */}
-            <div className="flex flex-col items-center px-4">
-              <div className="text-red-500 mb-3 text-4xl">💼</div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Expense Control</h3>
-              <p className="text-gray-600">
-                Reporting Log has various powerful tools that helps you to control daily and monthly expenses
-                dynamically without wasting time to calculate manually and traditional way.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      
-      <section className="bg-white">
-
-
-        {/* Strong Numbers Section */}
-        <div className="bg-gray-100 py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-12">STRONG NUMBERS</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-              {/* Stat 1 */}
-              <div>
-                <div className="flex justify-center mb-4">
-                  {/* <img src="/icons/users.svg" alt="Users" className="h-10" /> */}
-                </div>
-                <p className="text-3xl font-bold text-gray-800">4500+</p>
-                <p className="text-gray-600 mt-2">Users use daily Reporting Log to submit their Daily Report.</p>
-              </div>
-
-              {/* Stat 2 */}
-              <div>
-                <div className="flex justify-center mb-4">
-                  {/* <img src="/icons/chat.svg" alt="Satisfaction" className="h-10" /> */}
-                </div>
-                <p className="text-3xl font-bold text-gray-800">99.9%</p>
-                <p className="text-gray-600 mt-2">User satisfaction rate for Reporting Log.</p>
-              </div>
-
-              {/* Stat 3 */}
-              <div>
-                <div className="flex justify-center mb-4">
-                  {/* <img src="/icons/globe.svg" alt="Countries" className="h-10" /> */}
-                </div>
-                <p className="text-3xl font-bold text-gray-800">10+</p>
-                <p className="text-gray-600 mt-2">Reporting Log team provides their service in more than 10 countries.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
-      <div className="bg-gray-50 min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-inter">
-        <div className="max-w-7xl mx-auto text-center">
-          {/* Section Heading and Subheading */}
-          <h3 className="text-gray-500 uppercase tracking-widest text-sm font-semibold mb-2">
-            CLIENTS FEEDBACK
-          </h3>
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-12">
-            What our client says
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            Built for the Way Your Field Team Works
           </h2>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 mx-auto mt-5" />
+        </div>
 
-          {/* Testimonials Container */}
-          <div className="flex flex-col md:flex-row justify-center items-center md:items-stretch gap-8 lg:gap-12">
-            {testimonials.map(testimonial => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map(({ icon: Icon, gradient, title, desc, soon }) => (
+            <div
+              key={title}
+              className="relative bg-white border border-slate-200 rounded-2xl p-8 hover:-translate-y-1 hover:shadow-xl transition-all"
+            >
+              {soon && (
+                <span className="absolute top-6 right-6 text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-full">
+                  Coming Soon
+                </span>
+              )}
               <div
-                key={testimonial.id}
-                className="bg-white p-8 md:p-10 rounded-3xl shadow-lg border border-gray-100 max-w-lg mx-auto md:mx-0 flex flex-col items-start space-y-6 transform transition-transform duration-300 hover:scale-105"
+                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-5`}
               >
-                {/* Quote Icon */}
-                <div className="flex items-center justify-center p-3 rounded-xl bg-blue-100 text-blue-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-quote"><path d="M15 22s-4-1-4-8V2h8v7.21c0 2.2-2 3.4-4 4.7l-1 1.1c-1 1.4-2 2.5-3 3.1c-1 0.5-2 0.7-3 0.9" /><path d="M9 22s-4-1-4-8V2h8v7.21c0 2.2-2 3.4-4 4.7l-1 1.1c-1 1.4-2 2.5-3 3.1c-1 0.5-2 0.7-3 0.9" /></svg>
-                </div>
+                <Icon className="text-white" size={26} />
+              </div>
+              <h3 className="text-lg font-bold mb-2">{title}</h3>
+              <p className="text-slate-500 text-sm">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-                {/* Quote Text */}
-                <p className="text-gray-600 leading-relaxed font-inter">{testimonial.quote}</p>
-
-                {/* Author and Title section */}
-                <div className="flex items-center space-x-4 pt-4">
-                  {/* Author Image */}
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-gray-800 font-bold text-lg font-inter">{testimonial.name}</span>
-                    <span className="text-gray-500 text-sm uppercase tracking-wide font-medium font-inter">{testimonial.title}</span>
-                  </div>
-                </div>
+      {/* BLUE BAND */}
+      <section className="bg-gradient-to-br from-indigo-700 to-blue-500 text-white px-6 py-20">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-5">
+              Built to Simplify Field Force Management
+            </h2>
+            <p className="text-blue-100 max-w-md mb-7">
+              Whether you manage a handful of MRs or a field force spread across
+              dozens of headquarters, ReportET keeps reporting, sales tracking,
+              and HR on one system — purpose-built for medical distribution
+              businesses.
+            </p>
+            <button className="bg-white text-blue-700 font-bold px-7 py-3.5 rounded-xl hover:-translate-y-0.5 transition-transform">
+              Talk to Us
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-5">
+            {[
+              ["Daily", "Visit & reporting cycle"],
+              ["Monthly", "Sales report roll-up"],
+              ["3 Roles", "Admin · Area Manager · MR"],
+              ["1 Platform", "Reporting + HRMS combined"],
+            ].map(([num, label]) => (
+              <div
+                key={num}
+                className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm"
+              >
+                <div className="text-2xl font-extrabold mb-1">{num}</div>
+                <div className="text-sm text-blue-100">{label}</div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-
-
-      {/* Contact Form Section */}
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-xl w-full mt-12 lg:mt-0">
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight mb-8 text-center">
-            Get in Touch
+      {/* PLATFORMS */}
+      <section className="px-6 py-24 max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-blue-600 font-bold tracking-widest text-xs uppercase mb-3">
+            Two Platforms, One System
+          </p>
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+            Admin Panel & Mobile App
           </h2>
-          <form className="space-y-6 bg-white p-8 rounded-2xl shadow-lg">
-            <div>
-              <label htmlFor="name" className="sr-only">Name</label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Your Name"
-                className="w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="sr-only">Email</label>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Your Email"
-                className="w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="sr-only">Message</label>
-              <textarea
-                name="message"
-                id="message"
-                rows="4"
-                placeholder="Your Message"
-                className="w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center space-x-2"
-            >
-              <span>Send Message</span>
-
-            </button>
-          </form>
+          <div className="w-16 h-1 rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 mx-auto mt-5" />
         </div>
-      </div>
 
-    </section>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white border border-slate-200 rounded-3xl p-10">
+            <span className="inline-block text-xs font-bold uppercase tracking-wide bg-indigo-50 text-indigo-700 px-3.5 py-1.5 rounded-full mb-5">
+              Admin Panel
+            </span>
+            <h3 className="text-2xl font-extrabold mb-3">
+              Complete visibility, from HQ to doctor
+            </h3>
+            <p className="text-slate-500 mb-6">
+              Everything your admin team needs to see how the field force is
+              performing, in one dashboard.
+            </p>
+            <ul className="space-y-3">
+              {adminPoints.map((point) => (
+                <li
+                  key={point}
+                  className="flex items-start gap-3 text-sm text-slate-700"
+                >
+                  <Check className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
 
+          <div className="bg-white border border-slate-200 rounded-3xl p-10">
+            <span className="inline-block text-xs font-bold uppercase tracking-wide bg-emerald-50 text-emerald-700 px-3.5 py-1.5 rounded-full mb-5">
+              Mobile App
+            </span>
+            <h3 className="text-2xl font-extrabold mb-3">
+              Built for the MR and Area Manager, on the move
+            </h3>
+            <p className="text-slate-500 mb-6">
+              A simple app to log visits, file reports, and stay on top of
+              doctor coverage — right from the field.
+            </p>
+            <ul className="space-y-3">
+              {mobilePoints.map((point) => (
+                <li
+                  key={point}
+                  className="flex items-start gap-3 text-sm text-slate-700"
+                >
+                  <Check className="text-blue-500 shrink-0 mt-0.5" size={18} />
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* WHO ITS FOR */}
+      <section className="px-6 pb-24 max-w-6xl mx-auto">
+        <div className="bg-slate-900 rounded-3xl p-10 md:p-14 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center text-white">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-4">
+              Made for Medical Distribution Businesses
+            </h2>
+            <p className="text-slate-400 max-w-md">
+              If you run a field force of Medical Representatives and Area
+              Managers — five or five hundred — ReportET is built around how
+              your business actually operates: doctor visits, headquarter-wise
+              sales, and the HR work that keeps a field team running.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {audienceTags.map((tag) => (
+              <span
+                key={tag}
+                className="bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm font-semibold text-slate-200"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="px-6 pb-24 text-center max-w-2xl mx-auto">
+        <h2 className="text-3xl font-extrabold tracking-tight mb-4">
+          Bring Your Field Force Onto One Platform
+        </h2>
+        <p className="text-slate-500 mb-8">
+          See how ReportET handles reporting, sales tracking, and HR for teams
+          like yours.
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <a
+            href="/contact"
+            className="bg-gradient-to-br from-indigo-600 to-blue-500 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-500/30 hover:-translate-y-0.5 transition-transform"
+          >
+            Request a Demo
+          </a>
+        </div>
+      </section>
+    </main>
   );
-};
-
-export default HeroSection;
+}

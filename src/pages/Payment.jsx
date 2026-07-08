@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import qrCode from "../assets/qrCode.jpg";
 import { useNavigate, Link } from "react-router-dom";
-import logo from "../assets/logo.jpeg";
+import logo from "../assets/SoftetLogo.png";
 import { useState, useEffect } from "react";
 import DashboardNavbar from "../components/DashboardNavbar";
 
