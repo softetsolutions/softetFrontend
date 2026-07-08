@@ -1,14 +1,14 @@
-import Navbar from "./Header"
-import Footer from "./Footer"
-import Hero from "./Hero"
+import Navbar from "./Header";
+import Footer from "../components/Footer";
+import Hero from "./Hero";
 function HomePage() {
   return (
     <>
-    <Navbar/>
-    <Hero/>
-    <Footer/>
+      <Navbar />
+      <Hero />
+      <Footer />
     </>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;

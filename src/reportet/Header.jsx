@@ -49,34 +49,18 @@ const Navbar = () => {
 
   return (
     <>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-gray-300 shadow-md text-black"
-            : "bg-transparent text-white"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-2 flex justify-between items-center">
           {/* Logo */}
           <a
             href="/"
-            className="flex items-center gap-2 text-blue-600 font-bold text-2xl"
+            className="flex items-center text-blue-600 font-bold text-2xl"
           >
             Report<span className="text-black">ET</span>
           </a>
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-6">
-            {["Home", "Features", "About", "FAQ", "Contact Us"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="hover:text-orange-500 font-medium transition-colors"
-              >
-                {item}
-              </a>
-            ))}
-
             <button
               onClick={onLoginClick}
               className="hover:cursor-pointer px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
@@ -114,19 +98,6 @@ const Navbar = () => {
             <button onClick={toggleMenu} aria-label="Close menu">
               <X className="w-6 h-6 text-black" />
             </button>
-          </div>
-
-          <div className="flex flex-col gap-6 mt-8">
-            {["Home", "Features", "About", "FAQ", "Contact Us"].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-black hover:text-orange-500 text-lg font-medium"
-                onClick={toggleMenu}
-              >
-                {item}
-              </a>
-            ))}
           </div>
 
           <div className="mt-auto mb-8">

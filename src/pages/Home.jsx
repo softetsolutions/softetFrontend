@@ -83,7 +83,7 @@ function Home() {
           />
         </div>
       </div>
-      <Link
+      {/* <Link
         to={"/full-stack-development-course"}
         className="
     fixed bottom-20 right-8 z-50
@@ -105,7 +105,7 @@ function Home() {
           Full Stack Development • Live
         </span>
         <span className="text-xs opacity-80">Become Job-Ready</span>
-      </Link>
+      </Link> */}
     </>
   );
 }
