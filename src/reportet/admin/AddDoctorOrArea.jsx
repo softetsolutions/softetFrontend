@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { ObjectId } from "bson";
-import { Trash2 } from "lucide-react";
+import { Trash2, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 import { Input, Select } from "../genericComps/InputComps";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import { getAreasByHeadQuarterId, createArea } from "../api/area";
 import { addDoctors } from "../api/doctor";
 import Spinner from "../genericComps/Spinner";
+import ImportAreaModal from "../modals/ImportAreaModal";
+import ImportDoctorModal from "../modals/ImportDoctorModal";
 
 const addOptions = [
   {
@@ -22,10 +24,15 @@ const addOptions = [
 const AddDoctorOrArea = () => {
   const [mode, setMode] = useState(""); //area or doctor
   const [loader, setLoader] = useState(false);
+  const [areaLoading, setAreaLoading] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [addedAreaList, setAddedAreaList] = useState([
     {
       id: new ObjectId().toString(),
       name: "",
+      dob: "",
+      email: "",
+      phoneNumber: "",
     },
   ]);
   const [addedDocterList, setAddedDoctorList] = useState([
@@ -43,7 +50,23 @@ const AddDoctorOrArea = () => {
   const [emptyFields, setEmptyFields] = useState({});
   const [saving, setSaving] = useState(false);
   const [hqLoading, setHqLoading] = useState(false);
-  const [areaLoading, setAreaLoading] = useState(false);
+
+  const refreshAreasForHeadQuarter = async () => {
+    if (mode !== "doctor" || !selectedHeadQuarter) return;
+    try {
+      setAreaLoading(true);
+      const res = await getAreasByHeadQuarterId(selectedHeadQuarter);
+      const areaOptions = res.data.map((doctor) => ({
+        name: doctor?.name,
+        value: doctor?._id,
+      }));
+      setAreaOptions(areaOptions);
+    } catch (error) {
+      console.error("Unable to refresh areas", error);
+    } finally {
+      setAreaLoading(false);
+    }
+  };
 
   const fetchHeadQuartersNames = async () => {
     try {
@@ -202,6 +225,9 @@ const AddDoctorOrArea = () => {
             acc[doctor.name] = {
               specialty: doctor?.speciallity,
               areaId: selectedArea,
+              dob: doctor?.dob || undefined,
+              email: doctor?.email || undefined,
+              phoneNumber: doctor?.phoneNumber || undefined,
             };
           } else if (acc[doctor.name]) {
             repeatingField[doctor?.id] = true;
@@ -264,14 +290,29 @@ const AddDoctorOrArea = () => {
         style={{ height: "calc(100% - 90px)", overflow: "auto" }}
         className="space-y-4 bg-white p-6 rounded-lg shadow-md h-full"
       >
-        <Select
-          labelName={"area/doctor"}
-          value={mode}
-          onChange={handleModeChange}
-          required={true}
-          options={addOptions}
-          selectName={"What do you want to add?"}
-        />
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex-1">
+            <Select
+              labelName={"area/doctor"}
+              value={mode}
+              onChange={handleModeChange}
+              required={true}
+              options={addOptions}
+              selectName={"What do you want to add?"}
+            />
+          </div>
+
+          {mode && (
+            <button
+              type="button"
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors whitespace-nowrap"
+            >
+              <Upload className="w-4 h-4" />
+              Import {mode === "doctor" ? "Doctors" : "Areas"} from Excel
+            </button>
+          )}
+        </div>
 
         {mode && (
           <Select
@@ -306,7 +347,10 @@ const AddDoctorOrArea = () => {
           {mode === "doctor" && selectedHeadQuarter && selectedArea && (
             <>
               {addedDocterList?.map((doctor) => (
-                <div key={doctor?.id} className="flex justify-between relative">
+                <div
+                  key={doctor?.id}
+                  className="flex flex-wrap gap-y-3 justify-between relative border-b pb-3 mb-1"
+                >
                   <Input
                     label="Doctor Name"
                     placeholder="Enter doctor name"
@@ -331,6 +375,39 @@ const AddDoctorOrArea = () => {
                       addDoctorDetails(
                         doctor?.id,
                         "speciallity",
+                        e.target.value,
+                      )
+                    }
+                  />
+                  <Input
+                    label="Date of Birth"
+                    type="date"
+                    style={{ width: "48%" }}
+                    value={doctor.dob}
+                    onChange={(e) =>
+                      addDoctorDetails(doctor?.id, "dob", e.target.value)
+                    }
+                  />
+                  <Input
+                    label="Email"
+                    type="email"
+                    placeholder="Enter doctor's email"
+                    style={{ width: "48%" }}
+                    value={doctor.email}
+                    onChange={(e) =>
+                      addDoctorDetails(doctor?.id, "email", e.target.value)
+                    }
+                  />
+                  <Input
+                    label="Phone Number"
+                    type="tel"
+                    placeholder="Enter doctor's phone number"
+                    style={{ width: "48%" }}
+                    value={doctor.phoneNumber}
+                    onChange={(e) =>
+                      addDoctorDetails(
+                        doctor?.id,
+                        "phoneNumber",
                         e.target.value,
                       )
                     }
@@ -433,6 +510,25 @@ const AddDoctorOrArea = () => {
           </button>
         </>
       </div>
+      {showImportModal && mode === "area" && (
+        <ImportAreaModal
+          onClose={() => setShowImportModal(false)}
+          onImported={() => {
+            fetchHeadQuartersNames();
+            setShowImportModal(false);
+          }}
+        />
+      )}
+
+      {showImportModal && mode === "doctor" && (
+        <ImportDoctorModal
+          onClose={() => setShowImportModal(false)}
+          onImported={() => {
+            refreshAreasForHeadQuarter();
+            setShowImportModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

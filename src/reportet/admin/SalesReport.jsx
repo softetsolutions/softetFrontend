@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
-import { organizationSalesList, updateSale, deleteSale } from "../api/sale";
+import {
+  organizationSalesList,
+  updateSale,
+  deleteSale,
+  exportAllSales,
+} from "../api/sale";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
-import { ChevronDown, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Trash2, Download } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
 
 const ALL_MONTHS = [
@@ -28,8 +33,10 @@ const ALL_YEARS = [currentYear];
 const SaleReport = () => {
   const [employees, setEmployees] = useState([]);
   const [saleData, setSaleData] = useState([]);
-  const [load, setLoad] = useState(false);
+
   const [tableLoading, setTableLoading] = useState(false);
+  const [load, setLoad] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [editModal, setEditModal] = useState(null);
   const [editAmount, setEditAmount] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
@@ -50,6 +57,24 @@ const SaleReport = () => {
   const monthDropdownRef = useRef(null);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
   const yearDropdownRef = useRef(null);
+
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      const payload = {
+        ...(reportFilters?.employee && { employeeId: reportFilters?.employee }),
+        months: reportFilters.months,
+        years: reportFilters.years,
+      };
+      await exportAllSales(payload);
+      toast.success("Sales report exported successfully");
+    } catch (error) {
+      console.error("Failed to export sales report", error);
+      toast.error(error.message || "Failed to export sales report");
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   const getSalesList = useCallback(
     async (abortController, payloadParams) => {
@@ -223,7 +248,25 @@ const SaleReport = () => {
   };
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-2xl font-bold text-gray-800">SALES REPORT</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">SALES REPORT</h2>
+        <button
+          onClick={handleExport}
+          disabled={exportLoading || tableLoading || saleData?.length === 0}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {exportLoading ? (
+            <Spinner
+              size={16}
+              borderWidth={2}
+              className="border-white border-t-transparent"
+            />
+          ) : (
+            <Download size={16} />
+          )}
+          {exportLoading ? "Exporting..." : "Export to Excel"}
+        </button>
+      </div>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Filter and review past sales records by MR, area, date, and status.
       </p>

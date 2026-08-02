@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { FaSearch } from "react-icons/fa";
-import { AlertTriangle, X, Check } from "lucide-react";
+import { AlertTriangle, X, Check, Download } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
-import { getDoctorVisitReport } from "../api/api";
+import { getDoctorVisitReport, exportDoctorVisitReport } from "../api/api";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 
@@ -26,6 +26,7 @@ const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
 const DoctorVisitReport = () => {
   const [loading, setLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [report, setReport] = useState([]);
   const [toast, setToast] = useState(null);
   const [totalDocuments, setTotalDocuments] = useState(0);
@@ -46,6 +47,24 @@ const DoctorVisitReport = () => {
   const showToast = (message, type = "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      await exportDoctorVisitReport({
+        month: filters.month || undefined,
+        year: filters.year,
+        doctorName: filters.doctorName || undefined,
+        minVisits: filters.minVisits || undefined,
+        headQuarterId: filters.headQuarterId || undefined,
+      });
+      showToast("Report exported successfully", "success");
+    } catch (error) {
+      showToast(error.message || "Failed to export report");
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   const fetchReport = useCallback(async () => {
@@ -137,6 +156,22 @@ const DoctorVisitReport = () => {
             View and filter doctor visit counts by month and year.
           </p>
         </div>
+        <button
+          onClick={handleExport}
+          disabled={exportLoading || loading || report?.length === 0}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {exportLoading ? (
+            <Spinner
+              size={16}
+              borderWidth={2}
+              className="border-white border-t-transparent"
+            />
+          ) : (
+            <Download size={16} />
+          )}
+          {exportLoading ? "Exporting..." : "Export to Excel"}
+        </button>
       </header>
 
       <div className="bg-white p-6 rounded-lg shadow-md flex-1 flex flex-col min-h-0">

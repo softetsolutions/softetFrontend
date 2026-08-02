@@ -22,7 +22,13 @@ const DoctorsList = () => {
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", specialty: "" });
+  const [editForm, setEditForm] = useState({
+    name: "",
+    specialty: "",
+    dob: "",
+    email: "",
+    phoneNumber: "",
+  });
   const [editLoader, setEditLoader] = useState(false);
   const [editError, setEditError] = useState("");
   const [deleteLoader, setDeleteLoader] = useState(null);
@@ -106,6 +112,9 @@ const DoctorsList = () => {
       name: doctor.name,
       specialty: doctor.specialty || "",
       areaId: doctor.areaId || "",
+      dob: doctor.dob || "",
+      email: doctor.email || "",
+      phoneNumber: doctor.phoneNumber || "",
     });
     setEditError("");
 
@@ -129,7 +138,14 @@ const DoctorsList = () => {
 
   const closeEdit = () => {
     setEditingDoctor(null);
-    setEditForm({ name: "", specialty: "", areaId: "" });
+    setEditForm({
+      name: "",
+      specialty: "",
+      areaId: "",
+      dob: "",
+      email: "",
+      phoneNumber: "",
+    });
     setEditError("");
     setAreaOptions([]);
   };
@@ -146,6 +162,9 @@ const DoctorsList = () => {
         name: editForm.name.trim(),
         specialty: editForm.specialty.trim(),
         ...(editForm.areaId && { areaId: editForm.areaId }),
+        dob: editForm.dob,
+        email: editForm.email.trim(),
+        phoneNumber: editForm.phoneNumber.trim(),
       });
       setDoctors((prev) =>
         prev.map((d) =>
@@ -154,6 +173,9 @@ const DoctorsList = () => {
                 ...d,
                 name: editForm.name.trim(),
                 specialty: editForm.specialty.trim(),
+                dob: editForm.dob,
+                email: editForm.email.trim(),
+                phoneNumber: editForm.phoneNumber.trim(),
               }
             : d,
         ),
@@ -458,6 +480,51 @@ const DoctorsList = () => {
                   }
                   className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
                 />
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.dob}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({ ...prev, dob: e.target.value }))
+                    }
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={editForm.phoneNumber}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        phoneNumber: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+                  />
+                </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">
                     Area

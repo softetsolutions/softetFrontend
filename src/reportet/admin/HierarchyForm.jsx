@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import { Building2, Users, Plus, Trash2, X } from "lucide-react";
 import { getAuthInfo } from "../utils/auth";
 import { createBulkHeadQuarterWithUi } from "../api/headQuarter";
+import { importHeadquartersFromExcel } from "../api/headQuarter";
+import ImportHeadquarterModal from "../modals/ImportHeadquaterModal";
 
 const HierarchyForm = () => {
   const [headquarters, setHeadquarters] = useState([
@@ -21,6 +23,7 @@ const HierarchyForm = () => {
     },
   ]);
   const [loader, setLoader] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [emptyFieldsOnSave, setEmptyFieldsOnSave] = useState({});
   // we have to change the state in the hash map style
 
@@ -116,7 +119,14 @@ const HierarchyForm = () => {
                   ...area,
                   doctors: [
                     ...area.doctors,
-                    { id: new ObjectId().toString(), name: "", specialty: "" },
+                    {
+                      id: new ObjectId().toString(),
+                      name: "",
+                      specialty: "",
+                      dob: "",
+                      email: "",
+                      phoneNumber: "",
+                    },
                   ],
                 };
               }
@@ -210,6 +220,9 @@ const HierarchyForm = () => {
                 _id: doctor.id,
                 name: doctor.name,
                 specialty: doctor.specialty,
+                dob: doctor.dob || undefined,
+                email: doctor.email || undefined,
+                phoneNumber: doctor.phoneNumber || undefined,
                 areaId: area.id,
                 organizationId: orgId.userId,
               });
@@ -269,20 +282,27 @@ const HierarchyForm = () => {
   return (
     <>
       <header className="mb-8">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <h1 className="text-3xl font-semibold text-gray-800">Headquarters</h1>
-          <button
-            disabled={loader}
-            onClick={() => submitHierarchyHandler(headquarters)}
-            className={`flex items-center gap-1 text-white px-4 py-2 rounded cursor-pointer ${loader ? "bg-blue-400" : "bg-blue-600"}`}
-          >
-            <div>{loader ? "Saving..." : "Save"}</div>
-            {loader && (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            )}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="flex items-center gap-1 text-indigo-600 border border-indigo-200 px-4 py-2 rounded hover:bg-indigo-50"
+            >
+              Import
+            </button>
+            <button
+              disabled={loader}
+              onClick={() => submitHierarchyHandler(headquarters)}
+              className={`flex items-center gap-1 text-white px-4 py-2 rounded cursor-pointer ${loader ? "bg-blue-400" : "bg-blue-600"}`}
+            >
+              <div>{loader ? "Saving..." : "Save"}</div>
+              {loader && (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              )}
+            </button>
+          </div>
         </div>
-
         <p className="text-gray-500 mt-1 italic">
           You can add multiple headquarters, and within each headquarters, you
           can add multiple areas. Each area can also include multiple doctors.
@@ -420,6 +440,48 @@ const HierarchyForm = () => {
                                   )
                                 }
                               />
+                              <input
+                                type="date"
+                                placeholder="DOB"
+                                className="flex-1 min-w-[130px] px-3 py-1.5 border rounded text-sm"
+                                onChange={(e) =>
+                                  addDoctorKeysValue(
+                                    hq.id,
+                                    area.id,
+                                    doc.id,
+                                    "dob",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                              <input
+                                type="email"
+                                placeholder="Email"
+                                className="flex-1 min-w-[150px] px-3 py-1.5 border rounded text-sm"
+                                onChange={(e) =>
+                                  addDoctorKeysValue(
+                                    hq.id,
+                                    area.id,
+                                    doc.id,
+                                    "email",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                              <input
+                                type="tel"
+                                placeholder="Phone Number"
+                                className="flex-1 min-w-[130px] px-3 py-1.5 border rounded text-sm"
+                                onChange={(e) =>
+                                  addDoctorKeysValue(
+                                    hq.id,
+                                    area.id,
+                                    doc.id,
+                                    "phoneNumber",
+                                    e.target.value,
+                                  )
+                                }
+                              />
                               <button
                                 onClick={() =>
                                   removeDoctor(hq.id, area.id, doc.id)
@@ -460,6 +522,12 @@ const HierarchyForm = () => {
           <span>Add Another Headquarter</span>
         </button>
       </div>
+      {showImportModal && (
+        <ImportHeadquarterModal
+          onClose={() => setShowImportModal(false)}
+          onImported={() => {}}
+        />
+      )}
     </>
   );
 };
