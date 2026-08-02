@@ -8,7 +8,13 @@ import "ace-builds/src-noconflict/theme-chrome";
 import "ace-builds/src-noconflict/ext-language_tools";
 import PropTypes from "prop-types";
 
-const AceEditorComponent = React.memo(function AceEditorComponent({key, mode, name, value, onChange}) {
+const AceEditorComponent = React.memo(function AceEditorComponent({
+  acKey,
+  mode,
+  name,
+  value,
+  onChange,
+}) {
   const editorOptions = {
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
@@ -24,7 +30,7 @@ const AceEditorComponent = React.memo(function AceEditorComponent({key, mode, na
   return (
     <div className="h-full">
       <AceEditor
-        key={key}
+        key={acKey}
         mode={mode}
         theme="chrome"
         value={value}
@@ -42,7 +48,7 @@ const AceEditorComponent = React.memo(function AceEditorComponent({key, mode, na
 AceEditorComponent.displayName = "AceEditorComponent";
 
 AceEditorComponent.propTypes = {
-  key: PropTypes.string.isRequired,
+  acKey: PropTypes.string.isRequired,
   mode: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,

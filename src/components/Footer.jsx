@@ -1,5 +1,5 @@
 import { Mail, Phone } from "lucide-react";
-import logo from "../assets/logo.jpeg";
+import logo from "../assets/SoftetLogo.png";
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -41,9 +41,9 @@ export function Footer() {
                   className="w-full h-full object-contain rounded-xl"
                 />
               </div>
-              <span className="text-xl font-bold text-white">
+              <a href="/" className="text-xl font-bold text-white">
                 Softet Solutions
-              </span>
+              </a>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/90">
               Empowering Businesses with Cutting-Edge Software Solutions
