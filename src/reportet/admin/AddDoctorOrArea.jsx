@@ -306,7 +306,7 @@ const AddDoctorOrArea = () => {
             <button
               type="button"
               onClick={() => setShowImportModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors whitespace-nowrap"
             >
               <Upload className="w-4 h-4" />
               Import {mode === "doctor" ? "Doctors" : "Areas"} from Excel

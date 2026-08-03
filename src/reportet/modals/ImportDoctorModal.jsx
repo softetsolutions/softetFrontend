@@ -83,7 +83,7 @@ const ImportDoctorModal = ({ onClose, onImported }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-indigo-600">Import Doctors</h2>
+          <h2 className="text-lg font-bold text-blue-600">Import Doctors</h2>
           <button
             type="button"
             onClick={handleClose}
@@ -104,8 +104,8 @@ const ImportDoctorModal = ({ onClose, onImported }) => {
           </button>
         </div>
 
-        <label className="border-2 border-dashed border-indigo-300 rounded-lg flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-indigo-50 transition mb-4">
-          <Upload className="w-6 h-6 text-indigo-500 mb-2" />
+        <label className="border-2 border-dashed border-blue-600 rounded-lg flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-blue-50 transition mb-4">
+          <Upload className="w-6 h-6 text-blue-500 mb-2" />
           <span className="text-sm font-medium text-gray-600">
             {file ? file.name : "Upload Excel (.xlsx)"}
           </span>
@@ -208,7 +208,7 @@ const ImportDoctorModal = ({ onClose, onImported }) => {
             type="button"
             onClick={handleImport}
             disabled={importing || !file}
-            className="px-4 py-2 text-sm font-semibold text-white bg-indigo-500 hover:bg-indigo-600 rounded-lg transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50"
           >
             {importing ? "Importing..." : "Import"}
           </button>

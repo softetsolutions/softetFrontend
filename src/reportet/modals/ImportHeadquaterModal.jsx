@@ -66,7 +66,7 @@ const ImportHeadquarterModal = ({ onClose, onImported }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-indigo-600">
+          <h2 className="text-lg font-bold text-blue-600">
             Import Headquarters
           </h2>
           <button
@@ -89,8 +89,8 @@ const ImportHeadquarterModal = ({ onClose, onImported }) => {
           </button>
         </div>
 
-        <label className="border-2 border-dashed border-indigo-300 rounded-lg flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-indigo-50 transition mb-4">
-          <Upload className="w-6 h-6 text-indigo-500 mb-2" />
+        <label className="border-2 border-dashed border-blue-600 rounded-lg flex flex-col items-center justify-center py-8 cursor-pointer hover:bg-blue-50 transition mb-4">
+          <Upload className="w-6 h-6 text-blue-500 mb-2" />
           <span className="text-sm font-medium text-gray-600">
             {file ? file.name : "Upload Excel (.xlsx)"}
           </span>
