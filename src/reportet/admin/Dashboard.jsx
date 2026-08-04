@@ -7,28 +7,37 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  LabelList,
   ResponsiveContainer,
 } from "recharts";
 
 import { getDoctorVisitReport } from "../api/api";
 import { getAllLeavesForAdmin } from "../api/leave";
-import { organizationSalesList } from "../api/sale";
+import { organizationSalesList, getHeadQuarterSalesList } from "../api/sale";
 import { getAllHeadQuarterNames, getHeadQuarterBudget } from "../api/profile";
 
-const VISIT_BUCKETS = ["0 Visits", "1-2 Visits", "3-5 Visits", "6+ Visits"];
-const BUCKET_COLORS = {
-  "0 Visits": "#ef4444",
-  "1-2 Visits": "#f59e0b",
-  "3-5 Visits": "#3b82f6",
-  "6+ Visits": "#22c55e",
-};
-
-function bucketVisits(totalVisits) {
-  if (!totalVisits) return "0 Visits";
-  if (totalVisits <= 2) return "1-2 Visits";
-  if (totalVisits <= 5) return "3-5 Visits";
-  return "6+ Visits";
+function TotalLabel({ stackId, totalKey }) {
+  return (
+    <Bar
+      dataKey="_anchor"
+      stackId={stackId}
+      fill="transparent"
+      isAnimationActive={false}
+    >
+      <LabelList
+        dataKey={totalKey}
+        position="top"
+        style={{ fontWeight: 600, fill: "#1f2937", fontSize: 13 }}
+      />
+    </Bar>
+  );
 }
+
+const VISIT_SEGMENTS = ["Visited", "0 Visits"];
+const VISIT_COLORS = {
+  Visited: "#334155",
+  "0 Visits": "#5c2c0d",
+};
 
 function DoctorVisitChart({ month, year }) {
   const [data, setData] = useState([]);
@@ -55,13 +64,25 @@ function DoctorVisitChart({ month, year }) {
       all.forEach((doc) => {
         const hq = doc.headQuarterName || "Unassigned";
         if (!grouped[hq]) {
-          grouped[hq] = { headquarter: hq };
-          VISIT_BUCKETS.forEach((b) => (grouped[hq][b] = 0));
+          grouped[hq] = {
+            headquarter: hq,
+            _anchor: 0,
+            "0 Visits": 0,
+            Visited: 0,
+          };
         }
-        grouped[hq][bucketVisits(doc.totalVisits)] += 1;
+        if (!doc.totalVisits) {
+          grouped[hq]["0 Visits"] += 1;
+        } else {
+          grouped[hq]["Visited"] += 1;
+        }
       });
 
-      const rows = Object.values(grouped);
+      const rows = Object.values(grouped).map((row) => ({
+        ...row,
+        doctorTotal: row["0 Visits"] + row["Visited"],
+      }));
+
       setData(rows);
       setZeroVisitCount(rows.reduce((sum, r) => sum + (r["0 Visits"] || 0), 0));
     } catch (err) {
@@ -95,34 +116,42 @@ function DoctorVisitChart({ month, year }) {
           No data for this period
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="headquarter" />
-            <YAxis allowDecimals={false} />
+        <ResponsiveContainer width="100%" height={340}>
+          <BarChart data={data} barSize={56} margin={{ top: 24, right: 12 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="headquarter"
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+            />
             <Tooltip />
             <Legend />
-            {VISIT_BUCKETS.map((bucket) => (
+            {VISIT_SEGMENTS.map((segment, i) => (
               <Bar
-                key={bucket}
-                dataKey={bucket}
+                key={segment}
+                dataKey={segment}
                 stackId="visits"
-                fill={BUCKET_COLORS[bucket]}
+                fill={VISIT_COLORS[segment]}
+                radius={i === VISIT_SEGMENTS.length - 1 ? [6, 6, 0, 0] : 0}
               />
             ))}
+            <TotalLabel stackId="visits" totalKey="doctorTotal" />
           </BarChart>
         </ResponsiveContainer>
       )}
     </div>
   );
 }
-
-const LEAVE_TYPES = ["sick", "casual", "earned", "unpaid"];
-const LEAVE_COLORS = {
-  sick: "#ef4444",
-  casual: "#3b82f6",
-  earned: "#22c55e",
-  unpaid: "#a855f7",
+const LEAVE_STATUSES = ["approved", "pending", "rejected"];
+const STATUS_COLORS = {
+  approved: "#22c55e",
+  pending: "#f59e0b",
+  rejected: "#ef4444",
 };
 
 function monthLabel(dateStr) {
@@ -145,22 +174,22 @@ function LeaveChart() {
       let all = [];
 
       while (true) {
-        const res = await getAllLeavesForAdmin({
-          pageNo,
-          limit,
-          status: "approved",
-        });
+        const res = await getAllLeavesForAdmin({ pageNo, limit });
         if (!res?.success) break;
         const batch = res.leaves || [];
         all = all.concat(batch);
-        if (!batch.length || all.length >= (res.totalCount || 0)) break;
+        if (!batch.length || all.length >= (res.totalCount ?? all.length))
+          break;
         pageNo += 1;
       }
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const currentlyOnLeave = all.filter(
-        (l) => new Date(l.startDate) <= today && new Date(l.endDate) >= today,
+        (l) =>
+          l.status === "approved" &&
+          new Date(l.startDate) <= today &&
+          new Date(l.endDate) >= today,
       ).length;
       setOnLeaveToday(currentlyOnLeave);
 
@@ -170,18 +199,23 @@ function LeaveChart() {
         if (!grouped[label]) {
           grouped[label] = {
             month: label,
+            _anchor: 0,
             _sortKey: new Date(leave.startDate),
           };
-          LEAVE_TYPES.forEach((t) => (grouped[label][t] = 0));
+          LEAVE_STATUSES.forEach((s) => (grouped[label][s] = 0));
         }
-        if (grouped[label][leave.leaveType] !== undefined) {
-          grouped[label][leave.leaveType] += 1;
+        if (grouped[label][leave.status] !== undefined) {
+          grouped[label][leave.status] += 1;
         }
       });
 
-      const sorted = Object.values(grouped).sort(
-        (a, b) => a._sortKey - b._sortKey,
-      );
+      const sorted = Object.values(grouped)
+        .map((row) => ({
+          ...row,
+          leaveTotal: LEAVE_STATUSES.reduce((sum, s) => sum + row[s], 0),
+        }))
+        .sort((a, b) => a._sortKey - b._sortKey);
+
       setData(sorted);
     } catch (err) {
       console.error("Failed to load leave data", err);
@@ -197,9 +231,7 @@ function LeaveChart() {
   return (
     <div className="bg-white rounded-xl shadow p-4">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Employees on Leave
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-800">Leave Requests</h2>
         <span className="text-sm font-medium text-blue-600">
           {onLeaveToday} on leave today
         </span>
@@ -211,25 +243,35 @@ function LeaveChart() {
         </div>
       ) : data.length === 0 ? (
         <div className="h-72 flex items-center justify-center text-gray-400">
-          No approved leaves found
+          No leave requests found
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis allowDecimals={false} />
+        <ResponsiveContainer width="100%" height={340}>
+          <BarChart data={data} barSize={56} margin={{ top: 24, right: 12 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+            />
             <Tooltip />
             <Legend />
-            {LEAVE_TYPES.map((type) => (
+            {LEAVE_STATUSES.map((status, i) => (
               <Bar
-                key={type}
-                dataKey={type}
+                key={status}
+                dataKey={status}
                 stackId="leaves"
-                fill={LEAVE_COLORS[type]}
-                name={type.charAt(0).toUpperCase() + type.slice(1)}
+                fill={STATUS_COLORS[status]}
+                name={status.charAt(0).toUpperCase() + status.slice(1)}
+                radius={i === LEAVE_STATUSES.length - 1 ? [6, 6, 0, 0] : 0}
               />
             ))}
+            <TotalLabel stackId="leaves" totalKey="leaveTotal" />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -258,42 +300,65 @@ function currentFinancialYear() {
   return now.getMonth() >= 3 ? `${y}-${y + 1}` : `${y - 1}-${y}`;
 }
 
+function extractHeadquarters(res) {
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res?.headQuarterNames)) return res.headQuarterNames;
+  if (Array.isArray(res?.headquarters)) return res.headquarters;
+  if (Array.isArray(res?.data)) return res.data;
+  if (Array.isArray(res?.headQuarters)) return res.headQuarters;
+  return [];
+}
+
+const ALL_HQ = "ALL";
+
 function SalesBudgetChart() {
   const [headquarters, setHeadquarters] = useState([]);
-  const [selectedHQ, setSelectedHQ] = useState("");
+  const [hqLoaded, setHqLoaded] = useState(false);
+  const [selectedHQ, setSelectedHQ] = useState(ALL_HQ);
   const [financialYear, setFinancialYear] = useState(currentFinancialYear());
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getAllHeadQuarterNames()
-      .then((res) => {
-        const list = res?.headquarters || res?.data || [];
-        setHeadquarters(list);
-        if (list[0]) setSelectedHQ(list[0]._id);
-      })
-      .catch((err) => console.error("Failed to load headquarters", err));
+      .then((res) => setHeadquarters(extractHeadquarters(res)))
+      .catch((err) => console.error("Failed to load headquarters", err))
+      .finally(() => setHqLoaded(true));
   }, []);
 
   const fetchData = useCallback(async () => {
-    if (!selectedHQ) return;
     setLoading(true);
     try {
       const [startYear, endYear] = financialYear.split("-").map(Number);
-
-      const [budgetRes, salesRes] = await Promise.all([
-        getHeadQuarterBudget(selectedHQ, financialYear),
-        organizationSalesList(null, {
-          years: [startYear, endYear],
-          limit: 1000,
-          pageNo: 1,
-        }),
-      ]);
-
       const budgetMap = {};
-      (budgetRes?.data?.months || []).forEach((m) => {
-        budgetMap[m.month.toLowerCase()] = m.allocatedBudget;
-      });
+
+      if (selectedHQ === ALL_HQ) {
+        const budgetResults = await Promise.all(
+          headquarters.map((hq) => getHeadQuarterBudget(hq._id, financialYear)),
+        );
+        budgetResults.forEach((budgetRes) => {
+          (budgetRes?.data?.months || []).forEach((m) => {
+            const key = m.month.toLowerCase();
+            budgetMap[key] = (budgetMap[key] || 0) + (m.allocatedBudget || 0);
+          });
+        });
+      } else {
+        const budgetRes = await getHeadQuarterBudget(selectedHQ, financialYear);
+        (budgetRes?.data?.months || []).forEach((m) => {
+          budgetMap[m.month.toLowerCase()] = m.allocatedBudget;
+        });
+      }
+
+      const salesRes =
+        selectedHQ === ALL_HQ
+          ? await organizationSalesList(null, {
+              years: [startYear, endYear],
+              limit: 1000,
+              pageNo: 1,
+            })
+          : await getHeadQuarterSalesList(selectedHQ, {
+              years: [startYear, endYear],
+            });
 
       const salesByMonth = {};
       (salesRes?.data || []).forEach((sale) => {
@@ -302,13 +367,14 @@ function SalesBudgetChart() {
       });
 
       const chartData = MONTH_ORDER.map((m) => {
-        const allocated = budgetMap[m] || 0;
-        const sold = salesByMonth[m] || 0;
+        const sale = salesByMonth[m] || 0;
+        const budget = budgetMap[m] || 0;
         return {
           month: m.charAt(0).toUpperCase() + m.slice(1),
-          "Sale Amount": Math.min(sold, allocated),
-          "Over Budget": Math.max(sold - allocated, 0),
-          "Remaining Budget": Math.max(allocated - sold, 0),
+          _anchor: 0,
+          "Sale Amount": sale,
+          "Allocated Budget": budget,
+          budgetTotal: (sale + budget).toLocaleString("en-IN"),
         };
       });
 
@@ -318,11 +384,18 @@ function SalesBudgetChart() {
     } finally {
       setLoading(false);
     }
-  }, [selectedHQ, financialYear]);
+  }, [selectedHQ, financialYear, headquarters]);
 
   useEffect(() => {
+    if (!hqLoaded) return;
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, hqLoaded]);
+
+  const noHeadquarters = hqLoaded && headquarters.length === 0;
+  const selectedHQName =
+    selectedHQ === ALL_HQ
+      ? null
+      : headquarters.find((hq) => hq._id === selectedHQ)?.headQuarterName;
 
   return (
     <div className="bg-white rounded-xl shadow p-4">
@@ -335,7 +408,9 @@ function SalesBudgetChart() {
             className="border rounded px-2 py-1 text-sm"
             value={selectedHQ}
             onChange={(e) => setSelectedHQ(e.target.value)}
+            disabled={headquarters.length === 0}
           >
+            <option value={ALL_HQ}>All Headquarters (Org Total)</option>
             {headquarters.map((hq) => (
               <option key={hq._id} value={hq._id}>
                 {hq.headQuarterName}
@@ -352,34 +427,50 @@ function SalesBudgetChart() {
       </div>
 
       <p className="text-xs text-gray-400 mb-2">
-        Note: sales are summed organization-wide per month — the Sale model
-        doesn&apos;t currently store a headquarter reference, so this isn&apos;t
-        filtered to the selected HQ yet. Add a headQuarterId to Sale (or derive
-        it from the employee) to make this exact.
+        {selectedHQ === ALL_HQ
+          ? `Comparing total sales across the organization against the combined budget of all headquarters for ${financialYear}.`
+          : `Comparing ${selectedHQName}'s sales against its allocated budget for ${financialYear}.`}
       </p>
-
-      {loading ? (
+      {noHeadquarters ? (
+        <div className="h-72 flex items-center justify-center text-gray-400 text-center px-6">
+          No headquarters configured yet. Add one under Headquarter Master to
+          see this chart.
+        </div>
+      ) : loading ? (
         <div className="h-72 flex items-center justify-center text-gray-400">
           Loading…
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
+        <ResponsiveContainer width="100%" height={340}>
+          <BarChart data={data} barSize={56} margin={{ top: 24, right: 12 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+              interval={0}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={{ stroke: "#d1d5db" }}
+            />
             <Tooltip />
             <Legend />
             <Bar dataKey="Sale Amount" stackId="budget" fill="#3b82f6" />
-            <Bar dataKey="Over Budget" stackId="budget" fill="#ef4444" />
-            <Bar dataKey="Remaining Budget" stackId="budget" fill="#e5e7eb" />
+            <Bar
+              dataKey="Allocated Budget"
+              stackId="budget"
+              fill="#e5e7eb"
+              radius={[6, 6, 0, 0]}
+            />
+            <TotalLabel stackId="budget" totalKey="budgetTotal" />
           </BarChart>
         </ResponsiveContainer>
       )}
     </div>
   );
 }
-
 export default function Dashboard() {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">

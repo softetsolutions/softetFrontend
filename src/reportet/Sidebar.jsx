@@ -24,7 +24,7 @@ const getStoredOrganization = () => {
 };
 
 const Sidebar = () => {
-  const [activeTabId, setActiveTabId] = useState("visit-report");
+  const [activeTabId, setActiveTabId] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
@@ -84,8 +84,6 @@ const Sidebar = () => {
     });
 
     const activeTab = allTabs.find((tab) => tab.id === activeTabId);
-
-    // Default to DoctorsList if activeTabId is not found
     if (!activeTab) {
       return <VisitReport />;
     }

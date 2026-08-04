@@ -99,3 +99,20 @@ export const exportAllSales = async (payload) => {
   link.click();
   URL.revokeObjectURL(url);
 };
+
+export const getHeadQuarterSalesList = async (headQuarterId, payload) => {
+  const res = await fetch(
+    `${API_BASE_URL}/sales/headQuarterSales/${headQuarterId}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    },
+  );
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.message || "Failed to fetch headquarter sales");
+  return data;
+};
