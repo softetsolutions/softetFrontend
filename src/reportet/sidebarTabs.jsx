@@ -13,6 +13,7 @@ import AdminLeaves from "./admin/AdminLeaves";
 import SalesReport from "./admin/SalesReport";
 import DoctorVisitReport from "./admin/DoctorVisit";
 import CreateSale from "./admin/Sale";
+import Dashboard from "./admin/Dashboard";
 
 import {
   ClipboardList,
@@ -26,9 +27,16 @@ import {
   Store,
   BadgeDollarSign,
   Parasol,
+  LayoutDashboard,
 } from "lucide-react";
 
 export const sidebarTabs = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: <LayoutDashboard size={18} />,
+    component: <Dashboard />,
+  },
   {
     id: "reports",
     label: "Reports",
