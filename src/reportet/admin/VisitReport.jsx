@@ -343,7 +343,13 @@ const VisitReport = () => {
                         </td>
 
                         <td className=" border-gray-300 px-3 py-2">
-                          {report?.assistedBy || "-"}
+                          {report?.with?.length
+                            ? report?.with?.map((emp) => (
+                                <div key={emp?._id}>
+                                  {emp?.firstName + " " + emp?.lastName + ","}
+                                </div>
+                              ))
+                            : "-"}
                         </td>
                         <td className=" border-gray-300 px-3 py-2">
                           {report.remark}
