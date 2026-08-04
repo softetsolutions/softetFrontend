@@ -12,6 +12,8 @@ import AreaList from "./admin/AreaList";
 import AdminLeaves from "./admin/AdminLeaves";
 import SalesReport from "./admin/SalesReport";
 import DoctorVisitReport from "./admin/DoctorVisit";
+import CreateSale from "./admin/Sale";
+
 import {
   ClipboardList,
   Package,
@@ -69,6 +71,12 @@ export const sidebarTabs = [
         label: "Create Stockist",
         icon: <ClipboardList size={18} />,
         component: <CreateStockist />,
+      },
+      {
+        id: "create-sales",
+        label: "Create Sale",
+        icon: <ClipboardList size={18} />,
+        component: <CreateSale />,
       },
     ],
   },

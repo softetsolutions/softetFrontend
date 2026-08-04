@@ -43,27 +43,38 @@ export const getAllHeadQuartersNames = async () => {
 };
 
 export const editHeadQuarter = async (headquarterId, data) => {
-  const res = await fetch(
-    `${API_BASE_URL}/headQuarter/${headquarterId}`,
-    {
-      method: "PUT",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),   
+  const res = await fetch(`${API_BASE_URL}/headQuarter/${headquarterId}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(data),
+  });
   if (!res.ok) throw new Error("Failed to update the headquarter");
   return await res.json();
 };
-
 
 export const deleteHeadQuarter = async (headquarterId) => {
   const res = await fetch(`${API_BASE_URL}/headQuarter/${headquarterId}`, {
     method: "DELETE",
     credentials: "include",
   });
-  
+
+  return await res.json();
+};
+
+export const importHeadquartersFromExcel = async (file, fromRow, toRow) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (fromRow) formData.append("rowNumber", fromRow);
+
+  const res = await fetch(`${API_BASE_URL}/headQuarter/import`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error("Failed to import headquarters");
   return await res.json();
 };

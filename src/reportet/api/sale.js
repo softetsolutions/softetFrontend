@@ -32,3 +32,70 @@ export const deleteSale = async (id) => {
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
 };
+
+export const createSaleByAdmin = async (saleData) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/sales/createSaleByAdmin`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(saleData),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to create sale");
+
+    return data;
+  } catch (err) {
+    console.error("Create Sale By Admin Error:", err);
+    throw err;
+  }
+};
+
+export const alreadySubmitedSaleByAdmin = async ({ stockist }) => {
+  try {
+    const params = new URLSearchParams({ stockist });
+    const res = await fetch(
+      `${API_BASE_URL}/sales/alreadySubmitedSalesByAdmin?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
+
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.error || "Failed to check sale submission status");
+
+    return data;
+  } catch (err) {
+    console.error("Already Submited Sale By Admin Error:", err);
+    throw err;
+  }
+};
+
+export const exportAllSales = async (payload) => {
+  const res = await fetch(`${API_BASE_URL}/sales/exportAllSales`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401) await handleUnauthorized();
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Failed to export sales report");
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `sales_report_${Date.now()}.xlsx`;
+  link.click();
+  URL.revokeObjectURL(url);
+};

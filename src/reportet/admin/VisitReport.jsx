@@ -4,17 +4,20 @@ import {
   organizationDailyVisitList,
   updateDailyVisit,
   deleteDailyVisit,
+  exportOrganizationDailyVisitList,
 } from "../api/api";
 import { getEmployeeListOptions } from "../api/employee";
 import { roleMaper } from "../utils/mappers";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
 import Spinner from "../genericComps/Spinner";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Download } from "lucide-react";
 
 const VisitReport = () => {
   const [employees, setEmployees] = useState([]);
   const [reportData, setReportData] = useState([]);
+
+  const [exportLoading, setExportLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
   const [editModal, setEditModal] = useState(null);
@@ -87,6 +90,23 @@ const VisitReport = () => {
     }
   };
 
+  const handleExport = async () => {
+    setExportLoading(true);
+    try {
+      const payload = {
+        ...(reportFilters?.employee && { employeeId: reportFilters?.employee }),
+        ...(reportFilters?.dateFrom && { dateFrom: reportFilters?.dateFrom }),
+        ...(reportFilters?.dateTo && { dateTo: reportFilters?.dateTo }),
+      };
+      await exportOrganizationDailyVisitList(payload);
+      toast.success("Report exported successfully");
+    } catch (error) {
+      console.error("Failed to export visit report", error);
+      toast.error(error.message || "Failed to export visit report");
+    } finally {
+      setExportLoading(false);
+    }
+  };
   const handleSearch = async () => {
     setBtnLoading(true);
     setFilterApplied((prev) => !prev);
@@ -135,7 +155,25 @@ const VisitReport = () => {
   };
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-2xl font-bold text-gray-800">VISIT REPORT</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">VISIT REPORT</h2>
+        <button
+          onClick={handleExport}
+          disabled={exportLoading || loading || reportData?.length === 0}
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {exportLoading ? (
+            <Spinner
+              size={16}
+              borderWidth={2}
+              className="border-white border-t-transparent"
+            />
+          ) : (
+            <Download size={16} />
+          )}
+          {exportLoading ? "Exporting..." : "Export to Excel"}
+        </button>
+      </div>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Filter and review past visit records by MR, area, date, and status.
       </p>

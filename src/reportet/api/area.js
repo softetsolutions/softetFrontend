@@ -119,14 +119,14 @@ export const editArea = async (areaId, data) => {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data), 
+    body: JSON.stringify(data),
   });
   const result = await res.json();
   if (!res.ok) throw new Error(result.message || "Failed to update area");
   return result;
 };
 export const deleteArea = async (areaId, force = false) => {
-  console.log("deleteArea called", areaId, force); 
+  console.log("deleteArea called", areaId, force);
   const res = await fetch(`${API_BASE_URL}/area/${areaId}?force=${force}`, {
     method: "DELETE",
     credentials: "include",

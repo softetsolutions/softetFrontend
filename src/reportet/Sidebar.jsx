@@ -1,15 +1,34 @@
 import { useState, cloneElement, useEffect } from "react";
 import { sidebarTabs } from "./sidebarTabs";
-import { ChevronRight, ChevronLeft, ChevronDown, LogOut } from "lucide-react";
+import {
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
 import VisitReport from "./admin/VisitReport";
 import { useNavigate } from "react-router-dom";
 import EmployeeDetail from "./admin/EmployeeProfile";
+import AdminProfile from "./admin/AdminProfile";
+
+const API_BASE_URL = import.meta.env.VITE_REPORTET_BASE_URL;
+const ASSET_BASE_URL = API_BASE_URL.replace(/\/api$/, "");
+
+const getStoredOrganization = () => {
+  try {
+    return JSON.parse(localStorage.getItem("organization") || "null");
+  } catch {
+    return null;
+  }
+};
 
 const Sidebar = () => {
   const [activeTabId, setActiveTabId] = useState("visit-report");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [organization, setOrganization] = useState(getStoredOrganization);
 
   const navigate = useNavigate();
 
@@ -24,6 +43,19 @@ const Sidebar = () => {
   // }, []);
 
   useEffect(() => {
+    const handleOrgUpdate = (e) => setOrganization(e.detail);
+    const handleStorage = (e) => {
+      if (e.key === "organization") setOrganization(getStoredOrganization());
+    };
+    window.addEventListener("organization-updated", handleOrgUpdate);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("organization-updated", handleOrgUpdate);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
+  useEffect(() => {
     const handler = (e) => {
       if (e.detail.tabId) {
         setActiveTabId(e.detail.tabId);
@@ -36,6 +68,9 @@ const Sidebar = () => {
     return () => window.removeEventListener("switch-tab", handler);
   }, []);
   const renderActiveComponent = () => {
+    if (activeTabId === "admin-profile") {
+      return <AdminProfile />;
+    }
     if (activeTabId === "profile") {
       return <EmployeeDetail preloadedEmployeeId={selectedEmployeeId} />;
     }
@@ -58,13 +93,48 @@ const Sidebar = () => {
     return activeTab.component;
   };
 
+  const brandName = organization?.brandName?.trim() || "ReportET";
+  const logoUrl = organization?.logoUrl
+    ? `${ASSET_BASE_URL}${organization.logoUrl}`
+    : null;
+
   return (
     <div className="h-screen flex flex-col">
       <div className="px-6 py-4 flex justify-between items-center">
         {/* Logo */}
-        <a href="/reportet" className="px-6 text-blue-600 font-bold text-2xl">
-          Report<span className="text-black">ET</span>
+        <a
+          href="/reportet"
+          className="px-6 flex items-center gap-2 text-blue-600 font-bold text-2xl"
+        >
+          {logoUrl ? (
+            <>
+              <img
+                src={logoUrl}
+                alt={`${brandName} logo`}
+                className="h-8 w-8 object-contain"
+              />
+              <span className="text-black">{brandName}</span>
+            </>
+          ) : organization?.brandName ? (
+            <span className="text-black">{brandName}</span>
+          ) : (
+            <>
+              Report<span className="text-black">ET</span>
+            </>
+          )}
         </a>
+        <button
+          onClick={() => setActiveTabId("admin-profile")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            activeTabId === "admin-profile"
+              ? "bg-blue-100 text-blue-700"
+              : "text-gray-600 hover:bg-gray-100"
+          }`}
+          aria-label="Open admin profile"
+        >
+          <UserCircle className="w-6 h-6" />
+          <span className="hidden sm:inline font-medium">Admin</span>
+        </button>
       </div>
       <div className="flex flex-1  bg-gray-100">
         {/* Sidebar */}

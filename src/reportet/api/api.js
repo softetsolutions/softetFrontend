@@ -117,8 +117,62 @@ export const getDoctorVisitReport = async (params) => {
 
   const res = await fetch(
     `${API_BASE_URL}/daily-visit/getDoctorVisitReport?${query.toString()}`,
-    { method: "GET", credentials: "include" }
+    { method: "GET", credentials: "include" },
   );
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
+};
+export const exportOrganizationDailyVisitList = async (payload) => {
+  const res = await fetch(
+    `${API_BASE_URL}/daily-visit/exportOrganizationVisitList`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Failed to export visit report");
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `visit_report_${Date.now()}.xlsx`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+export const exportDoctorVisitReport = async (params) => {
+  const query = new URLSearchParams();
+  if (params.month) query.append("month", params.month);
+  if (params.year) query.append("year", params.year);
+  if (params.doctorId) query.append("doctorId", params.doctorId);
+  if (params.doctorName) query.append("doctorName", params.doctorName);
+  if (params.minVisits) query.append("minVisits", params.minVisits);
+  if (params.headQuarterId) query.append("headQuarterId", params.headQuarterId);
+
+  const res = await fetch(
+    `${API_BASE_URL}/daily-visit/exportDoctorVisitReport?${query.toString()}`,
+    { method: "GET", credentials: "include" },
+  );
+
+  if (res.status === 401) await handleUnauthorized();
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Failed to export doctor visit report");
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `doctor_visit_report_${Date.now()}.xlsx`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
