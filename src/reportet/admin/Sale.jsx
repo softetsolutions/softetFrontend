@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createSaleByAdmin, alreadySubmitedSaleByAdmin } from "../api/Sale";
+import { createSaleByAdmin, alreadySubmitedSaleByAdmin } from "../api/sale";
 import { getAllStockists } from "../api/stockist";
 import toast from "react-hot-toast";
 import Spinner from "../genericComps/Spinner";
