@@ -3,9 +3,11 @@ import { loginUser } from "./api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { useOrganization } from "./admin/OrganizationContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { refreshOrganization } = useOrganization();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +23,7 @@ const Login = () => {
     try {
       await loginUser(form);
       const data = await loginUser(form);
+      await refreshOrganization();
 
       toast.success("Login successful!");
       navigate("/admin");

@@ -7,6 +7,7 @@ import {
   LogOut,
   UserCircle,
 } from "lucide-react";
+import { useOrganization } from "./admin/OrganizationContext";
 import VisitReport from "./admin/VisitReport";
 import { useNavigate } from "react-router-dom";
 import EmployeeDetail from "./admin/EmployeeProfile";
@@ -15,20 +16,22 @@ import AdminProfile from "./admin/AdminProfile";
 const API_BASE_URL = import.meta.env.VITE_REPORTET_BASE_URL;
 const ASSET_BASE_URL = API_BASE_URL.replace(/\/api$/, "");
 
-const getStoredOrganization = () => {
-  try {
-    return JSON.parse(localStorage.getItem("organization") || "null");
-  } catch {
-    return null;
-  }
-};
+// const getStoredOrganization = () => {
+//   try {
+//     return JSON.parse(localStorage.getItem("organization") || "null");
+//   } catch {
+//     return null;
+//   }
+// };
 
 const Sidebar = () => {
+  const { organization, refreshOrganization, clearOrganization } =
+    useOrganization();
   const [activeTabId, setActiveTabId] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-  const [organization, setOrganization] = useState(getStoredOrganization);
+  //const [organization, setOrganization] = useState(getStoredOrganization);
 
   const navigate = useNavigate();
 
@@ -36,24 +39,28 @@ const Sidebar = () => {
     setOpenDropdown(openDropdown === id ? null : id);
   };
 
+  useEffect(() => {
+    refreshOrganization();
+  }, [refreshOrganization]);
+
   // useEffect(() => {
   //   const handler = (e) => setActiveTabId(e.detail);
   //   window.addEventListener("switch-tab", handler);
   //   return () => window.removeEventListener("switch-tab", handler);
   // }, []);
 
-  useEffect(() => {
-    const handleOrgUpdate = (e) => setOrganization(e.detail);
-    const handleStorage = (e) => {
-      if (e.key === "organization") setOrganization(getStoredOrganization());
-    };
-    window.addEventListener("organization-updated", handleOrgUpdate);
-    window.addEventListener("storage", handleStorage);
-    return () => {
-      window.removeEventListener("organization-updated", handleOrgUpdate);
-      window.removeEventListener("storage", handleStorage);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const handleOrgUpdate = (e) => setOrganization(e.detail);
+  //   const handleStorage = (e) => {
+  //     if (e.key === "organization") setOrganization(getStoredOrganization());
+  //   };
+  //   window.addEventListener("organization-updated", handleOrgUpdate);
+  //   window.addEventListener("storage", handleStorage);
+  //   return () => {
+  //     window.removeEventListener("organization-updated", handleOrgUpdate);
+  //     window.removeEventListener("storage", handleStorage);
+  //   };
+  // }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -93,7 +100,7 @@ const Sidebar = () => {
 
   const brandName = organization?.brandName?.trim() || "ReportET";
   const logoUrl = organization?.logoUrl
-    ? `${ASSET_BASE_URL}${organization.logoUrl}`
+    ? `${ASSET_BASE_URL}${organization.logoUrl}?v=${organization._id}`
     : null;
 
   return (
@@ -268,6 +275,8 @@ const Sidebar = () => {
                 }`}
                 onClick={() => {
                   localStorage.removeItem("userToken");
+                  localStorage.removeItem("organization");
+                  clearOrganization();
                   navigate("/reportet");
                 }}
               >
