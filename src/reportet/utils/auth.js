@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { logoutUser } from "../api/api";
 import toast from "react-hot-toast";
-import { useOrganization } from "../admin/OrganizationContext";
+import { useOrganization } from "../context/OrganizationContext";
 
 export const getAuthInfo = () => {
   const token = localStorage.getItem("userToken");
@@ -45,6 +45,8 @@ export const isAuthenticated = () => {
 };
 
 export const handleUnauthorized = async (navigate) => {
+  if (window.location.pathname === "/login") return;
+
   await logout();
   toast.error("Session expired. Please login again.");
   if (typeof navigate === "function") {

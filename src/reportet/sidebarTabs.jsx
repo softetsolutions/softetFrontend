@@ -14,6 +14,7 @@ import SalesReport from "./admin/SalesReport";
 import DoctorVisitReport from "./admin/DoctorVisit";
 import CreateSale from "./admin/Sale";
 import Dashboard from "./admin/Dashboard";
+import CallAverageReport from "./admin/CallAverageReport";
 
 import {
   ClipboardList,
@@ -60,6 +61,12 @@ export const sidebarTabs = [
         label: "Doctor Visit Report",
         icon: <BadgeDollarSign size={18} />,
         component: <DoctorVisitReport />,
+      },
+      {
+        id: "call-visit-report",
+        label: "Call Average Report",
+        icon: <BadgeDollarSign size={18} />,
+        component: <CallAverageReport />,
       },
     ],
   },
