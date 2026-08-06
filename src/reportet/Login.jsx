@@ -3,7 +3,7 @@ import { loginUser } from "./api/api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { useOrganization } from "./admin/OrganizationContext";
+import { useOrganization } from "./context/OrganizationContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
     try {
       await loginUser(form);
-      const data = await loginUser(form);
+      //const data = await loginUser(form);
       await refreshOrganization();
 
       toast.success("Login successful!");

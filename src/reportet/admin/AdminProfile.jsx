@@ -9,7 +9,7 @@ import {
   UserX,
   Plus,
 } from "lucide-react";
-import { useOrganization } from "../admin/OrganizationContext";
+import { useOrganization } from "../context/OrganizationContext";
 import {
   updateBranding,
   getAllHeadQuarterNames,

@@ -7,7 +7,7 @@ import {
   LogOut,
   UserCircle,
 } from "lucide-react";
-import { useOrganization } from "./admin/OrganizationContext";
+import { useOrganization } from "./context/OrganizationContext";
 import VisitReport from "./admin/VisitReport";
 import { useNavigate } from "react-router-dom";
 import EmployeeDetail from "./admin/EmployeeProfile";
