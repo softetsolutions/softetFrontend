@@ -14,6 +14,18 @@ export const updateBranding = async (formData) => {
   return data;
 };
 
+export const getMyOrganization = async () => {
+  const res = await fetch(`${API_BASE_URL}/logo/me`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch organization");
+  return data;
+};
+
 export const getAllHeadQuarterNames = async () => {
   const res = await fetch(
     `${API_BASE_URL}/headQuarter/getAllHeadQuarterNames`,
@@ -62,7 +74,7 @@ export const getHeadQuarterBudget = async (headQuarterId, financialYear) => {
   );
 
   if (res.status === 401) await handleUnauthorized();
-  if (res.status === 404) return null; // no budget yet — not an error, handled by caller
+  if (res.status === 404) return null;
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to fetch budget");
   return data;
@@ -79,5 +91,17 @@ export const setHeadQuarterBudget = async (headQuarterId, payload) => {
   if (res.status === 401) await handleUnauthorized();
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Failed to save budget");
+  return data;
+};
+
+export const getAllHeadQuarterBudgetsForYear = async (financialYear) => {
+  const res = await fetch(
+    `${API_BASE_URL}/budget?financialYear=${financialYear}`,
+    { method: "GET", credentials: "include" },
+  );
+
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to fetch budgets");
   return data;
 };

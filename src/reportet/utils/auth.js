@@ -1,6 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { logoutUser } from "../api/api";
 import toast from "react-hot-toast";
+import { useOrganization } from "../admin/OrganizationContext";
 
 export const getAuthInfo = () => {
   const token = localStorage.getItem("userToken");
@@ -22,10 +23,15 @@ export const getAuthInfo = () => {
 export const logout = async () => {
   try {
     await logoutUser();
+    clearOrganization();
   } catch (error) {
     console.error("Logout API call failed:", error);
   } finally {
+    localStorage.removeItem("organization");
     localStorage.removeItem("userToken");
+    if (typeof clearOrgCallback === "function") {
+      clearOrgCallback();
+    }
   }
 };
 

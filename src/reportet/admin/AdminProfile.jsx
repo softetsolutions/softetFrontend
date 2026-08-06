@@ -9,6 +9,7 @@ import {
   UserX,
   Plus,
 } from "lucide-react";
+import { useOrganization } from "../admin/OrganizationContext";
 import {
   updateBranding,
   getAllHeadQuarterNames,
@@ -78,17 +79,31 @@ const StatusBanner = ({ status }) => {
 };
 
 const BrandingSection = () => {
+  const { organization, refreshOrganization } = useOrganization();
+
   const [brandName, setBrandName] = useState("");
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null);
 
+  // Sync state whenever the active organization context changes
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("organization") || "null");
-    if (stored?.brandName) setBrandName(stored.brandName);
-    if (stored?.logoUrl) setLogoPreview(`${ASSET_BASE_URL}${stored.logoUrl}`);
-  }, []);
+    if (organization) {
+      setBrandName(organization.brandName || "");
+      if (organization.logoUrl) {
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        setLogoPreview(
+          `${ASSET_BASE_URL}${organization.logoUrl}${cacheBuster}`,
+        );
+      } else {
+        setLogoPreview(null);
+      }
+    } else {
+      setBrandName("");
+      setLogoPreview(null);
+    }
+  }, [organization]);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -113,21 +128,11 @@ const BrandingSection = () => {
       if (brandName.trim()) formData.append("brandName", brandName.trim());
       if (logoFile) formData.append("logo", logoFile);
 
-      const res = await updateBranding(formData);
-      const updated = res.data;
+      await updateBranding(formData);
 
-      const organizationRecord = {
-        brandName: updated.brandName,
-        logoUrl: updated.logoUrl,
-      };
+      // Re-fetch organization context to propagate changes everywhere in the app
+      await refreshOrganization();
 
-      localStorage.setItem("organization", JSON.stringify(organizationRecord));
-
-      window.dispatchEvent(
-        new CustomEvent("organization-updated", { detail: organizationRecord }),
-      );
-
-      setLogoPreview(`${ASSET_BASE_URL}${updated.logoUrl}`);
       setLogoFile(null);
       setStatus({ type: "success", message: "Branding updated successfully" });
     } catch (err) {
@@ -203,7 +208,6 @@ const BrandingSection = () => {
     </div>
   );
 };
-
 const BudgetSection = () => {
   const [headquarters, setHeadquarters] = useState([]);
   const [selectedHQ, setSelectedHQ] = useState("");

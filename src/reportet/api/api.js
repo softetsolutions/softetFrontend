@@ -53,7 +53,7 @@ export const logoutUser = async () => {
   if (res.status === 401) await handleUnauthorized();
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Logout failed");
-
+  localStorage.removeItem("organization");
   localStorage.removeItem("userToken"); // clear from storage
   return data;
 };
@@ -104,7 +104,7 @@ export const deleteDailyVisit = async (id) => {
   return await res.json();
 };
 
-export const getDoctorVisitReport = async (params) => {
+export const getDoctorVisitReport = async ({ signal, ...params }) => {
   const query = new URLSearchParams();
   if (params.month) query.append("month", params.month);
   if (params.year) query.append("year", params.year);
@@ -117,7 +117,7 @@ export const getDoctorVisitReport = async (params) => {
 
   const res = await fetch(
     `${API_BASE_URL}/daily-visit/getDoctorVisitReport?${query.toString()}`,
-    { method: "GET", credentials: "include" },
+    { method: "GET", credentials: "include", signal },
   );
   if (res.status === 401) await handleUnauthorized();
   return await res.json();
@@ -175,4 +175,23 @@ export const exportDoctorVisitReport = async (params) => {
   link.download = `doctor_visit_report_${Date.now()}.xlsx`;
   link.click();
   URL.revokeObjectURL(url);
+};
+
+export const getDoctorVisitSummary = async ({
+  month,
+  year,
+  headQuarterId,
+  signal,
+}) => {
+  const query = new URLSearchParams();
+  if (month) query.append("month", month);
+  if (year) query.append("year", year);
+  if (headQuarterId) query.append("headQuarterId", headQuarterId);
+
+  const res = await fetch(
+    `${API_BASE_URL}/daily-visit/getDoctorVisitSummary?${query.toString()}`,
+    { method: "GET", credentials: "include", signal },
+  );
+  if (res.status === 401) await handleUnauthorized();
+  return await res.json();
 };
