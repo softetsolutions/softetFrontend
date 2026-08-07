@@ -60,7 +60,11 @@ const CallAverageReport = () => {
       }
     },
 
-    [filterApplied],
+    [
+      reportFilters.headQuarterId,
+      reportFilters.startDate,
+      reportFilters.endDate,
+    ],
   );
 
   const getHeadquarterOptions = async () => {
