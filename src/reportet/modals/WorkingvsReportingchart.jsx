@@ -9,13 +9,13 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { getDoctorVisitSummary } from "../api/api";
+import { getDailyWorkingVsReportingSummary } from "../api/profile";
 import { TotalLabel, ChartCard, ChartStatus } from "./ChartHelpers";
 
-const VISIT_SEGMENTS = ["Visited", "0 Visits"];
-const VISIT_COLORS = {
-  Visited: "#0f800f",
-  "0 Visits": "#e71919",
+const REPORTING_SEGMENTS = ["Reported", "Not Reported"];
+const REPORTING_COLORS = {
+  Reported: "#0f800f",
+  "Not Reported": "#e71919",
 };
 
 const MONTHS = [
@@ -39,13 +39,19 @@ function currentYearOptions() {
   return [now, now - 1, now - 2, now - 3];
 }
 
-export default function DoctorVisitChart() {
+// Format "2026-08-05" -> "5 Aug" for compact x-axis labels
+function formatDayLabel(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+}
+
+export default function WorkingVsReportingChart() {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [zeroVisitCount, setZeroVisitCount] = useState(0);
+  const [overallComplianceRate, setOverallComplianceRate] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +60,7 @@ export default function DoctorVisitChart() {
     async function fetchSummary() {
       setLoading(true);
       try {
-        const res = await getDoctorVisitSummary({
+        const res = await getDailyWorkingVsReportingSummary({
           month,
           year,
           signal: controller.signal,
@@ -62,14 +68,20 @@ export default function DoctorVisitChart() {
         if (cancelled) return;
         if (!res?.success) {
           setData([]);
-          setZeroVisitCount(0);
+          setOverallComplianceRate(0);
           return;
         }
-        setData(res.data || []);
-        setZeroVisitCount(res.zeroVisitCount || 0);
+        const chartData = (res.data || []).map((row) => ({
+          date: formatDayLabel(row.date),
+          Reported: row.reported,
+          "Not Reported": row.notReported,
+          expectedToWork: row.expectedToWork,
+        }));
+        setData(chartData);
+        setOverallComplianceRate(res.summary?.overallComplianceRate || 0);
       } catch (err) {
         if (!cancelled && err.name !== "AbortError") {
-          console.error("Failed to load doctor visit summary", err);
+          console.error("Failed to load working vs reporting summary", err);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -85,7 +97,7 @@ export default function DoctorVisitChart() {
 
   return (
     <ChartCard
-      title="Doctor Visit Coverage"
+      title="Daily Working vs Reporting"
       badge={
         <div className="flex items-center gap-2">
           <select
@@ -110,9 +122,8 @@ export default function DoctorVisitChart() {
               </option>
             ))}
           </select>
-          <span className="text-sm font-medium text-red-600 whitespace-nowrap">
-            {zeroVisitCount} doctor{zeroVisitCount === 1 ? "" : "s"} with 0
-            visits
+          <span className="text-sm font-medium text-teal-700 whitespace-nowrap">
+            {overallComplianceRate}% compliance
           </span>
         </div>
       }
@@ -124,12 +135,13 @@ export default function DoctorVisitChart() {
       />
       {!loading && data.length > 0 && (
         <ResponsiveContainer width="100%" height={340}>
-          <BarChart data={data} barSize={56} margin={{ top: 24, right: 12 }}>
+          <BarChart data={data} barSize={20} margin={{ top: 24, right: 12 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis
-              dataKey="headquarter"
+              dataKey="date"
               tickLine={false}
               axisLine={{ stroke: "#d1d5db" }}
+              interval={Math.ceil(data.length / 15)}
             />
             <YAxis
               allowDecimals={false}
@@ -138,16 +150,16 @@ export default function DoctorVisitChart() {
             />
             <Tooltip />
             <Legend />
-            {VISIT_SEGMENTS.map((segment, i) => (
+            {REPORTING_SEGMENTS.map((segment, i) => (
               <Bar
                 key={segment}
                 dataKey={segment}
-                stackId="visits"
-                fill={VISIT_COLORS[segment]}
-                radius={i === VISIT_SEGMENTS.length - 1 ? [6, 6, 0, 0] : 0}
+                stackId="reporting"
+                fill={REPORTING_COLORS[segment]}
+                radius={i === REPORTING_SEGMENTS.length - 1 ? [4, 4, 0, 0] : 0}
               />
             ))}
-            <TotalLabel stackId="visits" totalKey="doctorTotal" />
+            <TotalLabel stackId="reporting" totalKey="expectedToWork" />
           </BarChart>
         </ResponsiveContainer>
       )}

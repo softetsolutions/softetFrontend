@@ -1,7 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_REPORTET_BASE_URL;
 
 export const applyLeave = async (leaveData) => {
-  const res = await fetch(`${API_BASE_URL}/leave/apply`, {
+  const res = await fetch(`${API_BASE_URL}/leaves/apply`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -49,7 +49,7 @@ export const getLeavesForAreaManager = async ({
   limit = 10,
   status,
 } = {}) => {
-  const res = await fetch(`${API_BASE_URL}/leave/manager/all`, {
+  const res = await fetch(`${API_BASE_URL}/leaves/manager/all`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -82,7 +82,7 @@ export const actionOnLeaveByAreaManager = async (
   leaveId,
   { action, rejectionReason } = {},
 ) => {
-  const res = await fetch(`${API_BASE_URL}/leave/manager/action/${leaveId}`, {
+  const res = await fetch(`${API_BASE_URL}/leaves/manager/action/${leaveId}`, {
     method: "PATCH",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -101,7 +101,7 @@ export const getLeaveSummary = async ({ year, signal } = {}) => {
   if (year) query.append("year", year);
 
   const res = await fetch(
-    `${API_BASE_URL}/leave/getLeaveSummary?${query.toString()}`,
+    `${API_BASE_URL}/leaves/getLeaveSummary?${query.toString()}`,
     { method: "GET", credentials: "include", signal },
   );
   if (res.status === 401) await handleUnauthorized();

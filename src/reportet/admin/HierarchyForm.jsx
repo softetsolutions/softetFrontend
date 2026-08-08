@@ -12,7 +12,7 @@ const HierarchyForm = () => {
     {
       id: new ObjectId().toString(),
       name: "",
-      location: "",
+      zone: "",
       areas: [
         {
           id: new ObjectId().toString(),
@@ -33,7 +33,7 @@ const HierarchyForm = () => {
       {
         id: new ObjectId().toString(),
         name: "",
-        location: "",
+        zone: "",
         areas: [{ id: new ObjectId().toString(), name: "", doctors: [] }],
       },
     ]);
@@ -203,7 +203,7 @@ const HierarchyForm = () => {
           acc.headquarters.push({
             _id: headQuarter.id,
             headQuarterName: headQuarter.name,
-            location: headQuarter.location,
+            zone: headQuarter.zone,
             organizationId: orgId.userId,
           });
 
@@ -235,8 +235,7 @@ const HierarchyForm = () => {
           });
 
           !headQuarter.name && (emptyFields[headQuarter.id + ".name"] = 1);
-          !headQuarter.location &&
-            (emptyFields[headQuarter.id + ".location"] = 1);
+          !headQuarter.zone && (emptyFields[headQuarter.id + ".zone"] = 1);
 
           return acc;
         },
@@ -262,7 +261,7 @@ const HierarchyForm = () => {
         {
           id: new ObjectId().toString(),
           name: "",
-          location: "",
+          zone: "",
           areas: [
             {
               id: new ObjectId().toString(),
@@ -348,14 +347,14 @@ const HierarchyForm = () => {
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-semibold text-slate-700">
-                    Location
+                    Zone
                   </label>
                   <input
                     type="text"
                     placeholder="City, State"
                     className={`w-full px-3 py-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-100 ${emptyFieldsOnSave[hq.id + ".location"] ? "border-red-400" : ""}`}
                     onChange={(e) =>
-                      addHeadquarterKeysValue(hq.id, "location", e.target.value)
+                      addHeadquarterKeysValue(hq.id, "zone", e.target.value)
                     }
                   />
                 </div>

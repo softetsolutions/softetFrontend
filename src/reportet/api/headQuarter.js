@@ -78,3 +78,12 @@ export const importHeadquartersFromExcel = async (file, fromRow, toRow) => {
   if (!res.ok) throw new Error("Failed to import headquarters");
   return await res.json();
 };
+
+export const getAllZones = async () => {
+  const res = await fetch(`${API_BASE_URL}/headQuarter/zones`, {
+    method: "GET",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Failed to fetch zones");
+  return await res.json();
+};
