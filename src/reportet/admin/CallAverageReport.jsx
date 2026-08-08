@@ -60,7 +60,11 @@ const CallAverageReport = () => {
       }
     },
 
-    [filterApplied],
+    [
+      reportFilters.headQuarterId,
+      reportFilters.startDate,
+      reportFilters.endDate,
+    ],
   );
 
   const getHeadquarterOptions = async () => {
@@ -109,7 +113,7 @@ const CallAverageReport = () => {
   };
 
   const average = (row) =>
-    row.workDays > 0 ? (row.totalVisits + row.workDays / 2).toFixed(2) : "0.00";
+    row.workDays > 0 ? (row.totalVisits / row.workDays).toFixed(2) : "0.00";
 
   // Pagination derived values (client-side slice of the full dataset)
   const totalRows = reportData?.length || 0;

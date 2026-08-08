@@ -104,3 +104,28 @@ export const getAllHeadQuarterBudgetsForYear = async (financialYear) => {
   if (!res.ok) throw new Error(data.message || "Failed to fetch budgets");
   return data;
 };
+
+export const getDailyWorkingVsReportingSummary = async ({
+  month,
+  year,
+  headQuarterId,
+  signal,
+}) => {
+  const params = new URLSearchParams();
+  if (month) params.append("month", month);
+  if (year) params.append("year", year);
+  if (headQuarterId) params.append("headQuarterId", headQuarterId);
+
+  const res = await fetch(
+    `${API_BASE_URL}/daily-visit/workingReporting?${params.toString()}`,
+    { method: "GET", credentials: "include", signal },
+  );
+
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(
+      data.message || "Failed to fetch working vs reporting summary",
+    );
+  return data;
+};

@@ -210,11 +210,11 @@ export default function SalesBudgetChart() {
             />
             <Tooltip />
             <Legend />
-            <Bar dataKey="Sale Amount" stackId="budget" fill="#3b82f6" />
+            <Bar dataKey="Sale Amount" stackId="budget" fill="#0f800f" />
             <Bar
               dataKey="Allocated Budget"
               stackId="budget"
-              fill="#1e293b"
+              fill="#e71919"
               radius={[6, 6, 0, 0]}
             />
             <TotalLabel stackId="budget" totalKey="budgetTotal" />

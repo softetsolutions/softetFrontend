@@ -21,7 +21,7 @@ const ImportHeadquarterModal = ({ onClose, onImported }) => {
       [
         "",
         "HQ Name",
-        "Location",
+        "Zone",
         "Area Name",
         "Doctor Name",
         "Specialty",
