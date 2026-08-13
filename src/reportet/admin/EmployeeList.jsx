@@ -19,6 +19,7 @@ const EmployeeList = () => {
     name: "",
     fromDate: "",
     toDate: "",
+    role: "",
   });
 
   const [selectedMR, setSelectedMR] = useState(null);
@@ -38,6 +39,7 @@ const EmployeeList = () => {
         name: filters.name,
         fromDate: filters.fromDate,
         toDate: filters.toDate,
+        role: filters.role,
       });
       setEmployees(data.employees || []);
       setTotalEmployees(data?.employeeCount || 0);
@@ -133,10 +135,30 @@ const EmployeeList = () => {
               />
             </div>
 
-            {(filters.name || filters.fromDate || filters.toDate) && (
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs text-gray-500 whitespace-nowrap">
+                Role
+              </label>
+              <select
+                name="role"
+                value={filters.role}
+                onChange={handleFilterChange}
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+              >
+                <option value="">All Roles</option>
+                <option value="mr">MR</option>
+                <option value="areaManager">Area Manager</option>
+                <option value="zonalManager">Zonal Manager</option>
+              </select>
+            </div>
+
+            {(filters.name ||
+              filters.fromDate ||
+              filters.toDate ||
+              filters.role) && (
               <button
                 onClick={() =>
-                  setFilters({ name: "", fromDate: "", toDate: "" })
+                  setFilters({ name: "", fromDate: "", toDate: "", role: "" })
                 }
                 className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"
               >

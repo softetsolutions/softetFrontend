@@ -5,13 +5,22 @@ import { FaFileImport } from "react-icons/fa";
 import Spinner from "../genericComps/Spinner";
 
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
-import { Pencil, X, Check, Loader2, Trash2, AlertTriangle } from "lucide-react";
+import {
+  Pencil,
+  X,
+  Check,
+  Loader2,
+  Trash2,
+  AlertTriangle,
+  Download,
+} from "lucide-react";
 import {
   getAllDoctors,
   importDoctorsFromExcel,
   editDoctor,
   deleteDoctor,
   getAllAreasForDropdown,
+  exportDoctors,
 } from "../api/doctor";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import { getAreasByHeadQuarterId } from "../api/area";
@@ -22,6 +31,7 @@ const DoctorsList = () => {
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState(null);
+  const [exporting, setExporting] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "",
     specialty: "",
@@ -76,6 +86,23 @@ const DoctorsList = () => {
   useEffect(() => {
     fetchDoctors();
   }, [fetchDoctors]);
+
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      await exportDoctors({
+        name: filters.name,
+        specialty: filters.specialty,
+        areaId: filters.areaId || undefined,
+        headQuarterId: filters.headQuarterId || undefined,
+      });
+      showToast("Doctors exported successfully.", "success");
+    } catch (error) {
+      showToast(error.message || "Failed to export doctors.", "error");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // Handle file import
   // const handleImport = async (e) => {
@@ -319,6 +346,23 @@ const DoctorsList = () => {
                 Clear
               </button>
             )}
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-60"
+            >
+              {exporting ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                <>
+                  <FaFileImport className="w-3.5 h-3.5 rotate-180" />
+                  Export to Excel
+                </>
+              )}
+            </button>
           </div>
         </div>
 

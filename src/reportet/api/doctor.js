@@ -136,3 +136,31 @@ export const getAllAreasForDropdown = async () => {
   const result = await res.json();
   return result.areas || [];
 };
+
+export const exportDoctors = async (filters = {}) => {
+  const res = await fetch(`${API_BASE_URL}/doctor/export`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(filters),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Failed to export doctors");
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+
+  const disposition = res.headers.get("Content-Disposition");
+  const match = disposition?.match(/filename=([^;]+)/);
+  link.download = match ? match[1].trim() : `doctors_${Date.now()}.xlsx`;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};

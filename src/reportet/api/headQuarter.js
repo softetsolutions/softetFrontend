@@ -87,3 +87,15 @@ export const getAllZones = async () => {
   if (!res.ok) throw new Error("Failed to fetch zones");
   return await res.json();
 };
+
+export const getHeadquarterAssignments = async (headquarterId) => {
+  const res = await fetch(
+    `${API_BASE_URL}/headQuarter/${headquarterId}/assignments`,
+    {
+      method: "GET",
+      credentials: "include",
+    },
+  );
+  if (!res.ok) throw new Error("Failed to fetch headquarter assignments");
+  return await res.json();
+};
