@@ -21,6 +21,11 @@ const MONTHS = [
   { label: "December", value: 12 },
 ];
 
+const ROLES = [
+  { label: "MR", value: "mr" },
+  { label: "Area Manager", value: "areaManager" },
+  { label: "Zonal Manager", value: "zonalManager" },
+];
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
@@ -42,6 +47,7 @@ const DoctorVisitReport = () => {
     doctorName: "",
     minVisits: "",
     headQuarterId: "",
+    role: "mr",
   });
 
   const showToast = (message, type = "error") => {
@@ -58,6 +64,7 @@ const DoctorVisitReport = () => {
         doctorName: filters.doctorName || undefined,
         minVisits: filters.minVisits || undefined,
         headQuarterId: filters.headQuarterId || undefined,
+        role: filters.role || undefined,
       });
       showToast("Report exported successfully", "success");
     } catch (error) {
@@ -76,6 +83,7 @@ const DoctorVisitReport = () => {
         doctorName: filters.doctorName || undefined,
         minVisits: filters.minVisits || undefined,
         headQuarterId: filters.headQuarterId || undefined,
+        role: filters.role || undefined,
         pageNo: paginationData.currentPage,
         limit: paginationData.perPageDocument,
       });
@@ -98,6 +106,7 @@ const DoctorVisitReport = () => {
     filters.year,
     filters.minVisits,
     filters.doctorName,
+    filters.role,
     paginationData.currentPage,
     paginationData.perPageDocument,
     filters.headQuarterId,
@@ -133,6 +142,7 @@ const DoctorVisitReport = () => {
       doctorName: "",
       minVisits: "",
       headQuarterId: "",
+      role: "mr",
     });
     setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
   };
@@ -244,12 +254,26 @@ const DoctorVisitReport = () => {
                 </option>
               ))}
             </select>
+            <select
+              name="role"
+              value={filters.role}
+              onChange={handleFilterChange}
+              className="px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition"
+            >
+              <option value="">All Roles</option>
+              {ROLES.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
 
             {/* Clear — show when doctorName typed or month cleared */}
             {(filters.doctorName ||
               !filters.month ||
               filters.minVisits ||
-              filters.headQuarterId) && (
+              filters.headQuarterId ||
+              filters.role !== "mr") && (
               <button
                 onClick={clearFilters}
                 className="px-3 py-2 text-sm text-red-500 hover:bg-red-50 border border-red-200 rounded-lg transition"

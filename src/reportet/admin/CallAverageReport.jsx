@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import toast from "react-hot-toast";
-import { getCallAverageReport } from "../api/callAverageapi";
+import {
+  getCallAverageReport,
+  exportCallAverageReport,
+} from "../api/callAverageapi";
 
 import { getAllHeadQuartersNames } from "../api/headQuarter";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Download } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 
@@ -13,13 +16,19 @@ const CallAverageReport = () => {
 
   const [tableLoading, setTableLoading] = useState(false);
   const [load, setLoad] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const [reportFilters, setReportFilters] = useState({
     headQuarterId: "",
     startDate: "",
     endDate: "",
   });
-  const [filterApplied, setFilterApplied] = useState(false);
+  // const [filterApplied, setFilterApplied] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({
+    headQuarterId: "",
+    startDate: "",
+    endDate: "",
+  });
 
   const [hqDropdownOpen, setHqDropdownOpen] = useState(false);
   const hqDropdownRef = useRef(null);
@@ -34,13 +43,13 @@ const CallAverageReport = () => {
       try {
         setTableLoading(true);
         const payload = {
-          ...(reportFilters?.headQuarterId && {
-            headQuarterId: reportFilters.headQuarterId,
+          ...(appliedFilters?.headQuarterId && {
+            headQuarterId: appliedFilters.headQuarterId,
           }),
-          ...(reportFilters?.startDate && {
-            startDate: reportFilters.startDate,
+          ...(appliedFilters?.startDate && {
+            startDate: appliedFilters.startDate,
           }),
-          ...(reportFilters?.endDate && { endDate: reportFilters.endDate }),
+          ...(appliedFilters?.endDate && { endDate: appliedFilters.endDate }),
         };
         const res = await getCallAverageReport(payload, abortController);
         setReportData(res?.data || []);
@@ -61,9 +70,9 @@ const CallAverageReport = () => {
     },
 
     [
-      reportFilters.headQuarterId,
-      reportFilters.startDate,
-      reportFilters.endDate,
+      appliedFilters.headQuarterId,
+      appliedFilters.startDate,
+      appliedFilters.endDate,
     ],
   );
 
@@ -79,7 +88,19 @@ const CallAverageReport = () => {
 
   const handleSearch = () => {
     setLoad(true);
-    setFilterApplied((prev) => !prev);
+    setAppliedFilters(reportFilters);
+  };
+
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      await exportCallAverageReport(appliedFilters);
+    } catch (error) {
+      console.error("Problem exporting call average report", error);
+      toast.error("Unable to export the report, Pls try again later");
+    } finally {
+      setExporting(false);
+    }
   };
 
   useEffect(() => {
@@ -130,6 +151,22 @@ const CallAverageReport = () => {
         <h2 className="text-2xl font-bold text-gray-800">
           CALL AVERAGE REPORT
         </h2>
+        <button
+          onClick={handleExport}
+          disabled={exporting || reportData.length === 0}
+          className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white rounded-md text-sm hover:bg-green-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {exporting ? (
+            <Spinner
+              size={16}
+              borderWidth={2}
+              className="border-white border-t-transparent"
+            />
+          ) : (
+            <Download size={16} />
+          )}
+          {exporting ? "Exporting..." : "Export to Excel"}
+        </button>
       </div>
       <p className="text-gray-600 mb-6 pb-2 italic">
         Review each employee's working days, visit count, call average, sales,

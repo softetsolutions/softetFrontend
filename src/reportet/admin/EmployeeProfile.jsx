@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getAllHeadQuartersNames } from "../api/headQuarter";
 import Spinner from "../genericComps/Spinner";
+import { getZoneOptions } from "../api/zone";
 import {
   PhoneCall,
   Mail,
@@ -34,6 +35,9 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const [saving, setSaving] = useState(false);
   const [allHeadQuarters, setAllHeadQuarters] = useState([]);
   const [hqsLoading, setHqsLoading] = useState(false);
+  const [allZones, setAllZones] = useState([]);
+  const [zonesLoading, setZonesLoading] = useState(false);
+  const [zoneInput, setZoneInput] = useState("");
   const [searching, setSearching] = useState(false);
 
   const [form, setForm] = useState({
@@ -63,6 +67,21 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
     fetchAllEmployees();
   }, []);
 
+  const fetchAllZones = async () => {
+    try {
+      setZonesLoading(true);
+      const data = await getZoneOptions();
+      setAllZones(data.data || []);
+    } catch (error) {
+      toast.error("Failed to fetch zones list");
+    } finally {
+      setZonesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllZones();
+  }, []);
   const fetchAllHeadQuarters = async () => {
     try {
       setHqsLoading(true);
@@ -106,6 +125,30 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
       toast.success(data.message);
     } catch (error) {
       toast.error("Failed to unassign headquarter");
+    }
+  };
+
+  const handleAssignZone = async (zoneId) => {
+    try {
+      const data = await updateEmployee(employeeId, {
+        addZones: [zoneId],
+      });
+      setEmployee(data.employee);
+      toast.success(data.message);
+    } catch (error) {
+      toast.error("Failed to assign zone");
+    }
+  };
+
+  const handleUnassignZone = async (zoneId) => {
+    try {
+      const data = await updateEmployee(employeeId, {
+        removeZones: [zoneId],
+      });
+      setEmployee(data.employee);
+      toast.success(data.message);
+    } catch (error) {
+      toast.error("Failed to unassign zone");
     }
   };
 
@@ -534,6 +577,7 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
                 >
                   <option value="mr">MR</option>
                   <option value="areaManager">Area Manager</option>
+                  <option value="zonalManager">Zonal Manager</option>
                 </select>
               ) : (
                 <div className="flex items-center gap-2 mt-1">
@@ -615,79 +659,151 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-              Assigned HeadQuarters
-            </h3>
-          </div>
-
-          {employee.assignedHeadQuarters?.length > 0 ? (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {employee.assignedHeadQuarters.map((hq) => (
-                <span
-                  key={hq._id}
-                  className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                >
-                  <Building2 size={14} />
-                  {hq.headQuarterName}
-
-                  <button
-                    onClick={() => handleUnassignHQ(hq._id)}
-                    className="ml-1 text-blue-400 hover:text-red-500 transition-colors"
-                    title="Unassign"
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
+        {employee.role === "zonalManager" ? (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Assigned Zones
+              </h3>
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 mb-4">
-              No headquarters assigned.
-            </p>
-          )}
 
-          <div className="flex gap-2 items-center">
-            <select
-              value={hqInput}
-              onChange={(e) => setHqInput(e.target.value)}
-              disabled={hqsLoading}
-              className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
-            >
-              <option value="">
-                {hqsLoading
-                  ? "Loading headquarters..."
-                  : "Select a headquarter..."}
-              </option>
-              {allHeadQuarters
-                .filter(
-                  (hq) =>
-                    !employee.assignedHeadQuarters?.some(
-                      (assigned) => assigned._id === hq._id,
-                    ),
-                )
-                .map((hq) => (
-                  <option key={hq._id} value={hq._id}>
-                    {hq.headQuarterName}
-                  </option>
+            {employee.assignedZones?.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {employee.assignedZones.map((zone) => (
+                  <span
+                    key={zone._id}
+                    className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
+                  >
+                    <Building2 size={14} />
+                    {zone.name}
+
+                    <button
+                      onClick={() => handleUnassignZone(zone._id)}
+                      className="ml-1 text-blue-400 hover:text-red-500 transition-colors"
+                      title="Unassign"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
                 ))}
-            </select>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 mb-4">No zones assigned.</p>
+            )}
 
-            <button
-              onClick={() => {
-                if (hqInput.trim()) {
-                  handleAssignHQ(hqInput.trim());
-                  setHqInput("");
-                }
-              }}
-              disabled={!hqInput || hqsLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Building2 size={14} /> Assign
-            </button>
+            <div className="flex gap-2 items-center">
+              <select
+                value={zoneInput}
+                onChange={(e) => setZoneInput(e.target.value)}
+                disabled={zonesLoading}
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">
+                  {zonesLoading ? "Loading zones..." : "Select a zone..."}
+                </option>
+                {allZones
+                  .filter(
+                    (zone) =>
+                      !employee.assignedZones?.some(
+                        (assigned) => assigned._id === zone._id,
+                      ),
+                  )
+                  .map((zone) => (
+                    <option key={zone._id} value={zone._id}>
+                      {zone.name}
+                    </option>
+                  ))}
+              </select>
+
+              <button
+                onClick={() => {
+                  if (zoneInput.trim()) {
+                    handleAssignZone(zoneInput.trim());
+                    setZoneInput("");
+                  }
+                }}
+                disabled={!zoneInput || zonesLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Building2 size={14} /> Assign
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+                Assigned HeadQuarters
+              </h3>
+            </div>
+
+            {employee.assignedHeadQuarters?.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {employee.assignedHeadQuarters.map((hq) => (
+                  <span
+                    key={hq._id}
+                    className="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
+                  >
+                    <Building2 size={14} />
+                    {hq.headQuarterName}
+
+                    <button
+                      onClick={() => handleUnassignHQ(hq._id)}
+                      className="ml-1 text-blue-400 hover:text-red-500 transition-colors"
+                      title="Unassign"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 mb-4">
+                No headquarters assigned.
+              </p>
+            )}
+
+            <div className="flex gap-2 items-center">
+              <select
+                value={hqInput}
+                onChange={(e) => setHqInput(e.target.value)}
+                disabled={hqsLoading}
+                className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                <option value="">
+                  {hqsLoading
+                    ? "Loading headquarters..."
+                    : "Select a headquarter..."}
+                </option>
+                {allHeadQuarters
+                  .filter(
+                    (hq) =>
+                      !employee.assignedHeadQuarters?.some(
+                        (assigned) => assigned._id === hq._id,
+                      ),
+                  )
+                  .map((hq) => (
+                    <option key={hq._id} value={hq._id}>
+                      {hq.headQuarterName}
+                    </option>
+                  ))}
+              </select>
+
+              <button
+                onClick={() => {
+                  if (hqInput.trim()) {
+                    handleAssignHQ(hqInput.trim());
+                    setHqInput("");
+                  }
+                }}
+                disabled={!hqInput || hqsLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Building2 size={14} /> Assign
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

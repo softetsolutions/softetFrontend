@@ -112,6 +112,7 @@ export const getDoctorVisitReport = async ({ signal, ...params }) => {
   if (params.doctorName) query.append("doctorName", params.doctorName);
   if (params.minVisits) query.append("minVisits", params.minVisits);
   if (params.headQuarterId) query.append("headQuarterId", params.headQuarterId);
+  if (params.role) query.append("role", params.role);
   if (params.pageNo) query.append("pageNo", params.pageNo);
   if (params.limit) query.append("limit", params.limit);
 
@@ -155,6 +156,7 @@ export const exportDoctorVisitReport = async (params) => {
   if (params.doctorName) query.append("doctorName", params.doctorName);
   if (params.minVisits) query.append("minVisits", params.minVisits);
   if (params.headQuarterId) query.append("headQuarterId", params.headQuarterId);
+  if (params.role) query.append("role", params.role);
 
   const res = await fetch(
     `${API_BASE_URL}/daily-visit/exportDoctorVisitReport?${query.toString()}`,

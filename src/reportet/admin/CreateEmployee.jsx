@@ -8,12 +8,14 @@ import { onboardEmployee } from "../api/api.js";
 import { Input } from "../genericComps/InputComps.jsx";
 import { EyeOff, Eye } from "lucide-react";
 import Spinner from "../genericComps/Spinner.jsx";
-
+import { getZoneOptions } from "../api/zone.js";
 const CreateEmployee = () => {
   const [selectedHeadQuarters, setSelectedHeadQuarters] = useState([]);
   const [headQuartersNames, setHeadQuartersNames] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedZones, setSelectedZones] = useState([]);
+  const [zoneNames, setZoneNames] = useState({});
 
   const [message, setMessage] = useState({ text: "", type: "" });
 
@@ -37,8 +39,23 @@ const CreateEmployee = () => {
   useEffect(() => {
     // fetchUsers();
     fetchHeadQuartersNames();
+    fetchZoneNames();
   }, []);
 
+  const fetchZoneNames = async () => {
+    try {
+      const response = await getZoneOptions();
+      const zones = response?.data?.reduce((acc, zone) => {
+        acc[zone.name] = zone._id;
+        return acc;
+      }, {});
+      setZoneNames(zones);
+      console.log("zone names are", zones);
+    } catch (error) {
+      console.error("error is", error);
+      toast.error("Failed to fetch zones");
+    }
+  };
   const fetchHeadQuartersNames = async () => {
     try {
       const data = await getAllHeadQuartersNames();
@@ -91,9 +108,19 @@ const CreateEmployee = () => {
         email: formData?.email.trim(),
         phoneNumber: formData?.phoneNumber,
         role: formData?.role?.trim(),
-        assignedHeadQuarters: selectedHeadQuarters?.map((headQuarter) => {
-          return headQuartersNames[headQuarter];
-        }),
+        // assignedHeadQuarters: selectedHeadQuarters?.map((headQuarter) => {
+        //   return headQuartersNames[headQuarter];
+        // }),
+        assignedHeadQuarters:
+          formData?.role === "zonalManager"
+            ? []
+            : selectedHeadQuarters?.map(
+                (headQuarter) => headQuartersNames[headQuarter],
+              ),
+        assignedZones:
+          formData?.role === "zonalManager"
+            ? selectedZones?.map((zone) => zoneNames[zone])
+            : [],
       });
 
       if (data.success) {
@@ -107,6 +134,7 @@ const CreateEmployee = () => {
           role: "",
         });
         setSelectedHeadQuarters([]);
+        setSelectedZones([]);
         toast.success(data.message);
         return;
       }
@@ -205,13 +233,54 @@ const CreateEmployee = () => {
             <option value="">Choose Role</option>
             <option value="mr">MR</option>
             <option value="areaManager">Area Manager</option>
+            <option value="zonalManager">Zonal Manager</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium">
-            Assign Headquarters
-          </label>
+          {formData?.role === "zonalManager" && (
+            <>
+              <label className="block text-sm font-medium">Assign Zones</label>
+              <Select
+                multiple
+                value={selectedZones}
+                onChange={(e) => setSelectedZones(e.target.value)}
+                className="w-full border border-black-300 rounded mt-1 text-sm bg-white"
+                sx={{
+                  height: "42px",
+                  ".MuiOutlinedInput-notchedOutline": { border: "none" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                  },
+                  ".MuiSelect-select": {
+                    paddingTop: "8px",
+                    paddingBottom: "8px",
+                    paddingLeft: "12px",
+                  },
+                }}
+                aria-placeholder="Choose Zones"
+              >
+                {Object.keys(zoneNames).map((zone) => (
+                  <MenuItem
+                    key={zone}
+                    value={zone}
+                    sx={{
+                      "&.Mui-selected": {
+                        backgroundColor: "#B3D7FF !important",
+                      },
+                    }}
+                  >
+                    {zone}
+                  </MenuItem>
+                ))}
+              </Select>
+            </>
+          )}
+          {(formData?.role === "areaManager" || formData?.role === "mr") && (
+            <label className="block text-sm font-medium">
+              Assign Headquarters
+            </label>
+          )}
           {formData?.role === "areaManager" && (
             <Select
               multiple
