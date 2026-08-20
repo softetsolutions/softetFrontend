@@ -7,8 +7,9 @@ import TableList from "../genericComps/tableList/TableList";
 import { getEmployeeList } from "../api/employee";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
-import { PhoneCall, Pencil } from "lucide-react";
+import { PhoneCall, Pencil, Radio, RadioOff } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
+import { enableLiveTracking, disableLiveTracking } from "../api/trackingApi";
 
 const EmployeeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +30,29 @@ const EmployeeList = () => {
     currentPage: 1,
     perPageDocument: 5,
   });
+  const [trackingLoadingId, setTrackingLoadingId] = useState(null);
 
+  const handleToggleEmployeeTracking = async (employee) => {
+    const turnOn = !employee.liveTrackingEnabled;
+    setTrackingLoadingId(employee._id);
+    try {
+      if (turnOn) {
+        await enableLiveTracking(employee._id);
+      } else {
+        await disableLiveTracking(employee._id);
+      }
+      setEmployees((prev) =>
+        prev.map((e) =>
+          e._id === employee._id ? { ...e, liveTrackingEnabled: turnOn } : e,
+        ),
+      );
+      toast.success(turnOn ? "Tracking enabled" : "Tracking disabled");
+    } catch (error) {
+      toast.error(error.message || "Failed to update tracking");
+    } finally {
+      setTrackingLoadingId(null);
+    }
+  };
   const fetchEmployees = async (paginationData) => {
     try {
       setLoading(true);
@@ -244,6 +267,28 @@ const EmployeeList = () => {
                           }}
                         >
                           <Pencil />
+                        </button>
+
+                        <button
+                          onClick={() => handleToggleEmployeeTracking(employee)}
+                          disabled={trackingLoadingId === employee._id}
+                          title={
+                            employee.liveTrackingEnabled
+                              ? "Disable tracking"
+                              : "Enable tracking"
+                          }
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition disabled:opacity-60 ${
+                            employee.liveTrackingEnabled
+                              ? "bg-green-50 text-green-700 hover:bg-green-100"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          }`}
+                        >
+                          {trackingLoadingId === employee._id ? (
+                            <Spinner size={12} borderWidth={2} />
+                          ) : (
+                            <Radio size={12} />
+                          )}
+                          {employee.liveTrackingEnabled ? "Enabled" : "Enable"}
                         </button>
                       </td>
                     </tr>

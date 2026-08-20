@@ -15,6 +15,7 @@ import DoctorVisitReport from "./admin/DoctorVisit";
 import CreateSale from "./admin/Sale";
 import Dashboard from "./admin/Dashboard";
 import CallAverageReport from "./admin/CallAverageReport";
+import LiveTracking from "./admin/LiveTrackingDashboard";
 
 import {
   ClipboardList,
@@ -37,6 +38,12 @@ export const sidebarTabs = [
     label: "Dashboard",
     icon: <LayoutDashboard size={18} />,
     component: <Dashboard />,
+  },
+  {
+    id: "tracking",
+    label: "Live Tracking",
+    icon: <LayoutDashboard size={18} />,
+    component: <LiveTracking />,
   },
   {
     id: "reports",
