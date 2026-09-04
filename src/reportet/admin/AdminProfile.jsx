@@ -8,6 +8,9 @@ import {
   MapPin,
   UserX,
   Plus,
+  Image as ImageIcon,
+  Palette,
+  Mail as MailIcon,
 } from "lucide-react";
 import { useOrganization } from "../context/OrganizationContext";
 import {
@@ -18,6 +21,11 @@ import {
   setHeadQuarterBudget,
   getConfiguredFinancialYears,
 } from "../api/profile";
+import {
+  getNotificationSettings,
+  updateNotificationEventSetting,
+  uploadEventLogo,
+} from "../api/notification";
 
 const API_BASE_URL = import.meta.env.VITE_REPORTET_BASE_URL;
 
@@ -87,7 +95,6 @@ const BrandingSection = () => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null);
 
-  // Sync state whenever the active organization context changes
   useEffect(() => {
     if (organization) {
       setBrandName(organization.brandName || "");
@@ -129,8 +136,6 @@ const BrandingSection = () => {
       if (logoFile) formData.append("logo", logoFile);
 
       await updateBranding(formData);
-
-      // Re-fetch organization context to propagate changes everywhere in the app
       await refreshOrganization();
 
       setLogoFile(null);
@@ -208,6 +213,480 @@ const BrandingSection = () => {
     </div>
   );
 };
+
+const BIRTHDAY_EVENT_TYPE = "doctorBirthdayAdminAlert";
+
+const EmailTemplateSection = () => {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [status, setStatus] = useState(null);
+
+  const [template, setTemplate] = useState({
+    mode: "default",
+    logoUrl: "",
+    backgroundImageUrl: "",
+    headerText: "",
+    bodyMessage: "",
+    footerText: "",
+    accentColor: "#111827",
+    bodyBackgroundColor: "#ffffff",
+    bodyBackgroundImageUrl: "",
+  });
+
+  const [uploadingBg, setUploadingBg] = useState(false);
+  const [uploadingBodyBg, setUploadingBodyBg] = useState(false);
+
+  const handleBodyBackgroundChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBodyBg(true);
+    setStatus(null);
+    try {
+      const { logoUrl } = await uploadEventLogo(file);
+      updateField("bodyBackgroundImageUrl", logoUrl);
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err.message || "Failed to upload body background image",
+      });
+    } finally {
+      setUploadingBodyBg(false);
+    }
+  };
+
+  const handleBackgroundChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingBg(true);
+    setStatus(null);
+    try {
+      const { logoUrl } = await uploadEventLogo(file);
+      updateField("backgroundImageUrl", logoUrl);
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err.message || "Failed to upload background image",
+      });
+    } finally {
+      setUploadingBg(false);
+    }
+  };
+
+  const fetchTemplate = useCallback(async () => {
+    setLoading(true);
+    try {
+      const settings = await getNotificationSettings();
+      const event = settings.events?.find(
+        (e) => e.eventType === BIRTHDAY_EVENT_TYPE,
+      );
+      if (event?.emailTemplate) {
+        setTemplate((prev) => ({ ...prev, ...event.emailTemplate }));
+      }
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err.message || "Failed to load email template",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTemplate();
+  }, [fetchTemplate]);
+
+  const updateField = (field, value) => {
+    setTemplate((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleModeChange = (mode) => {
+    updateField("mode", mode);
+  };
+
+  const handleLogoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setStatus(null);
+    try {
+      const { logoUrl } = await uploadEventLogo(file);
+      updateField("logoUrl", logoUrl);
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err.message || "Failed to upload logo",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setStatus(null);
+    try {
+      const updated = await updateNotificationEventSetting(
+        BIRTHDAY_EVENT_TYPE,
+        { emailTemplate: template },
+      );
+      const savedEvent = updated.events?.find(
+        (e) => e.eventType === BIRTHDAY_EVENT_TYPE,
+      );
+      if (savedEvent?.emailTemplate) {
+        setTemplate((prev) => ({ ...prev, ...savedEvent.emailTemplate }));
+      }
+      setStatus({ type: "success", message: "Email template saved" });
+    } catch (err) {
+      setStatus({
+        type: "error",
+        message: err.message || "Failed to save email template",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const isCustom = template.mode === "custom";
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-2 text-gray-500 text-sm py-8 justify-center">
+          <Loader2 size={18} className="animate-spin" />
+          Loading email template...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-1">
+        Birthday Email Template
+      </h2>
+      <p className="text-sm text-gray-500 mb-5">
+        Choose the default greeting email, or customize it with your own logo,
+        text, and color.
+      </p>
+
+      <StatusBanner status={status} />
+
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => handleModeChange("default")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+            !isCustom
+              ? "bg-blue-600 border-blue-600 text-white"
+              : "border-gray-300 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Use Default
+        </button>
+        <button
+          onClick={() => handleModeChange("custom")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+            isCustom
+              ? "bg-blue-600 border-blue-600 text-white"
+              : "border-gray-300 text-gray-600 hover:bg-gray-50"
+          }`}
+        >
+          Customize
+        </button>
+      </div>
+
+      {isCustom && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+                <ImageIcon size={14} /> Logo
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                  {template.logoUrl ? (
+                    <img
+                      src={`${ASSET_BASE_URL}${template.logoUrl}`}
+                      alt="Logo preview"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-[10px] text-gray-400">No logo</span>
+                  )}
+                </div>
+                <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+                  {uploading ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Upload size={14} />
+                  )}
+                  {uploading ? "Uploading..." : "Upload logo"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                    onChange={handleLogoChange}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* <div
+              className="text-center py-4 px-4 mt-2 bg-cover bg-center"
+              style={{
+                backgroundColor: template.accentColor,
+                backgroundImage: template.backgroundImageUrl
+                  ? `url(${ASSET_BASE_URL}${template.backgroundImageUrl})`
+                  : "none",
+              }}
+            >
+              <p className="text-white font-bold text-base drop-shadow">
+                {template.headerText || "🎂 Birthday Reminder"}
+              </p>
+            </div> */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Header Text
+              </label>
+              <input
+                type="text"
+                value={template.headerText}
+                onChange={(e) => updateField("headerText", e.target.value)}
+                placeholder="🎂 Birthday Reminder"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Body Message
+              </label>
+              <textarea
+                rows={4}
+                value={template.bodyMessage}
+                onChange={(e) => updateField("bodyMessage", e.target.value)}
+                placeholder="Write the default message shown when no custom message is sent..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Footer Text
+              </label>
+              <input
+                type="text"
+                value={template.footerText}
+                onChange={(e) => updateField("footerText", e.target.value)}
+                placeholder="© 2026 Your Company. All rights reserved."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+                <Palette size={14} /> Accent Color
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={template.accentColor}
+                  onChange={(e) => updateField("accentColor", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={template.accentColor}
+                  onChange={(e) => updateField("accentColor", e.target.value)}
+                  className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+              <MailIcon size={14} /> Preview
+            </label>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-3">
+              <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+                {template.logoUrl && (
+                  <div className="flex justify-center pt-4">
+                    <img
+                      src={`${ASSET_BASE_URL}${template.logoUrl}`}
+                      alt="Logo"
+                      className="max-h-10 object-contain"
+                    />
+                  </div>
+                )}
+                <div
+                  className="text-center py-4 px-4 mt-2 bg-cover bg-center"
+                  style={{
+                    backgroundColor: template.accentColor,
+                    backgroundImage: template.backgroundImageUrl
+                      ? `url(${ASSET_BASE_URL}${template.backgroundImageUrl})`
+                      : "none",
+                  }}
+                >
+                  <p className="text-white font-bold text-base drop-shadow">
+                    {template.headerText || "🎂 Birthday Reminder"}
+                  </p>
+                </div>
+                <div
+                  className="px-5 py-5 text-sm text-gray-700 leading-relaxed bg-cover bg-center"
+                  style={{
+                    backgroundColor: template.bodyBackgroundColor,
+                    backgroundImage: template.bodyBackgroundImageUrl
+                      ? `url(${ASSET_BASE_URL}${template.bodyBackgroundImageUrl})`
+                      : "none",
+                  }}
+                >
+                  {template.bodyMessage ||
+                    "Happy Birthday, Dr. {doctorName}! Wishing you a wonderful year ahead."}
+                  <div className="mt-4 bg-gray-50 border border-gray-100 rounded-md px-3 py-2 text-xs">
+                    <strong>Doctor:</strong> Dr. Example Name
+                  </div>
+                </div>
+                <div className="bg-gray-100 text-center py-3 text-[11px] text-gray-500">
+                  {template.footerText ||
+                    "© 2026 Softet Solutions. All rights reserved."}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+              <ImageIcon size={14} /> Header Background Image
+            </label>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                {template.backgroundImageUrl ? (
+                  <img
+                    src={`${ASSET_BASE_URL}${template.backgroundImageUrl}`}
+                    alt="Background preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-[10px] text-gray-400">None</span>
+                )}
+              </div>
+              <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+                {uploadingBg ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Upload size={14} />
+                )}
+                {uploadingBg ? "Uploading..." : "Upload background"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleBackgroundChange}
+                  disabled={uploadingBg}
+                  className="hidden"
+                />
+              </label>
+              {template.backgroundImageUrl && (
+                <button
+                  type="button"
+                  onClick={() => updateField("backgroundImageUrl", "")}
+                  className="text-xs text-red-500 hover:text-red-600"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">
+              Shown behind the header banner text. Use SVG-free formats
+              (PNG/JPG/WebP) — background images have limited support in some
+              email clients.
+            </p>
+          </div>
+          <div>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5">
+              <Palette size={14} /> Body Background
+            </label>
+            <div className="flex items-center gap-3 mb-2">
+              <input
+                type="color"
+                value={template.bodyBackgroundColor}
+                onChange={(e) =>
+                  updateField("bodyBackgroundColor", e.target.value)
+                }
+                className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer"
+              />
+              <input
+                type="text"
+                value={template.bodyBackgroundColor}
+                onChange={(e) =>
+                  updateField("bodyBackgroundColor", e.target.value)
+                }
+                className="w-28 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                {template.bodyBackgroundImageUrl ? (
+                  <img
+                    src={`${ASSET_BASE_URL}${template.bodyBackgroundImageUrl}`}
+                    alt="Body background preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-[10px] text-gray-400">None</span>
+                )}
+              </div>
+              <label className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+                {uploadingBodyBg ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Upload size={14} />
+                )}
+                {uploadingBodyBg ? "Uploading..." : "Upload background"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleBodyBackgroundChange}
+                  disabled={uploadingBodyBg}
+                  className="hidden"
+                />
+              </label>
+              {template.bodyBackgroundImageUrl && (
+                <button
+                  type="button"
+                  onClick={() => updateField("bodyBackgroundImageUrl", "")}
+                  className="text-xs text-red-500 hover:text-red-600"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-gray-400 mt-1">
+              Fills the message area behind the body text. Use a light image or
+              low contrast — small text over a busy image can be hard to read.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={handleSave}
+        disabled={saving || uploading}
+        className="flex items-center gap-2 px-5 py-2.5 mt-6 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+      >
+        {saving ? (
+          <Loader2 size={16} className="animate-spin" />
+        ) : (
+          <Save size={16} />
+        )}
+        {saving ? "Saving..." : "Save Email Template"}
+      </button>
+    </div>
+  );
+};
+
 const BudgetSection = () => {
   const [headquarters, setHeadquarters] = useState([]);
   const [selectedHQ, setSelectedHQ] = useState("");
@@ -602,8 +1081,10 @@ const AdminProfile = () => {
       </div>
 
       <BrandingSection />
+
       <BudgetSection />
       <UnassignedHierarchySection />
+      <EmailTemplateSection />
     </div>
   );
 };
