@@ -87,7 +87,7 @@ export default function ResetPassword() {
             1 hour.
           </p>
           <a
-            href="/forgot-password"
+            href="/reportet/employee/forgot-password"
             className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg flex items-center justify-center transition-colors mb-4"
           >
             Request a new link

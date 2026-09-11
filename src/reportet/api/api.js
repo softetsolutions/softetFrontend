@@ -14,7 +14,9 @@ export const signupUser = async (userData) => {
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "Signup failed");
 
-  // If token is sent in response, store it
+  // Cookie session (credentials: include) is the API auth source.
+  // Keep a JWT copy only for client-side role/expiry checks until the
+  // backend exposes role on a cookie-authenticated /me endpoint.
   if (data.token) {
     localStorage.setItem("userToken", data.token);
   }

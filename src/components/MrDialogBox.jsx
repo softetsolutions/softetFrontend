@@ -1,6 +1,4 @@
 import { useContext } from "react";
-import InfoIcon from "@mui/icons-material/Info";
-import Tooltip from "@mui/material/Tooltip";
 import CloseIcon from "@mui/icons-material/Close";
 import { MrContext } from "../reportet/context/MrContext";
 
@@ -11,7 +9,7 @@ function MrDialogBox({ open, close, mr }) {
     setEditMr(mr);
     close();
     window.dispatchEvent(
-      new CustomEvent("switch-tab", { detail: "create-user" })
+      new CustomEvent("switch-tab", { detail: "create-user" }),
     );
   };
 
@@ -50,16 +48,6 @@ function MrDialogBox({ open, close, mr }) {
           <div className="flex justify-between">
             <span className="font-semibold">Email</span>
             <span>{mr?.email}</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">Password</span>
-            <div className="flex items-center">
-              <span className="text-gray-800 text-sm">******</span>
-              <Tooltip title={`Password: ${mr?.password}`} arrow>
-                <InfoIcon className="cursor-pointer scale-75" />
-              </Tooltip>
-            </div>
           </div>
         </div>
 

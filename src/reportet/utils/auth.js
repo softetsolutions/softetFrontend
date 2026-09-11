@@ -1,7 +1,13 @@
 import { jwtDecode } from "jwt-decode";
 import { logoutUser } from "../api/api";
 import toast from "react-hot-toast";
-import { useOrganization } from "../context/OrganizationContext";
+
+let clearOrgCallback = null;
+
+/** Wire OrganizationContext.clearOrganization into logout cleanup. */
+export const setClearOrganizationCallback = (fn) => {
+  clearOrgCallback = typeof fn === "function" ? fn : null;
+};
 
 export const getAuthInfo = () => {
   const token = localStorage.getItem("userToken");
@@ -11,19 +17,20 @@ export const getAuthInfo = () => {
 
   const decoded = jwtDecode(token);
   const userId = decoded.id;
+  // Org JWT is { id, typ: "org" } — no role claim
+  const typ = decoded.typ;
   const role = decoded.role;
 
   if (!userId) {
     throw new Error("No user ID found in token");
   }
 
-  return { token, userId, role };
+  return { token, userId, typ, role };
 };
 
 export const logout = async () => {
   try {
     await logoutUser();
-    clearOrganization();
   } catch (error) {
     console.error("Logout API call failed:", error);
   } finally {

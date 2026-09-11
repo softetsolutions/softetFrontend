@@ -10,8 +10,10 @@ import EmployeeList from "./admin/EmployeeList";
 import EmployeeDetail from "./admin/EmployeeProfile";
 import AreaList from "./admin/AreaList";
 import AdminLeaves from "./admin/AdminLeaves";
+import LeaveSettings from "./admin/LeaveSettings";
 import SalesReport from "./admin/SalesReport";
 import DoctorVisitReport from "./admin/DoctorVisit";
+import LeaveReport from "./admin/LeaveReport";
 import CreateSale from "./admin/Sale";
 import Dashboard from "./admin/Dashboard";
 import CallAverageReport from "./admin/CallAverageReport";
@@ -29,6 +31,7 @@ import {
   BadgeDollarSign,
   Parasol,
   LayoutDashboard,
+  Settings2,
 } from "lucide-react";
 
 export const sidebarTabs = [
@@ -67,6 +70,12 @@ export const sidebarTabs = [
         label: "Call Average Report",
         icon: <BadgeDollarSign size={18} />,
         component: <CallAverageReport />,
+      },
+      {
+        id: "leave-report",
+        label: "Leave Report",
+        icon: <Parasol size={18} />,
+        component: <LeaveReport />,
       },
     ],
   },
@@ -174,6 +183,12 @@ export const sidebarTabs = [
         label: "Leaves",
         icon: <Map size={18} />,
         component: <AdminLeaves />,
+      },
+      {
+        id: "leave-settings",
+        label: "Leave Settings",
+        icon: <Settings2 size={18} />,
+        component: <LeaveSettings />,
       },
     ],
   },

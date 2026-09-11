@@ -87,7 +87,7 @@ const Login = () => {
                       Password
                     </label>
                     <a
-                      href="/forgot-password"
+                      href="/reportet/employee/forgot-password"
                       className="text-xs text-blue-600 hover:underline"
                     >
                       Forgot Password?

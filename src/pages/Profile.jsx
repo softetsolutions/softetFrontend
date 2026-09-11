@@ -1,16 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 const API = import.meta.env.VITE_API_BASE_URL;
 
 const ProfileModal = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user")) || {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+91 98765 43210",
-    course: "Industrial Training",
-  };
+  const storedUser = JSON.parse(localStorage.getItem("user")) || {};
 
-  const [user, setUser] = useState(storedUser);
-  // const [editing, setEditing] = useState(false);
+  const [user] = useState(storedUser);
   const [loading, setLoading] = useState(false);
 
   const handleDownloadAppointmentLetter = async () => {
@@ -51,28 +45,6 @@ const ProfileModal = () => {
     }
   };
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setUser((prev) => ({ ...prev, [name]: value }));
-  // };
-
-  // const handlePhotoChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = () =>
-  //       setUser((prev) => ({ ...prev, photo: reader.result }));
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
-
-  // const handleRemovePhoto = () => setUser((prev) => ({ ...prev, photo: null }));
-  // const handleSave = () => {
-  //   localStorage.setItem("user", JSON.stringify(user));
-  //   setEditing(false);
-  //   alert("Profile updated! (Demo storage)");
-  // };
-
   return (
     <div className="relative max-w-4xl mx-auto mt-8 px-6">
       {/* Top-right Download Button */}
@@ -97,15 +69,6 @@ const ProfileModal = () => {
           Profile
         </h2>
 
-        {/* Profile Picture
-        <div className="flex flex-col items-center gap-3 mb-4">
-          <img
-            src={user.photo || "https://via.placeholder.com/120"}
-            alt="Profile"
-            className="w-28 h-28 rounded-full object-cover border-2 border-blue-200 shadow-sm"
-          />
-        </div> */}
-
         {/* Profile Fields */}
         <div className="space-y-4 bg-white p-6 rounded-lg shadow-md border border-gray-200">
           {["name", "email", "phone", "course"].map((field) => (
@@ -113,7 +76,9 @@ const ProfileModal = () => {
               <label className="font-medium text-gray-700 capitalize">
                 {field}:
               </label>
-              <p className="mt-1 text-gray-800">{user[field]}</p>
+              <p className="mt-1 text-gray-800">
+                {user[field] || "Not available"}
+              </p>
             </div>
           ))}
         </div>

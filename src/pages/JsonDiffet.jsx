@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { diff } from "deep-diff";
-import PropTypes from 'prop-types';
+import diff from "microdiff";
+import PropTypes from "prop-types";
 
 function Card({ children }) {
-  return <div className="border rounded-lg shadow-sm p-4 bg-white">{children}</div>;
+  return (
+    <div className="border rounded-lg shadow-sm p-4 bg-white">{children}</div>
+  );
 }
 
 function CardContent({ children }) {
@@ -23,7 +25,10 @@ function Textarea({ value, onChange, rows }) {
 
 function Button({ children, onClick }) {
   return (
-    <button className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg" onClick={onClick}>
+    <button
+      className="mt-4 w-full p-2 bg-blue-500 text-white rounded-lg"
+      onClick={onClick}
+    >
       {children}
     </button>
   );
@@ -39,7 +44,11 @@ export default function JsonDiffTool() {
       const obj1 = JSON.parse(json1);
       const obj2 = JSON.parse(json2);
       const differences = diff(obj1, obj2);
-      setDiffResult(differences ? JSON.stringify(differences, null, 2) : "No differences found");
+      setDiffResult(
+        differences.length > 0
+          ? JSON.stringify(differences, null, 2)
+          : "No differences found",
+      );
     } catch {
       setDiffResult("Invalid JSON format");
     }
@@ -52,13 +61,21 @@ export default function JsonDiffTool() {
         <Card>
           <CardContent>
             <h3 className="font-semibold mb-2">Original JSON</h3>
-            <Textarea value={json1} onChange={(e) => setJson1(e.target.value)} rows={10} />
+            <Textarea
+              value={json1}
+              onChange={(e) => setJson1(e.target.value)}
+              rows={10}
+            />
           </CardContent>
         </Card>
         <Card>
           <CardContent>
             <h3 className="font-semibold mb-2">Modified JSON</h3>
-            <Textarea value={json2} onChange={(e) => setJson2(e.target.value)} rows={10} />
+            <Textarea
+              value={json2}
+              onChange={(e) => setJson2(e.target.value)}
+              rows={10}
+            />
           </CardContent>
         </Card>
       </div>
@@ -66,7 +83,9 @@ export default function JsonDiffTool() {
       <Card className="mt-4">
         <CardContent>
           <h3 className="font-semibold mb-2">Differences</h3>
-          <pre className="p-2 border rounded bg-gray-50 overflow-auto">{diffResult}</pre>
+          <pre className="p-2 border rounded bg-gray-50 overflow-auto">
+            {diffResult}
+          </pre>
         </CardContent>
       </Card>
     </div>
