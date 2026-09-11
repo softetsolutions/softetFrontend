@@ -1,23 +1,4 @@
-import AddAreaOrDoctor from "./admin/AddDoctorOrArea";
-import StockistMaster from "./admin/StockistMaster";
-import CreateEmployee from "./admin/CreateEmployee";
-import DoctorsList from "./admin/DoctorList";
-import VisitReport from "./admin/VisitReport";
-import HierarchyForm from "./admin/HierarchyForm";
-import HeadQuarterListing from "./admin/HeadQuarterListing";
-import CreateStockist from "./admin/CreateStockist";
-import EmployeeList from "./admin/EmployeeList";
-import EmployeeDetail from "./admin/EmployeeProfile";
-import AreaList from "./admin/AreaList";
-import AdminLeaves from "./admin/AdminLeaves";
-import LeaveSettings from "./admin/LeaveSettings";
-import SalesReport from "./admin/SalesReport";
-import DoctorVisitReport from "./admin/DoctorVisit";
-import LeaveReport from "./admin/LeaveReport";
-import CreateSale from "./admin/Sale";
-import Dashboard from "./admin/Dashboard";
-import CallAverageReport from "./admin/CallAverageReport";
-
+import { lazy } from "react";
 import {
   ClipboardList,
   Package,
@@ -34,48 +15,67 @@ import {
   Settings2,
 } from "lucide-react";
 
+const Dashboard = lazy(() => import("./admin/Dashboard"));
+const VisitReport = lazy(() => import("./admin/VisitReport"));
+const SalesReport = lazy(() => import("./admin/SalesReport"));
+const DoctorVisitReport = lazy(() => import("./admin/DoctorVisit"));
+const CallAverageReport = lazy(() => import("./admin/CallAverageReport"));
+const LeaveReport = lazy(() => import("./admin/LeaveReport"));
+const StockistMaster = lazy(() => import("./admin/StockistMaster"));
+const CreateStockist = lazy(() => import("./admin/CreateStockist"));
+const CreateSale = lazy(() => import("./admin/Sale"));
+const CreateEmployee = lazy(() => import("./admin/CreateEmployee"));
+const EmployeeList = lazy(() => import("./admin/EmployeeList"));
+const EmployeeDetail = lazy(() => import("./admin/EmployeeProfile"));
+const AddAreaOrDoctor = lazy(() => import("./admin/AddDoctorOrArea"));
+const AreaList = lazy(() => import("./admin/AreaList"));
+const DoctorsList = lazy(() => import("./admin/DoctorList"));
+const HierarchyForm = lazy(() => import("./admin/HierarchyForm"));
+const HeadQuarterListing = lazy(() => import("./admin/HeadQuarterListing"));
+const AdminLeaves = lazy(() => import("./admin/AdminLeaves"));
+const LeaveSettings = lazy(() => import("./admin/LeaveSettings"));
+
 export const sidebarTabs = [
   {
     id: "dashboard",
     label: "Dashboard",
     icon: <LayoutDashboard size={18} />,
-    component: <Dashboard />,
+    Component: Dashboard,
   },
   {
     id: "reports",
     label: "Reports",
     icon: <ClipboardList size={18} />,
-
     dropdown: [
       {
         id: "visit-report",
         label: "Visit Report",
         icon: <ClipboardList size={18} />,
-        component: <VisitReport />,
+        Component: VisitReport,
       },
       {
         id: "sales-report",
         label: "Sales Report",
         icon: <BadgeDollarSign size={18} />,
-        component: <SalesReport />,
+        Component: SalesReport,
       },
       {
         id: "doctor-visit-report",
         label: "Doctor Visit Report",
         icon: <BadgeDollarSign size={18} />,
-        component: <DoctorVisitReport />,
+        Component: DoctorVisitReport,
       },
       {
         id: "call-visit-report",
         label: "Call Average Report",
         icon: <BadgeDollarSign size={18} />,
-        component: <CallAverageReport />,
+        Component: CallAverageReport,
       },
       {
         id: "leave-report",
         label: "Leave Report",
         icon: <Parasol size={18} />,
-        component: <LeaveReport />,
+        Component: LeaveReport,
       },
     ],
   },
@@ -88,19 +88,19 @@ export const sidebarTabs = [
         id: "stockist-master",
         label: "Stockist List",
         icon: <Store size={18} />,
-        component: <StockistMaster />,
+        Component: StockistMaster,
       },
       {
         id: "create-stockist",
         label: "Create Stockist",
         icon: <ClipboardList size={18} />,
-        component: <CreateStockist />,
+        Component: CreateStockist,
       },
       {
         id: "create-sales",
         label: "Create Sale",
         icon: <ClipboardList size={18} />,
-        component: <CreateSale />,
+        Component: CreateSale,
       },
     ],
   },
@@ -113,19 +113,19 @@ export const sidebarTabs = [
         id: "create-user",
         label: "Onboard New",
         icon: <UserPlus size={20} />,
-        component: <CreateEmployee />,
+        Component: CreateEmployee,
       },
       {
         id: "mr-list",
         label: "Employee List",
         icon: <UserPlus size={20} />,
-        component: <EmployeeList />,
+        Component: EmployeeList,
       },
       {
         id: "profile",
         label: "Profile",
         icon: <UserPlus size={20} />,
-        component: <EmployeeDetail key="employee-detail" />,
+        Component: EmployeeDetail,
       },
     ],
   },
@@ -138,19 +138,19 @@ export const sidebarTabs = [
         id: "add",
         label: "Add",
         icon: <UserPlus size={18} />,
-        component: <AddAreaOrDoctor />,
+        Component: AddAreaOrDoctor,
       },
       {
         id: "area-list",
         label: "Area List",
         icon: <UserCheck size={18} />,
-        component: <AreaList />,
+        Component: AreaList,
       },
       {
         id: "doctors-list",
         label: "Doctors List",
         icon: <List size={18} />,
-        component: <DoctorsList />,
+        Component: DoctorsList,
       },
     ],
   },
@@ -163,13 +163,13 @@ export const sidebarTabs = [
         id: "add-headquarter",
         label: "Add Headquarter",
         icon: <Map size={18} />,
-        component: <HierarchyForm />,
+        Component: HierarchyForm,
       },
       {
         id: "list-headquarter",
         label: "Headquarter List",
         icon: <UserCheck size={18} />,
-        component: <HeadQuarterListing />,
+        Component: HeadQuarterListing,
       },
     ],
   },
@@ -182,13 +182,13 @@ export const sidebarTabs = [
         id: "leaves",
         label: "Leaves",
         icon: <Map size={18} />,
-        component: <AdminLeaves />,
+        Component: AdminLeaves,
       },
       {
         id: "leave-settings",
         label: "Leave Settings",
         icon: <Settings2 size={18} />,
-        component: <LeaveSettings />,
+        Component: LeaveSettings,
       },
     ],
   },

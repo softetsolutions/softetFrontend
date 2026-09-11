@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/SoftetLogo.png";
 import { motion } from "framer-motion";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -13,7 +13,6 @@ const navItems = [
   { label: "Contact", refKey: "contactRef" },
 ];
 
-//  hamburger button component
 const MenuButton = ({ isOpen, toggle }) => {
   return (
     <button
@@ -74,27 +73,7 @@ export function Navbar({
   contactRef,
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const [firstInstallmentPaid, setFirstInstallmentPaid] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    Boolean(localStorage.getItem("token")),
-  );
 
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser?.firstInstallmentPaid) {
-      setFirstInstallmentPaid(true);
-    }
-  }, []);
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setFirstInstallmentPaid(false);
-    window.location.href = "/industrial-training";
-  };
-
-  // Mapping refKey to actual useRef
   const refMap = {
     heroRef,
     servicesRef,
@@ -109,7 +88,6 @@ export function Navbar({
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 sm:h-20 items-center justify-between">
-          {/* Logo and Company Name */}
           <a href="/" className="flex-shrink-0">
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <img
@@ -126,73 +104,26 @@ export function Navbar({
               </span>
             </div>
           </a>
-          {/* isLoggedIn */}
-          {location.pathname.startsWith("/industrial-training") && (
-            <div className="hidden lg:flex items-center gap-3 ml-2">
-              {!isLoggedIn ? (
-                <>
-                  <Link
-                    to="/industrial-training/login"
-                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-                  >
-                    Login
-                  </Link>
 
-                  <Link
-                    to="/industrial-training/signup"
-                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-                  >
-                    Signup
-                  </Link>
-                </>
-              ) : !firstInstallmentPaid ? (
-                <div className="flex items-center gap-3">
-                  <Link
-                    to="/industrial-training/payment"
-                    className="px-4 xl:px-6 py-2 xl:py-3 bg-[#0B3B6A] text-white rounded-lg hover:bg-[#165490] transition-all"
-                  >
-                    Payment
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 xl:px-6 py-2 xl:py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  to="/industrial-training/dashboard"
-                  className="px-4 xl:px-6 py-2 xl:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
-                >
-                  Dashboard
-                </Link>
-              )}
-            </div>
-          )}
-
-          {(showoptions ||
-            location.pathname.startsWith("/industrial-training")) && (
+          {showoptions && (
             <>
-              {showoptions && (
-                <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
-                  <Link
-                    className="bg-blue-400 px-4 py-2 text-white font-semibold rounded-lg"
-                    to="/reportet"
+              <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
+                <Link
+                  className="bg-blue-400 px-4 py-2 text-white font-semibold rounded-lg"
+                  to="/reportet"
+                >
+                  ReportEt
+                </Link>
+                {navItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => scrollToSection(refMap[item.refKey])}
+                    className="nav-item text-sm xl:text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A]"
                   >
-                    ReportEt
-                  </Link>
-                  {navItems.map((item) => (
-                    <button
-                      key={item.label}
-                      onClick={() => scrollToSection(refMap[item.refKey])}
-                      className="nav-item text-sm xl:text-base font-medium text-gray-600 transition-colors hover:text-[#0B3B6A]"
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </nav>
-              )}
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
 
               <div className="lg:hidden flex items-center">
                 <MenuButton
@@ -204,8 +135,6 @@ export function Navbar({
           )}
         </div>
 
-        {/* Mobile Navigation Menu */}
-
         <motion.div
           initial="closed"
           animate={mobileMenuOpen ? "open" : "closed"}
@@ -216,80 +145,27 @@ export function Navbar({
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="lg:hidden overflow-hidden"
         >
-          {mobileMenuOpen && (
+          {mobileMenuOpen && showoptions && (
             <nav className="flex flex-col gap-4 py-4">
-              {location.pathname.startsWith("/industrial-training") ? (
-                <>
-                  {!isLoggedIn ? (
-                    <>
-                      <Link
-                        to="/industrial-training/payment"
-                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Payment
-                      </Link>
-
-                      <Link
-                        to="/industrial-training/login"
-                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Login
-                      </Link>
-
-                      <Link
-                        to="/industrial-training/signup"
-                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Signup
-                      </Link>
-                    </>
-                  ) : !firstInstallmentPaid ? (
-                    <>
-                      <Link
-                        to="/industrial-training/payment"
-                        className="px-4 py-2.5 bg-[#0B3B6A] text-white rounded-xl text-center"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        Payment
-                      </Link>
-
-                      <button
-                        onClick={handleLogout}
-                        className="px-4 py-2.5 bg-gray-700 text-white rounded-xl text-center"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link
-                      to="/industrial-training/dashboard"
-                      className="px-4 py-2.5 bg-green-600 text-white rounded-xl text-center"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                  )}
-                </>
-              ) : (
-                /* ⭐ default website mobile nav ⭐ */
-                <>
-                  {navItems.map((item) => (
-                    <button
-                      key={item.label}
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        scrollToSection(refMap[item.refKey]);
-                      }}
-                      className="text-left text-gray-700 font-medium py-2"
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                </>
-              )}
+              <Link
+                className="text-left text-blue-600 font-semibold py-2"
+                to="/reportet"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                ReportEt
+              </Link>
+              {navItems.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    scrollToSection(refMap[item.refKey]);
+                  }}
+                  className="text-left text-gray-700 font-medium py-2"
+                >
+                  {item.label}
+                </button>
+              ))}
             </nav>
           )}
         </motion.div>
@@ -298,7 +174,6 @@ export function Navbar({
   );
 }
 
-//PropTypes
 Navbar.propTypes = {
   scrollToSection: PropTypes.func.isRequired,
   heroRef: PropTypes.object.isRequired,
@@ -307,7 +182,6 @@ Navbar.propTypes = {
   aboutUsRef: PropTypes.object.isRequired,
   toolsRef: PropTypes.object.isRequired,
   projectsRef: PropTypes.object.isRequired,
-  // coursesRef: PropTypes.object.isRequired,
   isLoginRequired: PropTypes.bool.isRequired,
   contactRef: PropTypes.object.isRequired,
 };

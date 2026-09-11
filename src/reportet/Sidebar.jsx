@@ -1,4 +1,4 @@
-import { useState, cloneElement, useEffect } from "react";
+import { useState, cloneElement, useEffect, Suspense, lazy } from "react";
 import { sidebarTabs } from "./sidebarTabs";
 import {
   ChevronRight,
@@ -8,13 +8,25 @@ import {
   UserCircle,
 } from "lucide-react";
 import { useOrganization } from "./context/OrganizationContext";
-import VisitReport from "./admin/VisitReport";
 import { useNavigate } from "react-router-dom";
-import EmployeeDetail from "./admin/EmployeeProfile";
-import AdminProfile from "./admin/AdminProfile";
+import { logout } from "./utils/auth";
+import Spinner from "./genericComps/Spinner";
+
+const VisitReport = lazy(() => import("./admin/VisitReport"));
+const EmployeeDetail = lazy(() => import("./admin/EmployeeProfile"));
+const AdminProfile = lazy(() => import("./admin/AdminProfile"));
 
 const API_BASE_URL = import.meta.env.VITE_REPORTET_BASE_URL;
-const ASSET_BASE_URL = API_BASE_URL.replace(/\/api$/, "");
+const ASSET_BASE_URL = (API_BASE_URL || "").replace(/\/api$/, "");
+
+function TabFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+      <Spinner size={36} borderWidth={4} />
+      <p className="text-sm">Loading…</p>
+    </div>
+  );
+}
 
 // const getStoredOrganization = () => {
 //   try {
@@ -25,8 +37,7 @@ const ASSET_BASE_URL = API_BASE_URL.replace(/\/api$/, "");
 // };
 
 const Sidebar = () => {
-  const { organization, refreshOrganization, clearOrganization } =
-    useOrganization();
+  const { organization, refreshOrganization } = useOrganization();
   const [activeTabId, setActiveTabId] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -91,11 +102,8 @@ const Sidebar = () => {
     });
 
     const activeTab = allTabs.find((tab) => tab.id === activeTabId);
-    if (!activeTab) {
-      return <VisitReport />;
-    }
-
-    return activeTab.component;
+    const Comp = activeTab?.Component || VisitReport;
+    return <Comp />;
   };
 
   const brandName = organization?.brandName?.trim() || "ReportET";
@@ -273,11 +281,9 @@ const Sidebar = () => {
                 className={`flex items-center text-md font-semibold text-red-500 hover:text-red-700 transition-colors ${
                   collapsed ? "justify-center w-full" : ""
                 }`}
-                onClick={() => {
-                  localStorage.removeItem("userToken");
-                  localStorage.removeItem("organization");
-                  clearOrganization();
-                  navigate("/reportet");
+                onClick={async () => {
+                  await logout();
+                  navigate("/login", { replace: true });
                 }}
               >
                 <LogOut size={18} className="flex-shrink-0" />
@@ -292,7 +298,9 @@ const Sidebar = () => {
           className="flex-1 p-6 flex flex-col overflow-y-auto"
           style={{ height: "calc(100vh - 64px)" }}
         >
-          {renderActiveComponent()}
+          <Suspense fallback={<TabFallback />}>
+            {renderActiveComponent()}
+          </Suspense>
         </div>
       </div>
     </div>

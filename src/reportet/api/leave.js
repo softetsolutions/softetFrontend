@@ -136,7 +136,9 @@ export const getLeaveReport = async ({ signal, ...params } = {}) => {
     },
   );
   if (res.status === 401) await handleUnauthorized();
-  return await res.json();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || "Failed to fetch leave report");
+  return data;
 };
 
 export const exportLeaveReport = async (params = {}) => {

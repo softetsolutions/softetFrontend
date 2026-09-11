@@ -16,6 +16,11 @@ export const getAuthInfo = () => {
   }
 
   const decoded = jwtDecode(token);
+  if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+    localStorage.removeItem("userToken");
+    throw new Error("Authentication token expired");
+  }
+
   const userId = decoded.id;
   // Org JWT is { id, typ: "org" } — no role claim
   const typ = decoded.typ;
