@@ -8,8 +8,8 @@ export const getEmployeeList = async (payload) => {
     credentials: "include",
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error("Failed to fetch employees list");
   if (res.status === 401) await handleUnauthorized();
+  if (!res.ok) throw new Error("Failed to fetch employees list");
   return await res.json();
 };
 

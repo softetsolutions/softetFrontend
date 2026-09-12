@@ -84,6 +84,7 @@ const SaleReport = () => {
           ...(reportFilters?.employee && {
             employeeId: reportFilters?.employee,
           }),
+          isAdmin: reportFilters?.employee === "admin",
           months: reportFilters.months,
           years: reportFilters.years,
           pageNo: paginationData?.currentPage,
@@ -243,7 +244,7 @@ const SaleReport = () => {
         toast.error(res.message || "Delete failed");
       }
     } catch (e) {
-      toast.error("Delete failed");
+      toast.error("Delete failed", e);
     }
   };
   return (
@@ -286,12 +287,20 @@ const SaleReport = () => {
               }
               className="border p-2 w-full rounded min-h-10.5"
             >
-              <option value="">--Select MR--</option>
-              {employees.map((employee) => (
-                <option key={employee?.employeeId} value={employee?.employeeId}>
-                  {employee?.employeeName}
-                </option>
-              ))}
+              <option value="">--Sell Entry By--</option>
+              {[
+                <option key="admin" value="admin">
+                  Admin
+                </option>,
+                ...employees.map((employee) => (
+                  <option
+                    key={employee?.employeeId}
+                    value={employee?.employeeId}
+                  >
+                    {employee?.employeeName}
+                  </option>
+                )),
+              ]}
             </select>
           </div>
 
@@ -481,10 +490,12 @@ const SaleReport = () => {
                     {saleData.map((report) => (
                       <tr key={report._id} className="hover:bg-gray-50">
                         <td className=" border-gray-300 px-3 py-2">
-                          {report?.saleBy?.firstName +
-                            " " +
-                            report?.saleBy?.lastName +
-                            ""}
+                          {report?.saleBy?.role === "admin"
+                            ? "Admin"
+                            : report?.saleBy?.firstName +
+                              " " +
+                              report?.saleBy?.lastName +
+                              ""}
                         </td>
                         <td className=" border-gray-300 px-3 py-2">
                           {roleMaper[report?.saleBy?.role]}

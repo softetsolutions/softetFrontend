@@ -97,11 +97,6 @@ const EmployeeList = () => {
       <MrDialogBox
         open={openDialog}
         close={() => setOpenDialog(false)}
-        firstName={selectedMR?.firstName}
-        lastName={selectedMR?.lastName}
-        username={selectedMR?.userName}
-        email={selectedMR?.email ? selectedMR?.email : "Not available"}
-        password={selectedMR?.password}
         mr={selectedMR}
       />
 

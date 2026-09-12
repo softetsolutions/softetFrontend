@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { getMyOrganization } from "../api/profile";
+import { setClearOrganizationCallback } from "../utils/auth";
 
 const OrganizationContext = createContext(null);
 
@@ -31,7 +32,17 @@ export function OrganizationProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    refreshOrganization();
+    setClearOrganizationCallback(clearOrganization);
+    return () => setClearOrganizationCallback(null);
+  }, [clearOrganization]);
+
+  useEffect(() => {
+    // Only hit /logo/me when a ReportEt session token exists
+    if (localStorage.getItem("userToken")) {
+      refreshOrganization();
+    } else {
+      setLoading(false);
+    }
   }, [refreshOrganization]);
 
   return (

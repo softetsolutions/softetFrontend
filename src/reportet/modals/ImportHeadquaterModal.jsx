@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Upload, X, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { importHeadquartersFromExcel } from "../api/headQuarter";
-import * as XLSX from "xlsx";
+import { downloadExcelTemplate } from "../utils/downloadExcelTemplate";
 
 const ImportHeadquarterModal = ({ onClose, onImported }) => {
   const [file, setFile] = useState(null);
@@ -16,23 +16,27 @@ const ImportHeadquarterModal = ({ onClose, onImported }) => {
     if (selected) setFile(selected);
   };
 
-  const downloadTemplate = () => {
-    const worksheet = XLSX.utils.aoa_to_sheet([
-      [
-        "",
-        "HQ Name",
-        "Zone",
-        "Area Name",
-        "Doctor Name",
-        "Specialty",
-        "DOB",
-        "Email",
-        "Phone Number",
-      ],
-    ]);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Headquarters");
-    XLSX.writeFile(workbook, "headquarters_template.xlsx");
+  const downloadTemplate = async () => {
+    try {
+      await downloadExcelTemplate({
+        sheetName: "Headquarters",
+        fileName: "headquarters_template.xlsx",
+        headers: [
+          "",
+          "HQ Name",
+          "Zone",
+          "Area Name",
+          "Doctor Name",
+          "Specialty",
+          "DOB",
+          "Email",
+          "Phone Number",
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download template");
+    }
   };
 
   const handleImport = async () => {
