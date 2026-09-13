@@ -34,6 +34,7 @@ const HierarchyForm = lazy(() => import("./admin/HierarchyForm"));
 const HeadQuarterListing = lazy(() => import("./admin/HeadQuarterListing"));
 const AdminLeaves = lazy(() => import("./admin/AdminLeaves"));
 const LeaveSettings = lazy(() => import("./admin/LeaveSettings"));
+const LiveTracking = lazy(() => import("./admin/LiveTrackingDashboard"));
 
 export const sidebarTabs = [
   {
@@ -42,6 +43,13 @@ export const sidebarTabs = [
     icon: <LayoutDashboard size={18} />,
     Component: Dashboard,
   },
+  {
+    id: "tracking",
+    label: "Live Tracking",
+    icon: <MapPin size={18} />,
+    Component: LiveTracking,
+  },
+
   {
     id: "reports",
     label: "Reports",
