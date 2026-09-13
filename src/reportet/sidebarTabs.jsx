@@ -46,8 +46,8 @@ export const sidebarTabs = [
   {
     id: "tracking",
     label: "Live Tracking",
-    icon: <LayoutDashboard size={18} />,
-    component: <LiveTracking />,
+    icon: <MapPin size={18} />,
+    Component: LiveTracking,
   },
 
   {

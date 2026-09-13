@@ -12,13 +12,33 @@ import {
   Footprints,
   Car,
   Users,
+  Circle,
 } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
-import { getTripByDate, openLiveLocationsStream } from "../api/trackingApi";
+import {
+  getTripByDate,
+  getTripRaw,
+  openLiveLocationsStream,
+  getTrackingEmployees,
+  enableOrgLiveTracking,
+  disableOrgLiveTracking,
+} from "../api/trackingApi";
 import { getEmployeeListOptions } from "../api/employee";
-import MapboxMap from "../modals/MapboxMap";
+import TrackingMap from "../modals/TrackingMap";
 
-const todayStr = () => new Date().toISOString().slice(0, 10);
+/** Calendar day in Asia/Kolkata as YYYY-MM-DD (contract date key). */
+const todayStr = () => {
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+};
 
 const formatTimeAgo = (isoOrDate) => {
   if (!isoOrDate) return "—";
@@ -32,15 +52,15 @@ const formatTimeAgo = (isoOrDate) => {
   return `${h}h ago`;
 };
 
-const formatDistance = (meters = 0) =>
-  meters >= 1000
-    ? `${(meters / 1000).toFixed(1)} km`
-    : `${Math.round(meters)} m`;
+const formatDistance = (meters = 0) => {
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
+  return `${Math.round(meters)} m`;
+};
 
 const formatDuration = (totalSeconds = 0) => {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
-  if (h === 0) return `${m}m`;
+  if (h === 0) return `${m} m`;
   return `${h}h ${m}m`;
 };
 
@@ -52,12 +72,10 @@ const formatClock = (iso) =>
       })
     : "—";
 
-const placeLabel = (point) =>
-  point?.placeName || `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`;
-
 const employeeDisplayName = (emp) =>
   emp?.displayName ||
   [emp?.firstName, emp?.lastName].filter(Boolean).join(" ") ||
+  emp?.name ||
   "Unknown";
 
 function normalizeEmployeeOptions(data) {
@@ -78,192 +96,140 @@ function normalizeEmployeeOptions(data) {
     .filter((e) => e.id);
 }
 
-const KMH = (ms) => (ms == null ? null : ms * 3.6);
-const classify = (speedMs) => {
-  const kmh = KMH(speedMs);
-  if (kmh == null) return "unknown";
-  if (kmh < 2) return "stopped";
-  if (kmh < 7) return "walking";
-  return "driving";
-};
-const avg = (arr) =>
-  arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
-
-function buildActivityTimeline(path) {
-  if (!path?.length) return [];
-
-  const events = [
-    { type: "start", point: path[0], timestamp: path[0].timestamp },
-  ];
-
-  let segStart = 0;
-  let currentType = classify(path[0].speed);
-
-  const flushSegment = (endIdxInclusive) => {
-    const seg = path.slice(segStart, endIdxInclusive + 1);
-    if (!seg.length) return;
-    const durationSec =
-      (new Date(seg[seg.length - 1].timestamp) - new Date(seg[0].timestamp)) /
-      1000;
-    const speeds = seg.map((p) => p.speed).filter((s) => s != null);
-
-    if (currentType === "stopped" && durationSec >= 60) {
-      events.push({
-        type: "stop",
-        startTime: seg[0].timestamp,
-        durationSec,
-        point: seg[0],
-      });
-    } else if (currentType === "walking" && durationSec >= 30) {
-      events.push({
-        type: "walking",
-        startTime: seg[0].timestamp,
-        durationSec,
-        avgSpeedMs: avg(speeds),
-        point: seg[0],
-      });
-    } else if (currentType === "driving" && durationSec >= 30) {
-      events.push({
-        type: "driving",
-        startTime: seg[0].timestamp,
-        durationSec,
-        avgSpeedMs: avg(speeds),
-        point: seg[0],
-      });
-    }
-  };
-
-  for (let i = 1; i < path.length; i++) {
-    const type = classify(path[i].speed);
-    if (type !== currentType) {
-      flushSegment(i - 1);
-      segStart = i;
-      currentType = type;
-    }
-  }
-  flushSegment(path.length - 1);
-
-  events.push({
-    type: "completed",
-    point: path[path.length - 1],
-    timestamp: path[path.length - 1].timestamp,
-  });
-
-  return events;
-}
-
-function buildTripMarkers(path, timeline, isLive) {
-  if (!path?.length) return [];
-
-  const markers = [];
-  const stopPoints = new Set(
-    timeline.filter((e) => e.type === "stop").map((e) => e.point.timestamp),
-  );
-
-  path.forEach((p, i) => {
-    const isFirst = i === 0;
-    const isLast = i === path.length - 1;
-    const isStop = stopPoints.has(p.timestamp);
-
-    if (isFirst) {
-      markers.push({
-        lat: p.lat,
-        lng: p.lng,
+/** Build map markers only from contract `markers` (+ optional live tip). */
+function markersFromTrip(tripMarkers, path, isLive) {
+  const out = [];
+  if (!tripMarkers) {
+    if (path?.length) {
+      const first = path[0];
+      const last = path[path.length - 1];
+      out.push({
+        lat: first.lat,
+        lng: first.lng,
         color: "green",
         label: "Start",
         type: "major",
       });
-    } else if (isLast) {
-      markers.push({
-        lat: p.lat,
-        lng: p.lng,
+      out.push({
+        lat: last.lat,
+        lng: last.lng,
         color: isLive ? "blue" : "darkred",
         label: isLive ? "Live" : "End",
         type: "major",
         pulse: isLive,
       });
-    } else if (isStop) {
-      markers.push({
-        lat: p.lat,
-        lng: p.lng,
-        color: "orange",
-        label: "Stop",
-        type: "major",
-      });
-    } else {
-      markers.push({
-        lat: p.lat,
-        lng: p.lng,
-        color: "blue",
-        label: `${formatClock(p.timestamp)}${
-          p.speed != null ? ` · ${Math.round(p.speed * 3.6)} km/h` : ""
-        }`,
-        type: "ping",
-      });
     }
+    return out;
+  }
+
+  if (tripMarkers.start) {
+    out.push({
+      lat: tripMarkers.start.lat,
+      lng: tripMarkers.start.lng,
+      color: "green",
+      label: tripMarkers.start.placeName
+        ? `Start · ${tripMarkers.start.placeName}`
+        : "Start",
+      type: "major",
+    });
+  }
+
+  (tripMarkers.stops || []).forEach((s) => {
+    out.push({
+      lat: s.lat,
+      lng: s.lng,
+      color: "orange",
+      label: s.placeName
+        ? `Stop · ${s.placeName}`
+        : `Stop${s.durationSeconds ? ` · ${formatDuration(s.durationSeconds)}` : ""}`,
+      type: "major",
+    });
   });
 
-  return markers;
+  if (isLive && path?.length) {
+    const last = path[path.length - 1];
+    out.push({
+      lat: last.lat,
+      lng: last.lng,
+      color: "blue",
+      label: "Live",
+      type: "major",
+      pulse: true,
+    });
+  } else if (tripMarkers.end) {
+    out.push({
+      lat: tripMarkers.end.lat,
+      lng: tripMarkers.end.lng,
+      color: "darkred",
+      label: tripMarkers.end.placeName
+        ? `End · ${tripMarkers.end.placeName}`
+        : "End",
+      type: "major",
+    });
+  }
+
+  return out;
 }
 
-const TIMELINE_ICON = {
-  start: { Icon: Radio, ring: "text-green-600 border-green-500", solid: false },
-  stop: { Icon: MapPin, ring: "text-red-600 border-red-500", solid: true },
+const ACTIVITY_ICON = {
+  still: { Icon: MapPin, ring: "text-red-600 border-red-500", solid: true },
+  walking: {
+    Icon: Footprints,
+    ring: "text-gray-600 border-gray-400",
+    solid: false,
+  },
   driving: {
     Icon: Car,
     ring: "text-gray-400 border-gray-300",
     solid: false,
     dotOnly: true,
   },
-  walking: {
-    Icon: Footprints,
-    ring: "text-gray-600 border-gray-400",
+  unknown: {
+    Icon: Circle,
+    ring: "text-gray-400 border-gray-300",
     solid: false,
   },
-  completed: { Icon: Flag, ring: "text-gray-900 border-gray-900", solid: true },
 };
 
-function TimelineRow({ event }) {
-  const cfg = TIMELINE_ICON[event.type];
-  const { Icon } = cfg;
+const TYPE_ICON = {
+  started: {
+    Icon: Radio,
+    ring: "text-green-600 border-green-500",
+    solid: false,
+  },
+  completed: {
+    Icon: Flag,
+    ring: "text-gray-900 border-gray-900",
+    solid: true,
+  },
+};
 
-  let title, meta, rightLabel, rightValue, badgeLabel;
-  switch (event.type) {
-    case "start":
-      title = "Trip Started";
-      meta = placeLabel(event.point);
-      rightLabel = "Accuracy";
-      rightValue = "GPS";
-      break;
-    case "stop":
-      title = `Stop (Still) for ${Math.round(event.durationSec / 60)} min${
-        Math.round(event.durationSec / 60) === 1 ? "" : "s"
-      }`;
-      meta = placeLabel(event.point);
-      badgeLabel = "STILL";
-      rightLabel = "Speed";
-      rightValue = "0 km/h";
-      break;
-    case "driving":
-      title = "Continued Journey";
-      badgeLabel = "DRIVING";
-      rightLabel = "Avg Speed";
-      rightValue = `${Math.round(KMH(event.avgSpeedMs))} km/h`;
-      break;
-    case "walking":
-      title = `Walking for ${Math.round(event.durationSec / 60)} min${
-        Math.round(event.durationSec / 60) === 1 ? "" : "s"
-      }`;
-      badgeLabel = "WALKING";
-      rightLabel = "Speed";
-      rightValue = `${Math.round(KMH(event.avgSpeedMs))} km/h`;
-      break;
-    case "completed":
-      title = "Trip Completed";
-      meta = placeLabel(event.point);
-      break;
-    default:
-      title = event.type;
+function timelineIconConfig(item) {
+  if (item.type === "started" || item.type === "completed") {
+    return TYPE_ICON[item.type];
+  }
+  return ACTIVITY_ICON[item.activity] || ACTIVITY_ICON.unknown;
+}
+
+function TimelineRow({ item }) {
+  const cfg = timelineIconConfig(item);
+  const { Icon } = cfg;
+  const badgeLabel =
+    item.type === "segment" && item.activity
+      ? String(item.activity).toUpperCase()
+      : null;
+
+  let rightLabel = null;
+  let rightValue = null;
+  if (item.meta?.precisionLabel) {
+    rightLabel = "Accuracy";
+    rightValue = item.meta.precisionLabel;
+  } else if (item.meta?.accuracyMeters != null) {
+    rightLabel = "Accuracy";
+    rightValue = `±${item.meta.accuracyMeters}m`;
+  } else if (item.meta?.avgSpeedKmh != null) {
+    rightLabel = "Avg Speed";
+    rightValue = `${Math.round(item.meta.avgSpeedKmh)} km/h`;
   }
 
   return (
@@ -284,10 +250,10 @@ function TimelineRow({ event }) {
       <div className="flex-1 flex items-start justify-between gap-3">
         <div>
           <div className="text-xs text-gray-400 font-medium">
-            {formatClock(event.startTime || event.timestamp)}
+            {formatClock(item.startTime)}
           </div>
           <div className="text-sm font-semibold text-gray-900 mt-0.5">
-            {title}
+            {item.title || item.type}
           </div>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             {badgeLabel && (
@@ -295,7 +261,9 @@ function TimelineRow({ event }) {
                 {badgeLabel}
               </span>
             )}
-            {meta && <span className="text-xs text-gray-500">{meta}</span>}
+            {item.placeName && (
+              <span className="text-xs text-gray-500">{item.placeName}</span>
+            )}
           </div>
         </div>
         {rightLabel && (
@@ -316,28 +284,64 @@ function TimelineRow({ event }) {
 function TripAnalysisPanel({
   tripData,
   selectedEmployee,
-  timeline,
+  tripDate,
   markers,
   isLive,
 }) {
   const [showRawGps, setShowRawGps] = useState(false);
+  const [rawPoints, setRawPoints] = useState(null);
+  const [rawLoading, setRawLoading] = useState(false);
+  const [rawError, setRawError] = useState(null);
 
   const tripCode =
-    tripData.trip.tripId ||
-    (tripData.trip._id ? `T-${tripData.trip._id.toString().slice(-4)}` : "—");
+    tripData.trip?.id ||
+    tripData.trip?.tripId ||
+    (tripData.trip?._id
+      ? `T-${String(tripData.trip._id).slice(-4)}`
+      : "—");
+
+  const timeline = Array.isArray(tripData.timeline) ? tripData.timeline : [];
+
+  useEffect(() => {
+    setShowRawGps(false);
+    setRawPoints(null);
+    setRawError(null);
+  }, [tripData]);
+
+  const loadRaw = async () => {
+    if (showRawGps) {
+      setShowRawGps(false);
+      return;
+    }
+    setShowRawGps(true);
+    if (rawPoints) return;
+    setRawLoading(true);
+    setRawError(null);
+    try {
+      const data = await getTripRaw({
+        employeeId: selectedEmployee.id,
+        date: tripDate,
+      });
+      setRawPoints(data.points || []);
+    } catch (err) {
+      setRawError(err.message || "Failed to load raw GPS");
+      setRawPoints([]);
+    } finally {
+      setRawLoading(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-5 flex-1 min-h-0">
-      {/* Map + overlay card */}
       <div className="xl:col-span-3 relative min-h-[420px]">
-        <MapboxMap
+        <TrackingMap
           markers={markers}
           route={tripData.path}
           height="100%"
           className="h-full"
           emptyLabel="No location pings recorded for this trip"
         />
-        <div className="absolute top-4 left-4 bg-white rounded-lg shadow-md px-4 py-2.5 flex items-center gap-6">
+        <div className="absolute top-4 left-4 z-[500] bg-white rounded-lg shadow-md px-4 py-2.5 flex items-center gap-6">
           <div>
             <div className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">
               Employee
@@ -350,9 +354,7 @@ function TripAnalysisPanel({
             <div className="text-[10px] uppercase tracking-wide text-gray-400 font-medium">
               Trip ID
             </div>
-            <div className="text-sm font-semibold text-gray-900">
-              {tripCode}
-            </div>
+            <div className="text-sm font-semibold text-gray-900">{tripCode}</div>
           </div>
           {isLive && (
             <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
@@ -362,7 +364,6 @@ function TripAnalysisPanel({
         </div>
       </div>
 
-      {/* Analysis panel */}
       <div className="xl:col-span-2 bg-white p-6 flex flex-col min-h-0 border-l border-gray-100">
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-xl font-semibold text-gray-900">Trip Analysis</h3>
@@ -376,7 +377,7 @@ function TripAnalysisPanel({
             >
               {isLive
                 ? "LIVE"
-                : tripData.trip.status === "active"
+                : tripData.trip?.status === "active"
                   ? "IN PROGRESS"
                   : "COMPLETED"}
             </span>
@@ -390,7 +391,7 @@ function TripAnalysisPanel({
               Total Distance
             </div>
             <div className="text-lg font-semibold text-gray-900">
-              {formatDistance(tripData.trip.totalDistanceMeters)}
+              {formatDistance(tripData.trip?.totalDistanceMeters)}
             </div>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
@@ -398,7 +399,7 @@ function TripAnalysisPanel({
               Duration
             </div>
             <div className="text-lg font-semibold text-gray-900">
-              {formatDuration(tripData.trip.durationSeconds)}
+              {formatDuration(tripData.trip?.durationSeconds)}
             </div>
           </div>
         </div>
@@ -408,7 +409,8 @@ function TripAnalysisPanel({
             Activity Timeline
           </div>
           <button
-            onClick={() => setShowRawGps((v) => !v)}
+            type="button"
+            onClick={loadRaw}
             className="text-xs font-medium text-blue-600 hover:text-blue-700"
           >
             {showRawGps ? "Hide Raw GPS" : "View Raw GPS"}
@@ -418,47 +420,75 @@ function TripAnalysisPanel({
         <div className="flex-1 overflow-y-auto pr-1">
           {timeline.length === 0 ? (
             <div className="text-sm text-gray-500 py-6 text-center">
-              No location pings recorded for this trip.
+              No activity timeline for this trip.
             </div>
           ) : (
-            timeline.map((event, i) => <TimelineRow key={i} event={event} />)
+            timeline.map((item, i) => <TimelineRow key={i} item={item} />)
           )}
         </div>
 
         {showRawGps && (
           <div className="overflow-x-auto border border-gray-100 rounded-lg mt-4 max-h-64 overflow-y-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Time
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Place
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Speed
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {tripData.path.map((p, i) => (
-                  <tr key={i} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(p.timestamp).toLocaleTimeString()}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500 max-w-[220px] truncate">
-                      {placeLabel(p)}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                      {p.speed != null
-                        ? `${Math.round(p.speed * 3.6)} km/h`
-                        : "—"}
-                    </td>
+            {rawLoading ? (
+              <div className="flex items-center justify-center gap-2 py-8 text-sm text-gray-500">
+                <Spinner size={20} borderWidth={3} /> Loading raw GPS…
+              </div>
+            ) : rawError ? (
+              <div className="py-6 text-center text-sm text-red-600">
+                {rawError}
+              </div>
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Time
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Activity
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Speed
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Acc.
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {(rawPoints || []).map((p, i) => (
+                    <tr key={i} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {p.timestamp
+                          ? new Date(p.timestamp).toLocaleTimeString()
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {p.activity || "—"}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {p.speed != null
+                          ? `${Math.round(p.speed * 3.6)} km/h`
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                        {p.accuracy != null ? `±${Math.round(p.accuracy)}m` : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                  {rawPoints?.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-4 py-6 text-center text-sm text-gray-500"
+                      >
+                        No raw points returned.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>
@@ -477,12 +507,53 @@ const LiveTrackingDashboard = () => {
   const [tripDate, setTripDate] = useState(todayStr());
   const [tripLoading, setTripLoading] = useState(false);
   const [tripData, setTripData] = useState(null);
+  const [orgLiveTrackingEnabled, setOrgLiveTrackingEnabled] = useState(false);
+  const [orgToggleLoading, setOrgToggleLoading] = useState(false);
+  const [orgStatusLoading, setOrgStatusLoading] = useState(true);
 
   const eventSourceRef = useRef(null);
 
   const showToast = (message, type = "error") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 4000);
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getTrackingEmployees(controller.signal)
+      .then((data) => {
+        setOrgLiveTrackingEnabled(!!data.orgLiveTrackingEnabled);
+      })
+      .catch((err) => {
+        if (err?.name !== "AbortError") {
+          showToast(err.message || "Could not load org tracking status");
+        }
+      })
+      .finally(() => setOrgStatusLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  const handleToggleOrgTracking = async () => {
+    const turnOn = !orgLiveTrackingEnabled;
+    setOrgToggleLoading(true);
+    try {
+      const data = turnOn
+        ? await enableOrgLiveTracking()
+        : await disableOrgLiveTracking();
+      setOrgLiveTrackingEnabled(
+        data.liveTrackingEnabled != null
+          ? !!data.liveTrackingEnabled
+          : turnOn,
+      );
+      showToast(
+        turnOn ? "Org live tracking enabled" : "Org live tracking disabled",
+        "success",
+      );
+    } catch (error) {
+      showToast(error.message || "Failed to update org tracking");
+    } finally {
+      setOrgToggleLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -502,27 +573,41 @@ const LiveTrackingDashboard = () => {
     eventSourceRef.current = es;
     setConnectionStatus("connecting");
 
+    const upsertFromLiveRow = (row) => {
+      const emp = row.employeeId;
+      const id = typeof emp === "object" ? emp?._id || emp?.id : emp;
+      if (!id) return null;
+      return {
+        id,
+        name: employeeDisplayName(typeof emp === "object" ? emp : null),
+        employeeCode:
+          typeof emp === "object" ? emp?.employeeId : undefined,
+        role: typeof emp === "object" ? emp?.role : undefined,
+        coordinates: row.location?.coordinates || row.coordinates,
+        speed: row.speed,
+        heading: row.heading,
+        isOnline: row.isOnline !== false,
+        lastPingAt: row.lastPingAt || row.timestamp,
+        sessionId: row.sessionId,
+      };
+    };
+
     es.addEventListener("snapshot", (evt) => {
       setConnectionStatus("open");
-      const rows = JSON.parse(evt.data);
+      let payload;
+      try {
+        payload = JSON.parse(evt.data);
+      } catch {
+        return;
+      }
+      const rows = Array.isArray(payload)
+        ? payload
+        : payload?.locations || payload?.employees || [payload];
       setLiveByEmployee((prev) => {
         const next = { ...prev };
         for (const row of rows) {
-          const emp = row.employeeId;
-          const id = emp?._id || emp;
-          if (!id) continue;
-          next[id] = {
-            id,
-            name: employeeDisplayName(emp),
-            employeeCode: emp?.employeeId,
-            role: emp?.role,
-            coordinates: row.location?.coordinates,
-            speed: row.speed,
-            heading: row.heading,
-            isOnline: row.isOnline,
-            lastPingAt: row.lastPingAt,
-            sessionId: row.sessionId,
-          };
+          const mapped = upsertFromLiveRow(row);
+          if (mapped) next[mapped.id] = { ...next[mapped.id], ...mapped };
         }
         return next;
       });
@@ -535,7 +620,7 @@ const LiveTrackingDashboard = () => {
         [data.employeeId]: {
           ...(prev[data.employeeId] || {
             id: data.employeeId,
-            name: `Employee ${data.employeeId.slice(-4)}`,
+            name: `Employee ${String(data.employeeId).slice(-4)}`,
           }),
           coordinates: data.coordinates,
           isOnline: true,
@@ -552,7 +637,7 @@ const LiveTrackingDashboard = () => {
         [data.employeeId]: {
           ...(prev[data.employeeId] || {
             id: data.employeeId,
-            name: `Employee ${data.employeeId.slice(-4)}`,
+            name: `Employee ${String(data.employeeId).slice(-4)}`,
           }),
           coordinates: data.coordinates,
           speed: data.speed,
@@ -602,7 +687,7 @@ const LiveTrackingDashboard = () => {
   const liveMapMarkers = useMemo(
     () =>
       liveList
-        .filter((e) => Array.isArray(e.coordinates))
+        .filter((e) => Array.isArray(e.coordinates) && e.coordinates.length >= 2)
         .map((e) => ({
           id: e.id,
           lat: e.coordinates[1],
@@ -661,7 +746,7 @@ const LiveTrackingDashboard = () => {
     if (!live?.coordinates || !live?.lastPingAt) return;
 
     setTripData((prev) => {
-      if (!prev) return prev;
+      if (!prev?.path) return prev;
       const last = prev.path[prev.path.length - 1];
       if (
         last &&
@@ -676,10 +761,7 @@ const LiveTrackingDashboard = () => {
         speed: live.speed,
         heading: live.heading,
         timestamp: live.lastPingAt,
-        // placeName omitted here — this point was appended live from the
-        // SSE stream, not from the backend trip fetch, so it hasn't been
-        // reverse-geocoded yet. placeLabel() falls back to coordinates
-        // until the next full trip reload resolves it.
+        activity: null,
         placeName: null,
       };
       return {
@@ -687,22 +769,20 @@ const LiveTrackingDashboard = () => {
         path: [...prev.path, newPoint],
         trip: {
           ...prev.trip,
-          status: live.isOnline ? "active" : prev.trip.status,
+          status: live.isOnline ? "active" : prev.trip?.status,
         },
       };
     });
   }, [selectedEmployee, isToday, liveByEmployee]);
 
-  const timeline = useMemo(
-    () => (tripData ? buildActivityTimeline(tripData.path || []) : []),
-    [tripData],
-  );
-
-  const isLive = isToday && tripData?.trip.status === "active";
+  const isLive = isToday && tripData?.trip?.status === "active";
 
   const tripMapMarkers = useMemo(
-    () => (tripData ? buildTripMarkers(tripData.path, timeline, isLive) : []),
-    [tripData, timeline, isLive],
+    () =>
+      tripData
+        ? markersFromTrip(tripData.markers, tripData.path, isLive)
+        : [],
+    [tripData, isLive],
   );
 
   return (
@@ -732,6 +812,28 @@ const LiveTrackingDashboard = () => {
             Watch field reps in real time and pull up any saved trip.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleToggleOrgTracking}
+          disabled={orgToggleLoading || orgStatusLoading}
+          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-60 ${
+            orgLiveTrackingEnabled
+              ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
+          }`}
+          title={
+            orgLiveTrackingEnabled
+              ? "Disable live tracking for the organization"
+              : "Enable live tracking for the organization"
+          }
+        >
+          {orgToggleLoading || orgStatusLoading ? (
+            <Spinner size={14} borderWidth={2} />
+          ) : (
+            <Radio size={14} />
+          )}
+          Org tracking: {orgLiveTrackingEnabled ? "On" : "Off"}
+        </button>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-1 min-h-0 overflow-y-auto pb-6">
@@ -812,6 +914,7 @@ const LiveTrackingDashboard = () => {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleSelectFromLive(emp)}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg transition shrink-0 ${
                         selectedEmployee?.id === emp.id
@@ -831,19 +934,19 @@ const LiveTrackingDashboard = () => {
         <div className="bg-white rounded-lg shadow-md lg:col-span-3 flex flex-col min-h-0 overflow-hidden">
           {!selectedEmployee ? (
             <div className="relative flex-1 min-h-[420px]">
-              <MapboxMap
+              <TrackingMap
                 markers={liveMapMarkers}
                 height="100%"
                 className="h-full"
                 emptyLabel="No live locations yet"
               />
-              <div className="absolute top-4 left-4 bg-white rounded-lg shadow-md px-4 py-2.5 flex items-center gap-2">
+              <div className="absolute top-4 left-4 z-[500] bg-white rounded-lg shadow-md px-4 py-2.5 flex items-center gap-2">
                 <Users size={14} className="text-gray-400" />
                 <span className="text-sm font-semibold text-gray-900">
                   {onlineCount} online
                 </span>
               </div>
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 rounded-lg shadow-md px-4 py-2 text-xs text-gray-500 text-center">
+              <div className="absolute bottom-4 left-4 right-4 z-[500] bg-white/95 rounded-lg shadow-md px-4 py-2 text-xs text-gray-500 text-center">
                 Select a rep to see their live location or a past trip.
               </div>
             </div>
@@ -854,13 +957,13 @@ const LiveTrackingDashboard = () => {
             </div>
           ) : !tripData ? (
             <div className="relative flex-1 min-h-[420px]">
-              <MapboxMap
+              <TrackingMap
                 markers={[]}
                 height="100%"
                 className="h-full"
                 emptyLabel="No location data"
               />
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 rounded-lg shadow-md px-4 py-2 text-xs text-gray-500 text-center">
+              <div className="absolute bottom-4 left-4 right-4 z-[500] bg-white/95 rounded-lg shadow-md px-4 py-2 text-xs text-gray-500 text-center">
                 No trip recorded for{" "}
                 {selectedEmployee.name || selectedEmployee.id} on {tripDate}.
               </div>
@@ -869,7 +972,7 @@ const LiveTrackingDashboard = () => {
             <TripAnalysisPanel
               tripData={tripData}
               selectedEmployee={selectedEmployee}
-              timeline={timeline}
+              tripDate={tripDate}
               markers={tripMapMarkers}
               isLive={isLive}
             />
@@ -889,6 +992,7 @@ const LiveTrackingDashboard = () => {
           )}
           {toast.message}
           <button
+            type="button"
             onClick={() => setToast(null)}
             className="ml-2 opacity-50 hover:opacity-100"
           >

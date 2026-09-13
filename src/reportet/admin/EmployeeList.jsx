@@ -7,9 +7,15 @@ import TableList from "../genericComps/tableList/TableList";
 import { getEmployeeList } from "../api/employee";
 import PaginationComp from "../genericComps/paginationComp/PaginationComp";
 import { formatDate } from "../utils/helperFunctions";
-import { PhoneCall, Pencil, Radio, RadioOff } from "lucide-react";
+import { PhoneCall, Pencil, Radio } from "lucide-react";
 import Spinner from "../genericComps/Spinner";
-import { enableLiveTracking, disableLiveTracking } from "../api/trackingApi";
+import {
+  enableLiveTracking,
+  disableLiveTracking,
+  enableOrgLiveTracking,
+  disableOrgLiveTracking,
+  getTrackingEmployees,
+} from "../api/trackingApi";
 
 const EmployeeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,6 +37,63 @@ const EmployeeList = () => {
     perPageDocument: 5,
   });
   const [trackingLoadingId, setTrackingLoadingId] = useState(null);
+  const [orgLiveTrackingEnabled, setOrgLiveTrackingEnabled] = useState(false);
+  const [orgToggleLoading, setOrgToggleLoading] = useState(false);
+  const [orgStatusLoading, setOrgStatusLoading] = useState(true);
+  const [trackingFlagsById, setTrackingFlagsById] = useState({});
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getTrackingEmployees(controller.signal)
+      .then((data) => {
+        setOrgLiveTrackingEnabled(!!data.orgLiveTrackingEnabled);
+        const flags = {};
+        for (const e of data.employees || []) {
+          if (e.id) flags[e.id] = !!e.liveTrackingEnabled;
+        }
+        setTrackingFlagsById(flags);
+      })
+      .catch((err) => {
+        if (err?.name !== "AbortError") {
+          toast.error(err.message || "Could not load org tracking status");
+        }
+      })
+      .finally(() => setOrgStatusLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (!Object.keys(trackingFlagsById).length) return;
+    setEmployees((prev) =>
+      prev.map((e) =>
+        Object.prototype.hasOwnProperty.call(trackingFlagsById, e._id)
+          ? { ...e, liveTrackingEnabled: trackingFlagsById[e._id] }
+          : e,
+      ),
+    );
+  }, [trackingFlagsById, employees.length]);
+
+  const handleToggleOrgTracking = async () => {
+    const turnOn = !orgLiveTrackingEnabled;
+    setOrgToggleLoading(true);
+    try {
+      const data = turnOn
+        ? await enableOrgLiveTracking()
+        : await disableOrgLiveTracking();
+      setOrgLiveTrackingEnabled(
+        data.liveTrackingEnabled != null
+          ? !!data.liveTrackingEnabled
+          : turnOn,
+      );
+      toast.success(
+        turnOn ? "Org live tracking enabled" : "Org live tracking disabled",
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to update org tracking");
+    } finally {
+      setOrgToggleLoading(false);
+    }
+  };
 
   const handleToggleEmployeeTracking = async (employee) => {
     const turnOn = !employee.liveTrackingEnabled;
@@ -46,6 +109,10 @@ const EmployeeList = () => {
           e._id === employee._id ? { ...e, liveTrackingEnabled: turnOn } : e,
         ),
       );
+      setTrackingFlagsById((prev) => ({
+        ...prev,
+        [employee._id]: turnOn,
+      }));
       toast.success(turnOn ? "Tracking enabled" : "Tracking disabled");
     } catch (error) {
       toast.error(error.message || "Failed to update tracking");
@@ -101,7 +168,7 @@ const EmployeeList = () => {
       />
 
       {/* Header */}
-      <header className="mb-8 flex justify-between items-center">
+      <header className="mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">
             Employee List
@@ -110,6 +177,28 @@ const EmployeeList = () => {
             Manage your Medical Representatives.
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleToggleOrgTracking}
+          disabled={orgToggleLoading || orgStatusLoading}
+          className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition disabled:opacity-60 ${
+            orgLiveTrackingEnabled
+              ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
+          }`}
+          title={
+            orgLiveTrackingEnabled
+              ? "Disable live tracking for the organization"
+              : "Enable live tracking for the organization"
+          }
+        >
+          {orgToggleLoading || orgStatusLoading ? (
+            <Spinner size={14} borderWidth={2} />
+          ) : (
+            <Radio size={14} />
+          )}
+          Org tracking: {orgLiveTrackingEnabled ? "On" : "Off"}
+        </button>
       </header>
 
       <div className="bg-white p-6 rounded-lg shadow-md flex-1 flex flex-col">
