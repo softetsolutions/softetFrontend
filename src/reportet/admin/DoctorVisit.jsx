@@ -116,7 +116,6 @@ const DoctorVisitReport = () => {
     const fetchHeadQuarters = async () => {
       try {
         const data = await getAllHeadQuartersNames();
-        console.log(data);
         if (data.status) setHeadQuarters(data.headQuarterNames);
       } catch (error) {
         console.error("Failed to fetch headquarters", error);

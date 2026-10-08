@@ -10,25 +10,6 @@ export const createArea = async (data) => {
   return res.json();
 };
 
-export const assignAreaToMR = async (mrId, areaId) => {
-  try {
-    const res = await fetch(`${API_BASE_URL}/area/assign`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ mrId, areaId }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to assign area to MR");
-
-    return data;
-  } catch (err) {
-    console.error("Assign Area Error:", err);
-    throw err;
-  }
-};
-
 export const getAreas = async (paginationData) => {
   const res = await fetch(`${API_BASE_URL}/area`, {
     method: "POST",
@@ -95,25 +76,6 @@ export const importAreasFromExcel = async (file) => {
   }
 };
 
-export const getAreaByMrId = async (mrId) => {
-  try {
-    if (!mrId) throw new Error("MR ID is required");
-
-    const res = await fetch(`${API_BASE_URL}/area/mr/${mrId}`, {
-      method: "GET",
-      credentials: "include",
-    });
-
-    const data = await res.json();
-    if (!res.ok)
-      throw new Error(data.message || "Failed to fetch assigned areas");
-
-    return data; // Array of assigned areas
-  } catch (err) {
-    console.error("Get Areas by MR ID Error:", err);
-    throw err;
-  }
-};
 export const editArea = async (areaId, data) => {
   const res = await fetch(`${API_BASE_URL}/area/${areaId}`, {
     method: "PUT",
@@ -126,7 +88,6 @@ export const editArea = async (areaId, data) => {
   return result;
 };
 export const deleteArea = async (areaId, force = false) => {
-  console.log("deleteArea called", areaId, force);
   const res = await fetch(`${API_BASE_URL}/area/${areaId}?force=${force}`, {
     method: "DELETE",
     credentials: "include",

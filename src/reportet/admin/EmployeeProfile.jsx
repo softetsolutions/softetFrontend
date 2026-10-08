@@ -16,13 +16,63 @@ import {
   Check,
   UserX,
   UserCheck,
+  TrendingUp,
 } from "lucide-react";
 import {
   getEmployeeById,
   updateEmployee,
   getAllEmployeeNames,
+  getEmployeePromotions,
 } from "../api/employee";
 import { formatDate } from "../utils/helperFunctions";
+import { roleMaper } from "../utils/mappers";
+import PromoteEmployeeModal from "../modals/PromoteEmployeeModal";
+import EmployeeBankDetails from "./EmployeeBankDetails";
+import EmployeeSalaryStructure from "./EmployeeSalaryStructure";
+
+const NEXT_ROLE = {
+  mr: "areaManager",
+  areaManager: "zonalManager",
+};
+
+const formatDateTime = (date) => {
+  if (!date) return "—";
+  return new Date(date).toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const territoryLabels = (items, nameKeys) => {
+  if (!items?.length) return [];
+  return items
+    .map((item) => {
+      if (typeof item === "string") return item;
+      for (const key of nameKeys) {
+        if (item?.[key]) return item[key];
+      }
+      return null;
+    })
+    .filter(Boolean);
+};
+
+const promotedByLabel = (promotedBy) => {
+  if (!promotedBy) return "—";
+  if (typeof promotedBy === "string") return promotedBy;
+  if (promotedBy.displayName) return promotedBy.displayName;
+  const name = `${promotedBy.firstName || ""} ${promotedBy.lastName || ""}`.trim();
+  if (name) {
+    return promotedBy.employeeId
+      ? `${name} (${promotedBy.employeeId})`
+      : name;
+  }
+  if (promotedBy.email) return promotedBy.email;
+  if (promotedBy.orgName) return promotedBy.orgName;
+  return "Org Admin";
+};
 
 const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const [employeeId, setEmployeeId] = useState("");
@@ -53,6 +103,9 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const [hqInput, setHqInput] = useState("");
   const [allEmployees, setAllEmployees] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showPromoteModal, setShowPromoteModal] = useState(false);
+  const [promotions, setPromotions] = useState([]);
+  const [promotionsLoading, setPromotionsLoading] = useState(false);
 
   const fetchAllEmployees = async () => {
     try {
@@ -181,6 +234,45 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
     if (employeeId) fetchEmployee();
   }, [employeeId]);
 
+  const fetchPromotions = async (mongoId) => {
+    if (!mongoId) return;
+    try {
+      setPromotionsLoading(true);
+      const data = await getEmployeePromotions(mongoId);
+      const list = data.promotions || data.data || data.history || [];
+      setPromotions(Array.isArray(list) ? list : []);
+    } catch (error) {
+      console.error("Error fetching promotions:", error);
+      setPromotions([]);
+      toast.error(error.message || "Failed to load promotion history");
+    } finally {
+      setPromotionsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (employee?._id) fetchPromotions(employee._id);
+    else setPromotions([]);
+  }, [employee?._id]);
+
+  const handlePromoted = (data) => {
+    if (data?.employee) {
+      setEmployee(data.employee);
+      setForm((prev) => ({
+        ...prev,
+        role: data.employee.role || prev.role,
+      }));
+    } else {
+      fetchEmployee();
+    }
+    if (data?.employee?._id || employee?._id) {
+      fetchPromotions(data?.employee?._id || employee._id);
+    }
+  };
+
+  const canPromote =
+    employee?.isActive && Boolean(NEXT_ROLE[employee?.role]);
+
   const handleToggleStatus = async () => {
     try {
       const newStatus = !employee.isActive;
@@ -203,7 +295,8 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const data = await updateEmployee(employeeId, form);
+      const { role: _role, ...payload } = form;
+      const data = await updateEmployee(employeeId, payload);
       setEmployee(data.employee);
       toast.success("Employee updated successfully");
       setEditMode(false);
@@ -446,6 +539,14 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
                   </>
                 )}
               </button>
+              {canPromote && (
+                <button
+                  onClick={() => setShowPromoteModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 transition-colors"
+                >
+                  <TrendingUp size={16} /> Promote
+                </button>
+              )}
               <button
                 onClick={() => setEditMode(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
@@ -468,8 +569,8 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
               <h2 className="text-xl font-semibold text-gray-800">
                 {employee.displayName}
               </h2>
-              <span className="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 capitalize">
-                {employee.role}
+              <span className="inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                {roleMaper[employee.role] || employee.role}
               </span>
               <span
                 className={`px-3 py-0.5 rounded-full text-xs font-medium ${
@@ -568,24 +669,16 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Role
               </label>
-              {editMode ? (
-                <select
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                  <option value="mr">MR</option>
-                  <option value="areaManager">Area Manager</option>
-                  <option value="zonalManager">Zonal Manager</option>
-                </select>
-              ) : (
-                <div className="flex items-center gap-2 mt-1">
-                  <BadgeCheck size={14} className="text-gray-400" />
-                  <p className="text-sm text-gray-800 capitalize">
-                    {employee.role}
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 mt-1">
+                <BadgeCheck size={14} className="text-gray-400" />
+                <p className="text-sm text-gray-800">
+                  {roleMaper[employee.role] || employee.role}
+                </p>
+              </div>
+              {editMode && canPromote && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Use Promote to change role and territories.
+                </p>
               )}
             </div>
 
@@ -804,7 +897,100 @@ const EmployeeDetail = ({ preloadedEmployeeId }) => {
             </div>
           </div>
         )}
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+              Promotion History
+            </h3>
+          </div>
+
+          {promotionsLoading ? (
+            <div className="flex items-center gap-2 text-sm text-gray-500 py-4">
+              <Spinner size={16} borderWidth={2} /> Loading history…
+            </div>
+          ) : promotions.length === 0 ? (
+            <p className="text-sm text-gray-500">No promotions recorded yet.</p>
+          ) : (
+            <ol className="relative border-l border-gray-200 ml-3 space-y-6">
+              {promotions.map((promo, index) => {
+                const fromRole =
+                  roleMaper[promo.fromRole] || promo.fromRole || "—";
+                const toRole = roleMaper[promo.toRole] || promo.toRole || "—";
+                const fromHqs = territoryLabels(
+                  promo.fromHeadQuarters || promo.fromHQs,
+                  ["headQuarterName", "name"],
+                );
+                const toHqs = territoryLabels(
+                  promo.toHeadQuarters || promo.toHQs,
+                  ["headQuarterName", "name"],
+                );
+                const fromZones = territoryLabels(promo.fromZones, ["name"]);
+                const toZones = territoryLabels(promo.toZones, ["name"]);
+                const when = formatDateTime(
+                  promo.createdAt || promo.promotedAt || promo.timestamp,
+                );
+
+                return (
+                  <li
+                    key={promo._id || `${promo.toRole}-${index}`}
+                    className="relative ml-4"
+                  >
+                    <span className="absolute -left-[1.4rem] top-1.5 h-3 w-3 rounded-full border border-white bg-indigo-500" />
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-sm font-medium text-gray-800">
+                        {fromRole}
+                        <span className="text-gray-400 mx-1.5">→</span>
+                        {toRole}
+                      </p>
+                      <time className="text-xs text-gray-400">{when}</time>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      By{" "}
+                      {promotedByLabel(
+                        promo.promotedBy || promo.promotedByUser,
+                      )}
+                    </p>
+                    {(fromHqs.length > 0 ||
+                      toHqs.length > 0 ||
+                      fromZones.length > 0 ||
+                      toZones.length > 0) && (
+                      <div className="mt-2 text-xs text-gray-600 space-y-1">
+                        {(fromHqs.length > 0 || toHqs.length > 0) && (
+                          <p>
+                            HQs: {fromHqs.length ? fromHqs.join(", ") : "—"}
+                            <span className="text-gray-400 mx-1">→</span>
+                            {toHqs.length ? toHqs.join(", ") : "—"}
+                          </p>
+                        )}
+                        {(fromZones.length > 0 || toZones.length > 0) && (
+                          <p>
+                            Zones:{" "}
+                            {fromZones.length ? fromZones.join(", ") : "—"}
+                            <span className="text-gray-400 mx-1">→</span>
+                            {toZones.length ? toZones.join(", ") : "—"}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
+
+        <EmployeeBankDetails employeeMongoId={employee._id} />
+        <EmployeeSalaryStructure employeeMongoId={employee._id} />
       </div>
+
+      {showPromoteModal && employee && (
+        <PromoteEmployeeModal
+          employee={employee}
+          onClose={() => setShowPromoteModal(false)}
+          onPromoted={handlePromoted}
+        />
+      )}
     </div>
   );
 };

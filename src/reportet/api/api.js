@@ -44,7 +44,7 @@ export const loginUser = async (credentialsData) => {
   return data;
 };
 
-// Logout API
+// Logout API — clears orgToken cookie; local cleanup always runs in auth.logout
 export const logoutUser = async () => {
   const res = await fetch(`${API_BASE_URL}/orgauth/logout`, {
     method: "POST",
@@ -52,11 +52,10 @@ export const logoutUser = async () => {
     credentials: "include",
   });
 
-  if (res.status === 401) await handleUnauthorized();
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || "Logout failed");
   localStorage.removeItem("organization");
-  localStorage.removeItem("userToken"); // clear from storage
+  localStorage.removeItem("userToken");
   return data;
 };
 

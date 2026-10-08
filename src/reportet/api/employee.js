@@ -100,3 +100,36 @@ export const resetPassword = async (token, payload) => {
   if (!res.ok) throw new Error(data.message || "Failed to reset password");
   return data;
 };
+
+const parseEmployeeJson = async (res) => {
+  if (res.status === 401) await handleUnauthorized();
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.message || "Request failed");
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+};
+
+export const promoteEmployee = async (employeeId, payload) => {
+  const res = await fetch(`${API_BASE_URL}/employee/${employeeId}/promote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+  return parseEmployeeJson(res);
+};
+
+export const getEmployeePromotions = async (employeeId) => {
+  const res = await fetch(
+    `${API_BASE_URL}/employee/${employeeId}/promotions`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    },
+  );
+  return parseEmployeeJson(res);
+};

@@ -50,7 +50,6 @@ const CreateEmployee = () => {
         return acc;
       }, {});
       setZoneNames(zones);
-      console.log("zone names are", zones);
     } catch (error) {
       console.error("error is", error);
       toast.error("Failed to fetch zones");

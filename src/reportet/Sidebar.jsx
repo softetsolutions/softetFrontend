@@ -6,11 +6,13 @@ import {
   ChevronDown,
   LogOut,
   UserCircle,
+  Bell,
 } from "lucide-react";
 import { useOrganization } from "./context/OrganizationContext";
 import { useNavigate } from "react-router-dom";
 import { logout } from "./utils/auth";
 import Spinner from "./genericComps/Spinner";
+import { getNotifications } from "./api/notifications";
 
 const VisitReport = lazy(() => import("./admin/VisitReport"));
 const EmployeeDetail = lazy(() => import("./admin/EmployeeProfile"));
@@ -42,6 +44,7 @@ const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   //const [organization, setOrganization] = useState(getStoredOrganization);
 
   const navigate = useNavigate();
@@ -53,6 +56,32 @@ const Sidebar = () => {
   useEffect(() => {
     refreshOrganization();
   }, [refreshOrganization]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+
+    const pollUnread = async () => {
+      try {
+        const data = await getNotifications({
+          page: 1,
+          limit: 1,
+          signal: controller.signal,
+        });
+        if (!cancelled) setUnreadCount(data.unreadCount || 0);
+      } catch {
+        /* ignore polling errors */
+      }
+    };
+
+    pollUnread();
+    const timer = setInterval(pollUnread, 60_000);
+    return () => {
+      cancelled = true;
+      controller.abort();
+      clearInterval(timer);
+    };
+  }, [activeTabId]);
 
   // useEffect(() => {
   //   const handler = (e) => setActiveTabId(e.detail);
@@ -136,18 +165,36 @@ const Sidebar = () => {
             </>
           )}
         </a>
-        <button
-          onClick={() => setActiveTabId("admin-profile")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-            activeTabId === "admin-profile"
-              ? "bg-blue-100 text-blue-700"
-              : "text-gray-600 hover:bg-gray-100"
-          }`}
-          aria-label="Open admin profile"
-        >
-          <UserCircle className="w-6 h-6" />
-          <span className="hidden sm:inline font-medium">Admin</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTabId("notification-inbox")}
+            className={`relative flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              activeTabId === "notification-inbox"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            aria-label="Open notifications"
+          >
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-semibold flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTabId("admin-profile")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              activeTabId === "admin-profile"
+                ? "bg-blue-100 text-blue-700"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            aria-label="Open admin profile"
+          >
+            <UserCircle className="w-6 h-6" />
+            <span className="hidden sm:inline font-medium">Admin</span>
+          </button>
+        </div>
       </div>
       <div className="flex flex-1  bg-gray-100">
         {/* Sidebar */}

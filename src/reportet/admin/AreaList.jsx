@@ -94,12 +94,6 @@ const AreaList = () => {
 
   const handleDelete = async (force = false) => {
     const area = force ? forceDeleteArea?.area : confirmDeleteArea;
-    console.log("handleDelete called", {
-      force,
-      area,
-      forceDeleteArea,
-      confirmDeleteArea,
-    });
     if (!area) return;
     const areaId = area._id;
 
@@ -112,7 +106,6 @@ const AreaList = () => {
       }
 
       const res = await deleteArea(areaId, force);
-      console.log("delete response", res);
 
       if (res?.hasLinkedDoctors) {
         setForceDeleteArea({ area, doctorCount: res.doctorCount });

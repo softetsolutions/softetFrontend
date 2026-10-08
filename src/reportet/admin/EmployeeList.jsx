@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { getAllMrs } from "../api/mr"; // your MR API file
 import MrDialogBox from "../../components/MrDialogBox";
 import TableList from "../genericComps/tableList/TableList";
 import { getEmployeeList } from "../api/employee";

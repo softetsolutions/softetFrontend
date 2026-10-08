@@ -13,6 +13,11 @@ import {
   Parasol,
   LayoutDashboard,
   Settings2,
+  CalendarDays,
+  Wallet,
+  MapPinned,
+  Bell,
+  Inbox,
 } from "lucide-react";
 
 const Dashboard = lazy(() => import("./admin/Dashboard"));
@@ -35,6 +40,12 @@ const HeadQuarterListing = lazy(() => import("./admin/HeadQuarterListing"));
 const AdminLeaves = lazy(() => import("./admin/AdminLeaves"));
 const LeaveSettings = lazy(() => import("./admin/LeaveSettings"));
 const LiveTracking = lazy(() => import("./admin/LiveTrackingDashboard"));
+const PayrollRuns = lazy(() => import("./admin/PayrollRuns"));
+const PayrollSettings = lazy(() => import("./admin/PayrollSettings"));
+const PayrollHolidays = lazy(() => import("./admin/PayrollHolidays"));
+const TourPlans = lazy(() => import("./admin/TourPlans"));
+const NotificationInbox = lazy(() => import("./admin/NotificationInbox"));
+const NotificationSettings = lazy(() => import("./admin/NotificationSettings"));
 
 export const sidebarTabs = [
   {
@@ -48,6 +59,25 @@ export const sidebarTabs = [
     label: "Live Tracking",
     icon: <MapPin size={18} />,
     Component: LiveTracking,
+  },
+  {
+    id: "notifications",
+    label: "Notifications",
+    icon: <Bell size={18} />,
+    dropdown: [
+      {
+        id: "notification-inbox",
+        label: "Inbox",
+        icon: <Inbox size={18} />,
+        Component: NotificationInbox,
+      },
+      {
+        id: "notification-settings",
+        label: "Settings",
+        icon: <Settings2 size={18} />,
+        Component: NotificationSettings,
+      },
+    ],
   },
 
   {
@@ -135,6 +165,12 @@ export const sidebarTabs = [
         icon: <UserPlus size={20} />,
         Component: EmployeeDetail,
       },
+      {
+        id: "tour-plans",
+        label: "Tour Plans",
+        icon: <MapPinned size={20} />,
+        Component: TourPlans,
+      },
     ],
   },
   {
@@ -197,6 +233,31 @@ export const sidebarTabs = [
         label: "Leave Settings",
         icon: <Settings2 size={18} />,
         Component: LeaveSettings,
+      },
+    ],
+  },
+  {
+    id: "payroll",
+    label: "Payroll",
+    icon: <Wallet size={18} />,
+    dropdown: [
+      {
+        id: "payroll-runs",
+        label: "Payroll Runs",
+        icon: <BadgeDollarSign size={18} />,
+        Component: PayrollRuns,
+      },
+      {
+        id: "payroll-settings",
+        label: "Payroll Settings",
+        icon: <Settings2 size={18} />,
+        Component: PayrollSettings,
+      },
+      {
+        id: "payroll-holidays",
+        label: "Holidays",
+        icon: <CalendarDays size={18} />,
+        Component: PayrollHolidays,
       },
     ],
   },

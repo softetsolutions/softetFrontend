@@ -171,7 +171,9 @@ export default function LeaveChart() {
           setOnLeaveToday(0);
           return;
         }
-        setData(res.data || []);
+        const rows = Array.isArray(res.data) ? res.data : [];
+        const hasLeaves = rows.some((row) => (row?.leaveTotal || 0) > 0);
+        setData(hasLeaves ? rows : []);
         setOnLeaveToday(res.onLeaveToday || 0);
       } catch (err) {
         if (!cancelled && err.name !== "AbortError") {

@@ -28,7 +28,7 @@ export const getAllDoctors = async (paginationData) => {
 
 // 3. Get doctors by areaId
 export const getDoctorsByAreaId = async (areaId) => {
-  const res = await fetch(`${API_BASE_URL}/doctors/area/${areaId}`, {
+  const res = await fetch(`${API_BASE_URL}/doctor/getByAreaId/${areaId}`, {
     method: "GET",
     credentials: "include",
   });
@@ -38,20 +38,7 @@ export const getDoctorsByAreaId = async (areaId) => {
   return data;
 };
 
-// 4. Assign doctor to MR
-export const assignDoctorToMR = async (mrId, doctorId) => {
-  const res = await fetch(`${API_BASE_URL}/doctor/assigntoMR`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ mrId, doctorId }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Failed to assign doctor to MR");
-  return data;
-};
-
-// 5. Import doctors from Excel file
+// 4. Import doctors from Excel file
 export const importDoctorsFromExcel = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -65,43 +52,6 @@ export const importDoctorsFromExcel = async (file) => {
   if (!res.ok)
     throw new Error(data.message || "Failed to import doctors from Excel");
   return data;
-};
-
-export const getDoctorsWithRemarks = async (
-  mrId,
-  areaId,
-  startDate,
-  endDate,
-) => {
-  try {
-    if (!mrId || !areaId || !startDate || !endDate) {
-      throw new Error("mrId, areaId, startDate, and endDate are required");
-    }
-
-    const queryParams = new URLSearchParams({
-      mrId,
-      areaId,
-      startDate,
-      endDate,
-    });
-
-    const res = await fetch(
-      `${API_BASE_URL}/daily-visit/visitReport?${queryParams.toString()}`,
-      {
-        method: "GET",
-        credentials: "include",
-      },
-    );
-
-    const data = await res.json();
-    if (!res.ok)
-      throw new Error(data.message || "Failed to fetch doctors with remarks");
-
-    return data; // Array of visits with doctorId & remark
-  } catch (err) {
-    console.error("Get Doctors With Remarks Error:", err);
-    throw err;
-  }
 };
 
 export const editDoctor = async (doctorId, data) => {

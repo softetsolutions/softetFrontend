@@ -133,7 +133,6 @@ const DoctorsList = () => {
   // );
   const openEdit = async (e, doctor) => {
     e.stopPropagation();
-    console.log("doctor.areaId:", doctor.areaId);
     setEditingDoctor(doctor);
     setEditForm({
       name: doctor.name,
