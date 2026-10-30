@@ -1,6 +1,6 @@
 # Softet Solutions
 
-Vite + React frontend for Softet marketing and ReportEt admin.
+Vite + React frontend for the Softet marketing site.
 
 ### Getting Started
 
@@ -19,8 +19,9 @@ See `.env.example`. On Vercel, set the same `VITE_*` keys for Production/Preview
 
 | Variable | Purpose |
 |---|---|
-| `VITE_REPORTET_BASE_URL` | ReportEt API (usually ends with `/api`) |
 | `VITE_EMAILJS_*` | Contact form |
+
+ReportET product lives at [https://reportet.softetsolutions.com/](https://reportet.softetsolutions.com/) (header CTA).
 
 ### Scripts
 
@@ -32,7 +33,6 @@ npm run preview
 
 ### Notes for go-live
 
-- ReportEt `/admin` requires org JWT (`typ: "org"`).
 - Industrial training routes are paused and redirect to `/`.
 
 Created and maintained by [Softet Solutions](https://softetsolutions.com/).
