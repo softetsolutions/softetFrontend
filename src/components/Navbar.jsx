@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import logo from "../assets/SoftetLogo.png";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+const REPORTET_URL = "https://reportet.softetsolutions.com/";
 
 const navItems = [
   { label: "Services", refKey: "servicesRef" },
@@ -108,12 +108,12 @@ export function Navbar({
           {showoptions && (
             <>
               <nav className="hidden lg:flex items-center gap-8 justify-end flex-1 ml-8">
-                <Link
+                <a
                   className="bg-blue-400 px-4 py-2 text-white font-semibold rounded-lg"
-                  to="/reportet"
+                  href={REPORTET_URL}
                 >
                   ReportEt
-                </Link>
+                </a>
                 {navItems.map((item) => (
                   <button
                     key={item.label}
@@ -147,13 +147,13 @@ export function Navbar({
         >
           {mobileMenuOpen && showoptions && (
             <nav className="flex flex-col gap-4 py-4">
-              <Link
+              <a
                 className="text-left text-blue-600 font-semibold py-2"
-                to="/reportet"
+                href={REPORTET_URL}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 ReportEt
-              </Link>
+              </a>
               {navItems.map((item) => (
                 <button
                   key={item.label}
